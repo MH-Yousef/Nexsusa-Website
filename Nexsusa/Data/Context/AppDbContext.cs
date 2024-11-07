@@ -2,16 +2,21 @@
 using Core.Page;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace Data.Context
 {
     public class AppDbContext : IdentityDbContext
     {
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        private readonly string _connectionString;
+        public AppDbContext(DbContextOptions<AppDbContext> dbContextOptions,IOptions<ConnectionStrings> options):base(dbContextOptions)
         {
-            optionsBuilder.UseSqlServer("Server=45.84.189.34\\MSSQLSERVER2022;Database=ragnarzz_Nexsusa;User Id=ragnarzz_sa;Password=&80wtJ3u8;TrustServerCertificate=True;");
+            _connectionString=options.Value.DefaultConnection;
+            
         }
 
+       
         // Names of Tables
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

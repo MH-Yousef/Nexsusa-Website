@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Core.Domains
 {
-    public class _Base<T>
+    public abstract class _Base<T>
     {
         [Key]
         [Column(Order = 0)]
