@@ -1,5 +1,5 @@
 ﻿using Core.Domains.Languages;
-using Core.Page;
+using Core.HomePage;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

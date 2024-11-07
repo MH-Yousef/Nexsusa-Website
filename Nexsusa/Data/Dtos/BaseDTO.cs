@@ -1,12 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Core.Domains
+namespace Data.Dtos
 {
-    public abstract class _Base<T>
+    public class BaseDTO<T>
     {
-        [Key]
-        [Column(Order = 0)]
         public T Id { get; set; }
         //====================================================================================================
         public DateTime CreatedDate { get; set; }
@@ -16,6 +17,4 @@ namespace Core.Domains
         public bool IsDeleted { get; set; }
         //====================================================================================================
     }
-    //========================================= ********************************************** =========================================
-    //========================================= ********************************************** =========================================
 }

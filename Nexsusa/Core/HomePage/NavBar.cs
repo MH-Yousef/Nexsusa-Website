@@ -1,7 +1,7 @@
 ﻿using Core.Domains;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Core.Page
+namespace Core.HomePage
 {
     public class NavBarItem : _Base<int>
     {

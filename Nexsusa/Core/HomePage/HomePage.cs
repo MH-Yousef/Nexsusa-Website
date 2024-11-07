@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Core.Page
+namespace Core.HomePage
 {
     public class HomePage : _Base<int>
     {
