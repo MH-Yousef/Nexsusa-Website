@@ -1,12 +1,13 @@
-﻿using System;
+﻿using Data.Dtos.BaseDTOs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Data.Dtos
+namespace Data.Dtos.LanguageDTOs
 {
-    public class LanguageDTO: BaseDTO<int>
+    public class UpdateLanguageDTO:BaseUpdateDTO<int>
     {
         public string Name { get; set; }
         //====================================================================================================

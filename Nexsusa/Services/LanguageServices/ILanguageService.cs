@@ -1,4 +1,4 @@
-﻿using Data.Dtos;
+﻿using Data.Dtos.LanguageDTOs;
 using Services._Base;
 
 namespace Services.LanguageServices
@@ -9,9 +9,9 @@ namespace Services.LanguageServices
         //====================================================================================================
         Task<ResponseResult<LanguageDTO>> GetById(int id);
         //====================================================================================================
-        Task<ResponseResult<LanguageDTO>> Create(LanguageDTO dto);
+        Task<ResponseResult<CreateLanguageDTO>> Create(CreateLanguageDTO dto);
         //====================================================================================================
-        Task<ResponseResult<LanguageDTO>> Update(LanguageDTO dto);
+        Task<ResponseResult<UpdateLanguageDTO>> Update(UpdateLanguageDTO dto);
         //====================================================================================================
         Task<ResponseResult<LanguageDTO>> Delete(int id);
         //====================================================================================================

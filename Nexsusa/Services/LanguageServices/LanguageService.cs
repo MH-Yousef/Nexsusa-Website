@@ -1,19 +1,23 @@
-﻿using Data.Context;
-using Data.Dtos;
+﻿using AutoMapper;
+using Data.Context;
+using Data.Dtos.LanguageDTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Services._Base;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Services.LanguageServices
 {
     public class LanguageService : BaseService<LanguageService>, ILanguageService
     {
-        public LanguageService(AppDbContext dbContext) : base(dbContext)
+        
+        public LanguageService(AppDbContext dbContext,IMapper mapper) : base(dbContext,mapper)
         {
         }
 
@@ -77,7 +81,7 @@ namespace Services.LanguageServices
             }
         }
 
-        public async Task<ResponseResult<LanguageDTO>> Create(LanguageDTO dto)
+        public async Task<ResponseResult<CreateLanguageDTO>> Create(CreateLanguageDTO dto)
         {
             try
             {
@@ -96,18 +100,51 @@ namespace Services.LanguageServices
             }
             catch (Exception ex)
             {
-                return Error<LanguageDTO>(ex);
+                return Error<CreateLanguageDTO>(ex);
             }
         }
 
-        public Task<ResponseResult<LanguageDTO>> Delete(int id)
+        public async Task<ResponseResult<LanguageDTO>> Delete(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var language = await _dbContext.Languages.FirstOrDefaultAsync(x => x.Id == id);
+                 _dbContext.Remove(language);
+                await _dbContext.SaveChangesAsync();
+                return Success<LanguageDTO>();
+
+            }
+            catch (Exception ex)
+            {
+
+                return Error<LanguageDTO>(ex);
+
+            }
+
         }
 
-        public Task<ResponseResult<LanguageDTO>> Update(LanguageDTO dto)
+        public async Task<ResponseResult<UpdateLanguageDTO>> Update(UpdateLanguageDTO dto)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var language = await _dbContext.Languages.FirstOrDefaultAsync(x => x.Id == dto.Id && !x.IsDeleted);
+                if (language == null)
+                {
+                    return Error<UpdateLanguageDTO>("Language is not found...");
+                }
+                language=_mapper.Map(dto, language);
+                 _dbContext.Update(language); 
+
+                await _dbContext.SaveChangesAsync();
+                return Success<UpdateLanguageDTO>();
+
+            }
+            catch (Exception ex)
+            {
+
+                return Error<UpdateLanguageDTO>(ex);
+
+            }
         }
     }
 }

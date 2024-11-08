@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Data.Dtos
+namespace Data.Dtos.BaseDTOs
 {
-    public class BaseDTO<T>
+    public class BaseUpdateDTO<T>
     {
         public T Id { get; set; }
         //====================================================================================================

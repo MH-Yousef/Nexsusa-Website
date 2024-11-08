@@ -1,4 +1,5 @@
-﻿using Data.Context;
+﻿using AutoMapper;
+using Data.Context;
 using Microsoft.AspNetCore.Http;
 using System.Net;
 
@@ -6,12 +7,17 @@ namespace Services._Base
 {
     public abstract class BaseService<C> where C : class
     {
-        public readonly AppDbContext _dbContext;
-
+        protected readonly AppDbContext _dbContext;
+        protected readonly IMapper _mapper;
         public BaseService(AppDbContext dbContext)
         {
             _dbContext = dbContext;
-
+           
+        }
+        public BaseService(AppDbContext dbContext,IMapper mapper)
+        {
+            _dbContext = dbContext;
+            _mapper = mapper;
         }
 
         #region Error

@@ -1,6 +1,13 @@
-﻿namespace Core.Domains.Languages
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Data.Dtos.BaseDTOs;
+
+namespace Data.Dtos.LanguageDTOs
 {
-    public class Language: _Base<int>
+    public class LanguageDTO : BaseDTO<int>
     {
         public string Name { get; set; }
         //====================================================================================================
@@ -14,6 +21,5 @@
         //====================================================================================================
         public bool IsActive { get; set; }
         //====================================================================================================
-        public List<StringResource> StringResources { get; set; }
     }
 }

@@ -1,23 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Services._Base
+namespace Data.Dtos.BaseDTOs
 {
-    public class ResponseResult<T>
+    public class BaseDTO<T>
     {
-        public HttpStatusCode StatusCode { get; set; }
+        public T Id { get; set; }
         //====================================================================================================
-        public bool IsSuccess { get; set; }
+        public DateTime CreatedDate { get; set; }
         //====================================================================================================
-        public List<string> Errors { get; set; }
+        public DateTime UpdatedDate { get; set; }
         //====================================================================================================
-        public T Data { get; set; }
+        public bool IsDeleted { get; set; }
         //====================================================================================================
-       
     }
-
 }

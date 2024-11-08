@@ -18,6 +18,7 @@ namespace Data
                 var connectionStrings = serviceProvider.GetRequiredService<IOptions<ConnectionStrings>>().Value;
                 options.UseSqlServer(connectionStrings.DefaultConnection);
             });
+            
             //services.AddIdentityCore<IdentityUser<string>>().AddEntityFrameworkStores<AppDbContext>();
             
             
