@@ -1,10 +1,5 @@
 ﻿using Core.Domains;
-using Core.HomePage.NavBar;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Core.HomePage.HomePageItems;
 
 namespace Core.HomePage
 {
@@ -16,5 +11,16 @@ namespace Core.HomePage
         public string MetaAuthor { get; set; }
         public string MetaPublisher { get; set; }
         public List<NavBarItem> NavBarItems { get; set; }
+        public Slider Slider { get; set; }
+        public Service Services { get; set; }
+        public OurCompany OurCompany { get; set; }  
+        public ChooseUs ChooseUs { get; set; }
+        public WorkingProcess WorkingProcess { get; set; }
+        public WorkShowCase WorkShowCase { get; set; }
+        public WhoWeAre WhoWeAre { get; set; }
+        public OurEmployees OurEmployees { get; set; }
+        public ClientSays ClientSays { get; set; }
+        public RegularBlogs RegularBlogs { get; set; }
+
     }
 }

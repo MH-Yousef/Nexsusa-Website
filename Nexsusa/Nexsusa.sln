@@ -5,13 +5,15 @@ VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nexsusa", "Nexsusa\Nexsusa.csproj", "{E689B4FE-2C05-400C-8C2B-D204B81AF406}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{9D3B655B-D5A1-4721-9E02-40DAB9FE460B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", "{9D3B655B-D5A1-4721-9E02-40DAB9FE460B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data", "Data\Data.csproj", "{D2C79D85-8C92-4C4D-8F7D-456825AE9E5E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Data", "Data\Data.csproj", "{D2C79D85-8C92-4C4D-8F7D-456825AE9E5E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services", "Services\Services.csproj", "{44EA960D-ED4D-4585-BD0D-EA55B5C2847C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Services", "Services\Services.csproj", "{44EA960D-ED4D-4585-BD0D-EA55B5C2847C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{096C2169-D7AE-4CE7-8B7D-DAFD58616920}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nexsusa_Admin", "Nexsusa_Admin\Nexsusa_Admin.csproj", "{642B2AC0-8466-437E-9B38-9DFF060CBFCD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,6 +37,10 @@ Global
 		{44EA960D-ED4D-4585-BD0D-EA55B5C2847C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44EA960D-ED4D-4585-BD0D-EA55B5C2847C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{44EA960D-ED4D-4585-BD0D-EA55B5C2847C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{642B2AC0-8466-437E-9B38-9DFF060CBFCD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{642B2AC0-8466-437E-9B38-9DFF060CBFCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{642B2AC0-8466-437E-9B38-9DFF060CBFCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{642B2AC0-8466-437E-9B38-9DFF060CBFCD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

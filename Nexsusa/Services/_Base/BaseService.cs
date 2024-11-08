@@ -7,12 +7,11 @@ namespace Services._Base
     public abstract class BaseService<C> where C : class
     {
         public readonly AppDbContext _dbContext;
-        public readonly IHttpContextAccessor _httpContextAccessor;
 
-        public BaseService(AppDbContext dbContext, IHttpContextAccessor httpContextAccessor)
+        public BaseService(AppDbContext dbContext)
         {
             _dbContext = dbContext;
-            _httpContextAccessor = httpContextAccessor;
+
         }
 
         #region Error

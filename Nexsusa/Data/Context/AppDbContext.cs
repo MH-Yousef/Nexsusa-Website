@@ -1,16 +1,6 @@
 ﻿using Core.Domains.Languages;
 using Core.HomePage;
-using Core.HomePage.ChooseUs;
-using Core.HomePage.ClientSays;
-using Core.HomePage.NavBar;
-using Core.HomePage.OurCompany;
-using Core.HomePage.OurEmployees;
-using Core.HomePage.RegularBlogs;
-using Core.HomePage.Services;
-using Core.HomePage.Slider;
-using Core.HomePage.WhoWeAre;
-using Core.HomePage.WorkingProcess;
-using Core.HomePage.WorkShowCase;
+using Core.HomePage.HomePageItems;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -52,7 +42,7 @@ namespace Data.Context
         public DbSet<OurEmployeesItem> OurEmployeesItems { get; set; }
         public DbSet<RegularBlogs> RegularBlogs { get; set; }
         public DbSet<RegularBlogsItem> RegularBlogsItems { get; set; }
-        public DbSet<Services> Services { get; set; }
+        public DbSet<Service> Services { get; set; }
         public DbSet<ServiceItem> ServiceItems { get; set; }
         public DbSet<Slider> Sliders { get; set; }
         public DbSet<WhoWeAre> WhoWeAres { get; set; }

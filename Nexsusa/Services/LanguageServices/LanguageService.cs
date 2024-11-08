@@ -13,7 +13,7 @@ namespace Services.LanguageServices
 {
     public class LanguageService : BaseService<LanguageService>, ILanguageService
     {
-        public LanguageService(AppDbContext dbContext, IHttpContextAccessor httpContextAccessor) : base(dbContext, httpContextAccessor)
+        public LanguageService(AppDbContext dbContext) : base(dbContext)
         {
         }
 
@@ -77,9 +77,27 @@ namespace Services.LanguageServices
             }
         }
 
-        public Task<ResponseResult<LanguageDTO>> Create(LanguageDTO dto)
+        public async Task<ResponseResult<LanguageDTO>> Create(LanguageDTO dto)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var language = new Core.Domains.Languages.Language
+                {
+                    Name = dto.Name,
+                    Culture = dto.Culture,
+                    IsActive = dto.IsActive,
+                    IsDefault = dto.IsDefault,
+                    IsRtl = dto.IsRtl,
+                    Shortcut = dto.Shortcut,
+                };
+                await _dbContext.Languages.AddAsync(language);
+                await _dbContext.SaveChangesAsync();
+                return Success(dto);
+            }
+            catch (Exception ex)
+            {
+                return Error<LanguageDTO>(ex);
+            }
         }
 
         public Task<ResponseResult<LanguageDTO>> Delete(int id)
