@@ -16,8 +16,9 @@ namespace Data
     {
         public static void Dependencies(this IServiceCollection services,IConfiguration configuration)
         {
-            services.AddTransient<ConnectionStrings>();
-            
+          
+            services.AddSingleton<ConnectionStrings>();
+
             services.AddDbContext<AppDbContext>((serviceProvider, options) =>
             {
                 var connectionStrings = serviceProvider.GetRequiredService<IOptions<ConnectionStrings>>().Value;

@@ -1,6 +1,6 @@
 ﻿using Core.Domains;
 
-namespace Core.HomePage
+namespace Core.HomePage.Services
 {
     public class Services : _Base<int>
     {

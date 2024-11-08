@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Core.HomePage
+namespace Core.HomePage.ChooseUs
 {
     public class Question : _Base<int>
     {

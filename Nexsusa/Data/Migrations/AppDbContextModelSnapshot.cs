@@ -55,7 +55,7 @@ namespace Data.Migrations
                     b.Property<string>("Shortcut")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("UpdateDate")
+                    b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
@@ -63,7 +63,7 @@ namespace Data.Migrations
                     b.ToTable("Languages", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Page.HomePage", b =>
+            modelBuilder.Entity("Core.HomePage.HomePage", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -93,7 +93,7 @@ namespace Data.Migrations
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("UpdateDate")
+                    b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
@@ -101,7 +101,7 @@ namespace Data.Migrations
                     b.ToTable("HomePages", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Page.NavBarItem", b =>
+            modelBuilder.Entity("Core.HomePage.NavBarItem", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -131,7 +131,7 @@ namespace Data.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("UpdateDate")
+                    b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Url")
@@ -144,7 +144,7 @@ namespace Data.Migrations
                     b.ToTable("NavBarItems", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Page.NavBarItemSubItem", b =>
+            modelBuilder.Entity("Core.HomePage.NavBarItemSubItem", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -171,7 +171,7 @@ namespace Data.Migrations
                     b.Property<int>("NavBarItemId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("UpdateDate")
+                    b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Url")
@@ -382,16 +382,16 @@ namespace Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Page.NavBarItem", b =>
+            modelBuilder.Entity("Core.HomePage.NavBarItem", b =>
                 {
-                    b.HasOne("Core.Page.HomePage", null)
+                    b.HasOne("Core.HomePage.HomePage", null)
                         .WithMany("NavBarItems")
                         .HasForeignKey("HomePageId");
                 });
 
-            modelBuilder.Entity("Core.Page.NavBarItemSubItem", b =>
+            modelBuilder.Entity("Core.HomePage.NavBarItemSubItem", b =>
                 {
-                    b.HasOne("Core.Page.NavBarItem", null)
+                    b.HasOne("Core.HomePage.NavBarItem", null)
                         .WithMany("NavBarItemSubItems")
                         .HasForeignKey("NavBarItemId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -449,12 +449,12 @@ namespace Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Core.Page.HomePage", b =>
+            modelBuilder.Entity("Core.HomePage.HomePage", b =>
                 {
                     b.Navigation("NavBarItems");
                 });
 
-            modelBuilder.Entity("Core.Page.NavBarItem", b =>
+            modelBuilder.Entity("Core.HomePage.NavBarItem", b =>
                 {
                     b.Navigation("NavBarItemSubItems");
                 });

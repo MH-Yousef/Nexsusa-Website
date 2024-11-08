@@ -5,11 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Core.HomePage
+namespace Core.HomePage.WhoWeAre
 {
-    public class Slider : _Base<int>
+    public class WhoWeAre:_Base<int>
     {
         public string Title { get; set; }
         public string Description { get; set; }
+        public List<WhoWeAreItem> WhoWeAreItem { get; set; }
     }
 }
