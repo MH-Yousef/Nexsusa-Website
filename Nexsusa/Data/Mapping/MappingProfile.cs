@@ -14,8 +14,7 @@ namespace Data.Mapping
         public MappingProfile()
         {
             CreateMap<Language, LanguageDTO>();
-            CreateMap<Language, CreateLanguageDTO>();
-            CreateMap<Language, UpdateLanguageDTO>();
+          
         
         }
     }

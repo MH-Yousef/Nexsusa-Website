@@ -5,7 +5,7 @@ using System.Net;
 
 namespace Services._Base
 {
-    public abstract class BaseService<C> where C : class
+    public abstract class BaseService 
     {
         protected readonly AppDbContext _dbContext;
         protected readonly IMapper _mapper;

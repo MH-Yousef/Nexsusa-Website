@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Services.LanguageServices
 {
-    public class LanguageService : BaseService<LanguageService>, ILanguageService
+    public class LanguageService : BaseService, ILanguageService
     {
         
         public LanguageService(AppDbContext dbContext,IMapper mapper) : base(dbContext,mapper)
@@ -81,7 +81,7 @@ namespace Services.LanguageServices
             }
         }
 
-        public async Task<ResponseResult<CreateLanguageDTO>> Create(CreateLanguageDTO dto)
+        public async Task<ResponseResult<LanguageDTO>> Create(LanguageDTO dto)
         {
             try
             {
@@ -100,7 +100,7 @@ namespace Services.LanguageServices
             }
             catch (Exception ex)
             {
-                return Error<CreateLanguageDTO>(ex);
+                return Error<LanguageDTO>(ex);
             }
         }
 
@@ -123,26 +123,26 @@ namespace Services.LanguageServices
 
         }
 
-        public async Task<ResponseResult<UpdateLanguageDTO>> Update(UpdateLanguageDTO dto)
+        public async Task<ResponseResult<LanguageDTO>> Update(LanguageDTO dto)
         {
             try
             {
                 var language = await _dbContext.Languages.FirstOrDefaultAsync(x => x.Id == dto.Id && !x.IsDeleted);
                 if (language == null)
                 {
-                    return Error<UpdateLanguageDTO>("Language is not found...");
+                    return Error<LanguageDTO>("Language is not found...");
                 }
                 language=_mapper.Map(dto, language);
                  _dbContext.Update(language); 
 
                 await _dbContext.SaveChangesAsync();
-                return Success<UpdateLanguageDTO>();
+                return Success<LanguageDTO>();
 
             }
             catch (Exception ex)
             {
 
-                return Error<UpdateLanguageDTO>(ex);
+                return Error<LanguageDTO>(ex);
 
             }
         }

@@ -1,25 +1,26 @@
-﻿using Data.Dtos.BaseDTOs;
+﻿using Core.HomePage.HomePageItems;
+using Data.Dtos.ClientSaysDTOs;
+using Data.Dtos.LanguageDTOs;
+using Services._Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Data.Dtos.LanguageDTOs
+namespace Services.ClientSaysServices
 {
-    public class CreateLanguageDTO:BaseCreateDTO
+    public interface IClientSaysService
     {
-        public string Name { get; set; }
+        Task<ResponseResult<List<ClientSaysDTO>>> Get();
         //====================================================================================================
-        public string Shortcut { get; set; }
+        Task<ResponseResult<ClientSaysDTO>> GetById(int id);
         //====================================================================================================
-        public string Culture { get; set; }
+        Task<ResponseResult<ClientSaysDTO>> Create(ClientSaysDTO dto);
         //====================================================================================================
-        public bool IsRtl { get; set; }
+        Task<ResponseResult<ClientSaysDTO>> Update(ClientSaysDTO dto);
         //====================================================================================================
-        public bool IsDefault { get; set; }
-        //====================================================================================================
-        public bool IsActive { get; set; }
+        Task<ResponseResult<ClientSaysDTO>> Delete(int id);
         //====================================================================================================
     }
 }

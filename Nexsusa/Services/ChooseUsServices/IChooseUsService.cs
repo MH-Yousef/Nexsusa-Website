@@ -1,19 +1,26 @@
-﻿using Data.Dtos.LanguageDTOs;
+﻿using Data.Dtos.ChooseUsDTOs;
+using Data.Dtos.LanguageDTOs;
 using Services._Base;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Services.LanguageServices
+namespace Services.ChooseUsServices
 {
-    public interface ILanguageService
+    public interface IChooseUsService
     {
-        Task<ResponseResult<List<LanguageDTO>>> Get();
+        Task<ResponseResult<List<ChooseUsDTO>>> Get();
+       
         //====================================================================================================
-        Task<ResponseResult<LanguageDTO>> GetById(int id);
+        Task<ResponseResult<ChooseUsDTO>> GetById(int id);
         //====================================================================================================
-        Task<ResponseResult<LanguageDTO>> Create(LanguageDTO dto);
+        Task<ResponseResult<ChooseUsDTO>> Create(ChooseUsDTO dto);
         //====================================================================================================
-        Task<ResponseResult<LanguageDTO>> Update(LanguageDTO dto);
+        Task<ResponseResult<ChooseUsDTO>> Update(ChooseUsDTO dto);
         //====================================================================================================
-        Task<ResponseResult<LanguageDTO>> Delete(int id);
+        Task<ResponseResult<ChooseUsDTO>> Delete(int id);
         //====================================================================================================
     }
 }
