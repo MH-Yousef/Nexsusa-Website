@@ -37,7 +37,7 @@ namespace Services.HomePageServices.ChooseUsServices
                         CreatedDate = DateTime.Now,
                         UpdatedDate = DateTime.Now,
                         IsDeleted = false,
-                        LangId = item.LangId,
+                        LanguageId = item.LangId,
                         ResourceId = item.Id,
                         Value = item.Title,
                     });
@@ -47,7 +47,7 @@ namespace Services.HomePageServices.ChooseUsServices
                         CreatedDate = DateTime.Now,
                         UpdatedDate = DateTime.Now,
                         IsDeleted = false,
-                        LangId = item.LangId,
+                        LanguageId = item.LangId,
                         ResourceId = item.Id,
                         Value = item.Description,
                     });

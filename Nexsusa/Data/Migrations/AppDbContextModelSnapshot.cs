@@ -81,10 +81,7 @@ namespace Data.Migrations
                     b.Property<string>("Key")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("LangId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("LanguageId")
+                    b.Property<int>("LanguageId")
                         .HasColumnType("int");
 
                     b.Property<int>("ResourceId")
@@ -1292,7 +1289,9 @@ namespace Data.Migrations
                 {
                     b.HasOne("Core.Domains.Languages.Language", "Language")
                         .WithMany("StringResources")
-                        .HasForeignKey("LanguageId");
+                        .HasForeignKey("LanguageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Language");
                 });

@@ -81,35 +81,35 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
 #endregion
 
 //Test
-var NavbarService = serviceProvider.GetRequiredService<INavBarItemService>();
-var model = new List<NavBarItemDTO>
-{
-    new()
-    {
-    CreatedDate = DateTime.Now,
-    IsDeleted = false,
-    UpdatedDate = DateTime.Now,
-    Name = "Home",
-    Url = "/",
-    Icon = "fas fa-home",
-    LangId = 1,
-    IsVisible = true,
-    NavBarItemSubItems = null
-    },
-    new()
-    {
-    CreatedDate = DateTime.Now,
-    IsDeleted = false,
-    UpdatedDate = DateTime.Now,
-    Name = "Ana Sayfa",
-    Url = "/",
-    Icon = "fas fa-home",
-    LangId = 1,
-    IsVisible = true,
-    NavBarItemSubItems = null
-    }
-};
-await NavbarService.Create(model);
+//var NavbarService = serviceProvider.GetRequiredService<INavBarItemService>();
+//var model = new List<NavBarItemDTO>
+//{
+//    new()
+//    {
+//    CreatedDate = DateTime.Now,
+//    IsDeleted = false,
+//    UpdatedDate = DateTime.Now,
+//    Name = "Home",
+//    Url = "/",
+//    Icon = "fas fa-home",
+//    LangId = 1,
+//    IsVisible = true,
+//    NavBarItemSubItems = null
+//    },
+//    new()
+//    {
+//    CreatedDate = DateTime.Now,
+//    IsDeleted = false,
+//    UpdatedDate = DateTime.Now,
+//    Name = "Ana Sayfa",
+//    Url = "/",
+//    Icon = "fas fa-home",
+//    LangId = 1,
+//    IsVisible = true,
+//    NavBarItemSubItems = null
+//    }
+//};
+//await NavbarService.Create(model);
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())

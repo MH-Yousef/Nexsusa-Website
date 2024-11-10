@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241110193341_Init")]
+    [Migration("20241110201708_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -84,10 +84,7 @@ namespace Data.Migrations
                     b.Property<string>("Key")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("LangId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("LanguageId")
+                    b.Property<int>("LanguageId")
                         .HasColumnType("int");
 
                     b.Property<int>("ResourceId")
@@ -1295,7 +1292,9 @@ namespace Data.Migrations
                 {
                     b.HasOne("Core.Domains.Languages.Language", "Language")
                         .WithMany("StringResources")
-                        .HasForeignKey("LanguageId");
+                        .HasForeignKey("LanguageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Language");
                 });

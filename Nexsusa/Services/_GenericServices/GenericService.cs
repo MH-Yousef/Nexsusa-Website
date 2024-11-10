@@ -60,7 +60,7 @@ namespace Services._GenericServices
         {
             try
             {
-                var entities = await _dbContext.StringResources.Where(x => x.LangId == langId && x.ResourceId == resourceId).ToListAsync();
+                var entities = await _dbContext.StringResources.Where(x => x.LanguageId == langId && x.ResourceId == resourceId).ToListAsync();
                 if (entities == null || !entities.Any())
                 {
                     return new ResponseResult<List<StringResource>> { IsSuccess = false, Errors = new List<string> { "String Resources not found" } };
@@ -82,7 +82,7 @@ namespace Services._GenericServices
                 {
                     var translation = new StringResource
                     {
-                        LangId = langId,
+                        LanguageId = langId,
                         ResourceId = resourceId,
                         Key = columnName,
                         Value = columnValue,

@@ -75,7 +75,7 @@ namespace Services.HomePageServices.NavBarItemServices
                 var defultModel = dtos.Where(x => x.LangId == defultLanguage.Id).FirstOrDefault();
                 var all = _mapper.Map<List<NavBarItem>>(dtos);
                 var navBarItem = _mapper.Map<NavBarItemDTO,NavBarItem>(defultModel);
-                var result = await genericService.CreateAync(dtos);
+                var result = await genericService.CreateAync(navBarItem);
                 // Add Translations
                 foreach (var item in dtos)
                 {
@@ -85,7 +85,7 @@ namespace Services.HomePageServices.NavBarItemServices
                             };
                     await genericService.AddTranslationsAsync(translations, navBarItem.Id, item.LangId);
                 }
-                return result;
+                return Success(dtos);
             }
             catch (Exception ex)
             {
