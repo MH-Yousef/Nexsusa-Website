@@ -14,4 +14,9 @@ namespace Data.Dtos.ClientSaysDTOs
         public string Description { get; set; }
         public List<ClientSaysItem> ClientSaysItems { get; set; }
     }
+    public abstract class GenericDTO
+    {
+        public object ClassDTO { get; set; }
+        public int LanguageId { get; set; }
+    }
 }

@@ -1,53 +1,29 @@
 ﻿using AutoMapper;
+using Core.Domains.Languages;
 using Data.Context;
 using Data.Dtos.LanguageDTOs;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Services._Base;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Services.LanguageServices
 {
     public class LanguageService : BaseService, ILanguageService
     {
-        
-        public LanguageService(AppDbContext dbContext,IMapper mapper) : base(dbContext,mapper)
+
+        public LanguageService(AppDbContext dbContext, IMapper mapper) : base(dbContext, mapper)
         {
         }
 
-        public async Task<ResponseResult<List<LanguageDTO>>> Get()
+        public async Task<IEnumerable<Language>> Get()
         {
             try
             {
-                var languages = await _dbContext.Languages.AsNoTracking()
-                    .Where(x => !x.IsDeleted)
-                    .Select(x => new LanguageDTO
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        Culture = x.Culture,
-                        CreatedDate = x.CreatedDate,
-                        UpdatedDate = x.UpdatedDate,
-                        IsActive = x.IsActive,
-                        IsDefault = x.IsDefault,
-                        IsRtl = x.IsRtl,
-                        Shortcut = x.Shortcut,
-                    }).ToListAsync();
-                if (languages == null)
-                {
-                    return Error<List<LanguageDTO>>("Languages not found", System.Net.HttpStatusCode.NotFound);
-                }
-                return Success(languages);
+                return await _dbContext.Languages.AsNoTracking()
+                    .Where(x => !x.IsDeleted).ToListAsync();
             }
-            catch (Exception ex)
+            catch
             {
-                return Error<List<LanguageDTO>>(ex);
+                return null;
             }
         }
 
@@ -81,26 +57,18 @@ namespace Services.LanguageServices
             }
         }
 
-        public async Task<ResponseResult<LanguageDTO>> Create(LanguageDTO dto)
+        public async Task<ResponseResult<Language>> Create(Language language)
         {
             try
             {
-                var language = new Core.Domains.Languages.Language
-                {
-                    Name = dto.Name,
-                    Culture = dto.Culture,
-                    IsActive = dto.IsActive,
-                    IsDefault = dto.IsDefault,
-                    IsRtl = dto.IsRtl,
-                    Shortcut = dto.Shortcut,
-                };
+                bool IsDefultExixts = await _dbContext.Languages.AnyAsync();
                 await _dbContext.Languages.AddAsync(language);
                 await _dbContext.SaveChangesAsync();
-                return Success(dto);
+                return Success(language);
             }
             catch (Exception ex)
             {
-                return Error<LanguageDTO>(ex);
+                return Error<Language>(ex);
             }
         }
 
@@ -109,7 +77,7 @@ namespace Services.LanguageServices
             try
             {
                 var language = await _dbContext.Languages.FirstOrDefaultAsync(x => x.Id == id);
-                 _dbContext.Remove(language);
+                _dbContext.Remove(language);
                 await _dbContext.SaveChangesAsync();
                 return Success<LanguageDTO>();
 
@@ -132,8 +100,8 @@ namespace Services.LanguageServices
                 {
                     return Error<LanguageDTO>("Language is not found...");
                 }
-                language=_mapper.Map(dto, language);
-                 _dbContext.Update(language); 
+                language = _mapper.Map(dto, language);
+                _dbContext.Update(language);
 
                 await _dbContext.SaveChangesAsync();
                 return Success<LanguageDTO>();

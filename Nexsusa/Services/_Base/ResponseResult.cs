@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Net;
 
 namespace Services._Base
 {
@@ -17,7 +12,7 @@ namespace Services._Base
         //====================================================================================================
         public T Data { get; set; }
         //====================================================================================================
-       
+
     }
 
 }

@@ -1,15 +1,16 @@
-﻿using Data.Dtos.LanguageDTOs;
+﻿using Core.Domains.Languages;
+using Data.Dtos.LanguageDTOs;
 using Services._Base;
 
 namespace Services.LanguageServices
 {
     public interface ILanguageService
     {
-        Task<ResponseResult<List<LanguageDTO>>> Get();
+        Task<IEnumerable<Language>> Get();
         //====================================================================================================
         Task<ResponseResult<LanguageDTO>> GetById(int id);
         //====================================================================================================
-        Task<ResponseResult<LanguageDTO>> Create(LanguageDTO dto);
+        Task<ResponseResult<Language>> Create(Language dto);
         //====================================================================================================
         Task<ResponseResult<LanguageDTO>> Update(LanguageDTO dto);
         //====================================================================================================

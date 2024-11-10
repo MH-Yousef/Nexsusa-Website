@@ -20,8 +20,8 @@ namespace Data
             });
             
             //services.AddIdentityCore<IdentityUser<string>>().AddEntityFrameworkStores<AppDbContext>();
-            
-            
+
+
         }
     }
 }

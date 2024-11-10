@@ -1,21 +1,18 @@
 ﻿using AutoMapper;
 using Core.Domains.Languages;
+using Core.HomePage.HomePageItems;
 using Data.Dtos.LanguageDTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Data.Dtos.NavBarDTOs;
 
 namespace Data.Mapping
 {
-    public class MappingProfile:Profile
+    public class MappingProfile : Profile
     {
         public MappingProfile()
         {
             CreateMap<Language, LanguageDTO>();
-          
-        
+            CreateMap<NavBarItem, NavBarItemDTO>().ReverseMap();
+            //CreateMap<NavBarItemSubItem, NavBarItemSubItemDTO>();
         }
     }
 }

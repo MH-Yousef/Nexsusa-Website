@@ -63,6 +63,46 @@ namespace Data.Migrations
                     b.ToTable("Languages", (string)null);
                 });
 
+            modelBuilder.Entity("Core.Domains.Languages.StringResource", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnOrder(0);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Key")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("LangId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("LanguageId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ResourceId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LanguageId");
+
+                    b.ToTable("StringResources");
+                });
+
             modelBuilder.Entity("Core.HomePage.HomePage", b =>
                 {
                     b.Property<int>("Id")
@@ -250,6 +290,112 @@ namespace Data.Migrations
                     b.HasIndex("ClientSaysId");
 
                     b.ToTable("ClientSaysItems");
+                });
+
+            modelBuilder.Entity("Core.HomePage.HomePageItems.Footer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnOrder(0);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Footers");
+                });
+
+            modelBuilder.Entity("Core.HomePage.HomePageItems.FooterService", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnOrder(0);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("FooterId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Url")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FooterId");
+
+                    b.ToTable("FooterServices");
+                });
+
+            modelBuilder.Entity("Core.HomePage.HomePageItems.Image", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnOrder(0);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("ServiceItemId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Url")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ServiceItemId");
+
+                    b.ToTable("Images");
                 });
 
             modelBuilder.Entity("Core.HomePage.HomePageItems.NavBarItem", b =>
@@ -465,6 +611,40 @@ namespace Data.Migrations
                     b.HasIndex("ChooseUsId");
 
                     b.ToTable("Questions");
+                });
+
+            modelBuilder.Entity("Core.HomePage.HomePageItems.QuickLink", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnOrder(0);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("FooterId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Url")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FooterId");
+
+                    b.ToTable("QuickLinks");
                 });
 
             modelBuilder.Entity("Core.HomePage.HomePageItems.RegularBlogs", b =>
@@ -1108,6 +1288,15 @@ namespace Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Core.Domains.Languages.StringResource", b =>
+                {
+                    b.HasOne("Core.Domains.Languages.Language", "Language")
+                        .WithMany("StringResources")
+                        .HasForeignKey("LanguageId");
+
+                    b.Navigation("Language");
+                });
+
             modelBuilder.Entity("Core.HomePage.HomePage", b =>
                 {
                     b.HasOne("Core.HomePage.HomePageItems.ChooseUs", "ChooseUs")
@@ -1182,6 +1371,20 @@ namespace Data.Migrations
                     b.Navigation("ClientSays");
                 });
 
+            modelBuilder.Entity("Core.HomePage.HomePageItems.FooterService", b =>
+                {
+                    b.HasOne("Core.HomePage.HomePageItems.Footer", null)
+                        .WithMany("services")
+                        .HasForeignKey("FooterId");
+                });
+
+            modelBuilder.Entity("Core.HomePage.HomePageItems.Image", b =>
+                {
+                    b.HasOne("Core.HomePage.HomePageItems.ServiceItem", null)
+                        .WithMany("Images")
+                        .HasForeignKey("ServiceItemId");
+                });
+
             modelBuilder.Entity("Core.HomePage.HomePageItems.NavBarItem", b =>
                 {
                     b.HasOne("Core.HomePage.HomePage", null)
@@ -1214,6 +1417,13 @@ namespace Data.Migrations
                     b.HasOne("Core.HomePage.HomePageItems.ChooseUs", null)
                         .WithMany("Questions")
                         .HasForeignKey("ChooseUsId");
+                });
+
+            modelBuilder.Entity("Core.HomePage.HomePageItems.QuickLink", b =>
+                {
+                    b.HasOne("Core.HomePage.HomePageItems.Footer", null)
+                        .WithMany("QuickLinks")
+                        .HasForeignKey("FooterId");
                 });
 
             modelBuilder.Entity("Core.HomePage.HomePageItems.RegularBlogsItem", b =>
@@ -1338,6 +1548,11 @@ namespace Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Core.Domains.Languages.Language", b =>
+                {
+                    b.Navigation("StringResources");
+                });
+
             modelBuilder.Entity("Core.HomePage.HomePage", b =>
                 {
                     b.Navigation("NavBarItems");
@@ -1351,6 +1566,13 @@ namespace Data.Migrations
             modelBuilder.Entity("Core.HomePage.HomePageItems.ClientSays", b =>
                 {
                     b.Navigation("ClientSaysItems");
+                });
+
+            modelBuilder.Entity("Core.HomePage.HomePageItems.Footer", b =>
+                {
+                    b.Navigation("QuickLinks");
+
+                    b.Navigation("services");
                 });
 
             modelBuilder.Entity("Core.HomePage.HomePageItems.NavBarItem", b =>
@@ -1371,6 +1593,11 @@ namespace Data.Migrations
             modelBuilder.Entity("Core.HomePage.HomePageItems.Service", b =>
                 {
                     b.Navigation("ServiceItem");
+                });
+
+            modelBuilder.Entity("Core.HomePage.HomePageItems.ServiceItem", b =>
+                {
+                    b.Navigation("Images");
                 });
 
             modelBuilder.Entity("Core.HomePage.HomePageItems.WhoWeAre", b =>

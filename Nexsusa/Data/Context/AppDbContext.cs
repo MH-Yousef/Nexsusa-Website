@@ -30,6 +30,7 @@ namespace Data.Context
 
         // Tables
         public DbSet<Language> Languages { get; set; }
+        public DbSet<StringResource> StringResources { get; set; }
         public DbSet<HomePage> HomePages { get; set; }
         public DbSet<NavBarItem> NavBarItems { get; set; }
         public DbSet<NavBarItemSubItem> NavBarItemSubItems { get; set; }

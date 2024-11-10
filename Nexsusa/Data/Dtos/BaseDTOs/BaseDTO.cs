@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Data.Dtos.BaseDTOs
+﻿namespace Data.Dtos.BaseDTOs
 {
     public class BaseDTO<T>
     {
         public T Id { get; set; }
+        //====================================================================================================
+        public int LangId { get; set; }
         //====================================================================================================
         public DateTime CreatedDate { get; set; }=DateTime.Now;
         //====================================================================================================
@@ -16,5 +12,13 @@ namespace Data.Dtos.BaseDTOs
         //====================================================================================================
         public bool IsDeleted { get; set; }
         //====================================================================================================
+        //public List<KeyLisTModel> Keys { get; set; }
+    }
+    public class KeyLisTModel
+    {
+        public int DtoId { get; set; }
+        public int LangId { get; set; }
+        public string Key { get; set; }
+        public string Value { get; set; }
     }
 }

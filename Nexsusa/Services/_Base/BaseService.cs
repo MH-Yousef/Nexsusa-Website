@@ -1,20 +1,14 @@
 ﻿using AutoMapper;
 using Data.Context;
-using Microsoft.AspNetCore.Http;
 using System.Net;
 
 namespace Services._Base
 {
-    public abstract class BaseService 
+    public abstract class BaseService
     {
         protected readonly AppDbContext _dbContext;
-        protected readonly IMapper _mapper;
-        public BaseService(AppDbContext dbContext)
-        {
-            _dbContext = dbContext;
-           
-        }
-        public BaseService(AppDbContext dbContext,IMapper mapper)
+        public readonly IMapper _mapper;
+        public BaseService(AppDbContext dbContext, IMapper mapper)
         {
             _dbContext = dbContext;
             _mapper = mapper;
@@ -54,7 +48,7 @@ namespace Services._Base
                 StatusCode = HttpStatusCode.BadRequest,
             };
         }
-
+        
         //============//============//============//============//============
         internal ResponseResult<T> Error<T>(string errorMsg, HttpStatusCode httpStatus)
         {
@@ -133,11 +127,7 @@ namespace Services._Base
                 Data = data,
             };
         }
-
         #endregion
-
-
-
     }
 
 
