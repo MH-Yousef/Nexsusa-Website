@@ -5,11 +5,12 @@ using Core.Domains.Languages;
 using Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Services._Base;
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace Services._GenericServices
 {
-    public class GenericService<T>  : BaseService, IGenericService where T : class
+    public class GenericService<T> : BaseService where T : class
     {
         public GenericService(AppDbContext dbContext, IMapper mapper) : base(dbContext, mapper)
         {
@@ -83,11 +84,17 @@ namespace Services._GenericServices
         }
 
 
-        public async Task<T> GetByIdAsync(int id, int langId, StringResourceEnums groupKey)
+        public async Task<T> GetByIdAsync(int id, int langId, StringResourceEnums groupKey, params Expression<Func<T, object>>[] includes)
         {
-            // Retrieve the entity by ID (assumes an entity with 'Id' property exists)
-            var entity = await _dbContext.Set<T>().AsNoTracking().FirstOrDefaultAsync(e => EF.Property<int>(e, "Id") == id);
-
+            var query = _dbContext.Set<T>().AsNoTracking().AsQueryable();
+            if (includes != null)
+            {
+                foreach (var include in includes)
+                {
+                    query = query.Include(include);
+                }
+            }
+            var entity = await query.FirstOrDefaultAsync(e => EF.Property<int>(e, "Id") == id);
             if (entity != null)
             {
                 entity = ApplyTranslations(entity, langId, id, groupKey);
@@ -95,7 +102,28 @@ namespace Services._GenericServices
 
             return entity;
         }
-        private T ApplyTranslations<T>(T entity, int langId, int resourceId, StringResourceEnums groupKey)
+        // Get List 
+        public async Task<ResponseResult<List<T>>> GetListAsync(int langId, StringResourceEnums groupKey, params Expression<Func<T, object>>[] includes)
+        {
+            var query = _dbContext.Set<T>().AsNoTracking().AsQueryable();
+
+            // Apply includes if provided
+            if (includes != null)
+            {
+                foreach (var include in includes)
+                {
+                    query = query.Include(include);
+                }
+            }
+
+            var entities = await query.ToListAsync();
+
+            // Filter entities that do not have translations
+            var filteredEntities = entities.Where(entity => HasTranslations(entity, langId, (int)entity.GetType().GetProperty("Id").GetValue(entity), groupKey)).ToList();
+
+            return Success(filteredEntities);
+        }
+        public T ApplyTranslations<T>(T entity, int langId, int resourceId, StringResourceEnums groupKey)
         {
             var properties = typeof(T).GetProperties();
             foreach (var property in properties)
@@ -115,7 +143,41 @@ namespace Services._GenericServices
                     property.SetValue(entity, translatedValue ?? originalValue);
                 }
             }
+
             return entity;
+        }
+
+        public bool HasTranslations<T>(T entity, int langId, int resourceId, StringResourceEnums groupKey)
+        {
+            var properties = typeof(T).GetProperties();
+            bool hasTranslation = true;
+
+            foreach (var property in properties)
+            {
+                // Check if the property has the Translatable attribute and is a string
+                if (property.IsDefined(typeof(TranslatableAttribute)) &&
+                    property.PropertyType == typeof(string) &&
+                    property.CanRead &&
+                    property.CanWrite)
+                {
+                    var originalValue = (string)property.GetValue(entity);
+                    var translatedValue = _dbContext.StringResources
+                        .Where(t => t.ResourceId == resourceId && t.Key == property.Name && t.LanguageId == langId && t.GroupKey == groupKey)
+                        .FirstOrDefault()?.Value;
+
+                    // If no translation is found, mark the entity as untranslated
+                    if (translatedValue == null)
+                    {
+                        hasTranslation = false;
+                    }
+                    else
+                    {
+                        property.SetValue(entity, translatedValue);
+                    }
+                }
+            }
+
+            return hasTranslation;
         }
     }
 }

@@ -1,14 +1,11 @@
-﻿using Data.Dtos.BaseDTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Core.Domains;
+using Data.Dtos.BaseDTOs;
 
 namespace Data.Dtos.NavBarDTOs
 {
     public class NavBarItemSubItemDTO : BaseDTO<int>
     {
+        [Translatable]
         public string Name { get; set; }
         public string Url { get; set; }
         public string Icon { get; set; }

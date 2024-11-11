@@ -1,4 +1,5 @@
-﻿using Data.Dtos.NavBarDTOs;
+﻿using Core.HomePage.HomePageItems;
+using Data.Dtos.NavBarDTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services._Base;
@@ -13,7 +14,7 @@ namespace Nexsusa_Api.Areas.Admin.Controllers
         [HttpGet]
         public async Task<ResponseResult<List<NavBarItemDTO>>> Get(int languageId)
         {
-            var result = await _navBarItemService.Get(languageId);
+            var result = await _navBarItemService.GetList(languageId);
             return result;
         }
 
@@ -25,7 +26,7 @@ namespace Nexsusa_Api.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<ResponseResult<List<NavBarItemDTO>>> Create(List<NavBarItemDTO> dto)
+        public async Task<ResponseResult<List<NavBarItemDTO>>> Manage(List<NavBarItemDTO> dto)
         {
             var result = await _navBarItemService.Create(dto);
             return result;

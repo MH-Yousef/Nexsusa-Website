@@ -15,9 +15,7 @@ namespace Services._ConfigureServices
             services.AddScoped<INavBarItemService, NavBarItemService>();
 
             #endregion
-
-            services.AddScoped<IGenericService, GenericService>();
-
+            services.AddScoped(typeof(GenericService<>));
         }
     }
 }

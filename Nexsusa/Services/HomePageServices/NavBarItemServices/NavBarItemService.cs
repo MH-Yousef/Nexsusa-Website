@@ -17,8 +17,8 @@ namespace Services.HomePageServices.NavBarItemServices
 {
     public class NavBarItemService : BaseService, INavBarItemService
     {
-        private readonly IGenericService genericService;
-        public NavBarItemService(AppDbContext dbContext, IMapper mapper, IGenericService genericService) : base(dbContext, mapper)
+        private readonly GenericService<NavBarItem> genericService;
+        public NavBarItemService(AppDbContext dbContext, IMapper mapper, GenericService<NavBarItem> genericService) : base(dbContext, mapper)
         {
             this.genericService = genericService;
         }
@@ -63,20 +63,48 @@ namespace Services.HomePageServices.NavBarItemServices
             }
 
         }
+        public async Task<ResponseResult<List<NavBarItemDTO>>> GetList(int LanguageId)
+        {
+            try
+            {
+                var navbarItems = await genericService.GetListAsync(LanguageId, StringResourceEnums.NavBarItem, x => x.NavBarItemSubItems);
+                var dto = _mapper.Map<List<NavBarItem>, List<NavBarItemDTO>>(navbarItems.Data);
+                foreach (var item in dto)
+                {
+                    item.LangId = LanguageId;
+                    if (item.NavBarItemSubItems != null)
+                    {
+                        foreach (var sub in item.NavBarItemSubItems)
+                        {
+                            sub.LangId = LanguageId;
+                            sub.Name = genericService.ApplyTranslations<NavBarItemSubItemDTO>(sub, LanguageId, sub.Id, StringResourceEnums.NavBarSubItem).Name;
+                        }
+                    }
+                }
+                return Success(dto);
+            }
+            catch (Exception ex)
+            {
+                return Error<List<NavBarItemDTO>>(ex);
+            }
+        }
 
         public async Task<ResponseResult<NavBarItemDTO>> GetById(int id, int languageId)
         {
             try
             {
-                var navBarItem = await _dbContext.NavBarItems.AsNoTracking()
-                    .Include(x => x.NavBarItemSubItems)
-                    .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
-                var dto = _mapper.Map<NavBarItemDTO>(navBarItem);
-                dto.Name = _dbContext.StringResources.Where(t => t.ResourceId == navBarItem.Id && t.Key == nameof(navBarItem.Name) && t.LanguageId == languageId && t.GroupKey == StringResourceEnums.NavBarItem).FirstOrDefault().Value ?? navBarItem.Name;
-                foreach (var item in dto.NavBarItemSubItems)
+                var navbar = await genericService.GetByIdAsync(id, languageId, StringResourceEnums.NavBarItem, x => x.NavBarItemSubItems);
+                var dto = _mapper.Map<NavBarItem, NavBarItemDTO>(navbar);
+
+                if (dto.NavBarItemSubItems != null)
                 {
-                    item.Name = _dbContext.StringResources.Where(t => t.ResourceId == item.Id && t.Key == nameof(item.Name) && t.LanguageId == languageId && t.GroupKey == StringResourceEnums.NavBarSubItem).FirstOrDefault()?.Value ?? item.Name;
+                    foreach (var item in dto.NavBarItemSubItems)
+                    {
+                        item.LangId = languageId;
+                        item.Name = genericService.ApplyTranslations<NavBarItemSubItemDTO>(item, languageId, item.Id, StringResourceEnums.NavBarSubItem).Name;
+                    }
                 }
+
                 return Success(dto);
             }
             catch (Exception ex)
