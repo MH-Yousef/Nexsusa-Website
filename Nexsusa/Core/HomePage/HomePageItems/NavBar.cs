@@ -5,6 +5,7 @@ namespace Core.HomePage.HomePageItems
 {
     public class NavBarItem : _Base<int>
     {
+        [Translatable]
         public string Name { get; set; }
         public string Url { get; set; }
         public string Icon { get; set; }
@@ -14,6 +15,7 @@ namespace Core.HomePage.HomePageItems
     }
     public class NavBarItemSubItem : _Base<int>
     {
+        [Translatable]
         public string Name { get; set; }
         public string Url { get; set; }
         public string Icon { get; set; }

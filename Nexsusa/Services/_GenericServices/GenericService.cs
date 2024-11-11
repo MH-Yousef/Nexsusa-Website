@@ -1,12 +1,15 @@
 ﻿using AutoMapper;
+using Core.Domains;
+using Core.Domains.Enums;
 using Core.Domains.Languages;
 using Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Services._Base;
+using System.Reflection;
 
 namespace Services._GenericServices
 {
-    public class GenericService : BaseService,IGenericService
+    public class GenericService<T>  : BaseService, IGenericService where T : class
     {
         public GenericService(AppDbContext dbContext, IMapper mapper) : base(dbContext, mapper)
         {
@@ -19,60 +22,7 @@ namespace Services._GenericServices
             await _dbContext.SaveChangesAsync();
             return Success(dto);
         }
-        public async Task<ResponseResult<List<T>>> CreateWithStringResources<T, U>(List<T> dtos)
-             where T : class
-             where U : class
-        {
-            try
-            {
-                // DTO'ları entity'lere map etme
-                var entities = _mapper.Map<List<U>>(dtos);
-
-                // Veritabanına ekleme
-                await _dbContext.AddRangeAsync(entities);
-                await _dbContext.SaveChangesAsync();
-
-                // Başarılı yanıt döndürme
-                return new ResponseResult<List<T>> { Data = dtos, IsSuccess = true };
-            }
-            catch (Exception ex)
-            {
-                // Hata yanıtı döndürme
-                return new ResponseResult<List<T>> { IsSuccess = false, Errors = new List<string> { ex.Message } };
-            }
-        }
-        public async Task<ResponseResult<List<T>>> GetListWithStringResources<T,U>() where T : class where U : class
-        {
-            try
-            {
-
-                var entities = await _dbContext.Set<U>().ToListAsync();
-                var dtos = _mapper.Map<List<T>>(entities);
-                return new ResponseResult<List<T>> { Data = dtos, IsSuccess = true };
-            }
-            catch (Exception ex)
-            {
-                return new ResponseResult<List<T>> { IsSuccess = false, Errors = new List<string> { ex.Message } };
-            }
-        }
-        // Get List by Language Id
-        public async Task<ResponseResult<List<StringResource>>> GetListByLangId(int langId, int resourceId)
-        {
-            try
-            {
-                var entities = await _dbContext.StringResources.Where(x => x.LanguageId == langId && x.ResourceId == resourceId).ToListAsync();
-                if (entities == null || !entities.Any())
-                {
-                    return new ResponseResult<List<StringResource>> { IsSuccess = false, Errors = new List<string> { "String Resources not found" } };
-                }
-                return Success(entities);
-            }
-            catch (Exception ex)
-            {
-                return Error<List<StringResource>>(ex);
-            }
-        }
-        public async Task AddTranslationsAsync(List<(string ColumnName, string ColumnValue)> translations, int resourceId, int langId)
+        public async Task AddTranslationsAsync(StringResourceEnums GroupKey, List<(string ColumnName, string ColumnValue)> translations, int resourceId, int langId)
         {
 
 
@@ -88,6 +38,7 @@ namespace Services._GenericServices
                         Value = columnValue,
                         CreatedDate = DateTime.Now,
                         UpdatedDate = DateTime.Now,
+                        GroupKey = GroupKey,
                         IsDeleted = false
                     };
                     await _dbContext.StringResources.AddAsync(translation);
@@ -96,6 +47,75 @@ namespace Services._GenericServices
             }
 
             await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task UpdateTranslationsAsync(StringResourceEnums GroupKey, List<(string ColumnName, string ColumnValue)> translations, int resourceId, int langId)
+        {
+            foreach (var (columnName, columnValue) in translations)
+            {
+                // Çeviriyi bul ve güncelle
+                var existingTranslation = await _dbContext.StringResources
+                    .FirstOrDefaultAsync(x => x.ResourceId == resourceId
+                                              && x.LanguageId == langId
+                                              && x.GroupKey == GroupKey
+                                              && x.Key == columnName);
+
+                if (existingTranslation != null)
+                {
+                    if (!string.IsNullOrEmpty(columnValue))
+                    {
+                        existingTranslation.Value = columnValue; // Yeni değeri ayarla
+                        existingTranslation.UpdatedDate = DateTime.Now;   // Güncelleme tarihini ayarla
+                    }
+                    else
+                    {
+                        // Eğer yeni değer boşsa, çeviri silinebilir
+                        _dbContext.StringResources.Remove(existingTranslation);
+                    }
+                }
+                else
+                {
+                    throw new Exception($"Translation not found for column {columnName} in language {langId}.");
+                }
+            }
+
+            await _dbContext.SaveChangesAsync(); // Tüm değişiklikleri kaydet
+        }
+
+
+        public async Task<T> GetByIdAsync(int id, int langId, StringResourceEnums groupKey)
+        {
+            // Retrieve the entity by ID (assumes an entity with 'Id' property exists)
+            var entity = await _dbContext.Set<T>().AsNoTracking().FirstOrDefaultAsync(e => EF.Property<int>(e, "Id") == id);
+
+            if (entity != null)
+            {
+                entity = ApplyTranslations(entity, langId, id, groupKey);
+            }
+
+            return entity;
+        }
+        private T ApplyTranslations<T>(T entity, int langId, int resourceId, StringResourceEnums groupKey)
+        {
+            var properties = typeof(T).GetProperties();
+            foreach (var property in properties)
+            {
+                // Check if the property has the Translatable attribute and is a string
+                if (property.IsDefined(typeof(TranslatableAttribute)) &&
+                    property.PropertyType == typeof(string) &&
+                    property.CanRead &&
+                    property.CanWrite)
+                {
+                    var originalValue = (string)property.GetValue(entity);
+                    var translatedValue = _dbContext.StringResources
+                        .Where(t => t.ResourceId == resourceId && t.Key == property.Name && t.LanguageId == langId && t.GroupKey == groupKey)
+                        .FirstOrDefault()?.Value;
+
+                    // Apply the translation if available, otherwise keep the original value
+                    property.SetValue(entity, translatedValue ?? originalValue);
+                }
+            }
+            return entity;
         }
     }
 }

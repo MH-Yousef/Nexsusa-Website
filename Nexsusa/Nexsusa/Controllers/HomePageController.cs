@@ -5,7 +5,7 @@ using Services.HomePageServices.NavBarItemServices;
 
 namespace Nexsusa_Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]/[action]")]
     [ApiController]
     public class HomePageController(INavBarItemService _navbarService) : ControllerBase
     {

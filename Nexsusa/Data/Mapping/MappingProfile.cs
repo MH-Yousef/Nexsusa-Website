@@ -12,7 +12,7 @@ namespace Data.Mapping
         {
             CreateMap<Language, LanguageDTO>();
             CreateMap<NavBarItem, NavBarItemDTO>().ReverseMap();
-            //CreateMap<NavBarItemSubItem, NavBarItemSubItemDTO>();
+            CreateMap<NavBarItemSubItem, NavBarItemSubItemDTO>();
         }
     }
 }

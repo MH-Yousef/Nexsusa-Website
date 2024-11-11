@@ -1,17 +1,10 @@
 using Core.Domains.Languages;
-using Core.HomePage.HomePageItems;
-using Core.ServicesPage;
 using Data;
-using Data.Dtos.NavBarDTOs;
 using Data.Mapping;
 using Microsoft.AspNetCore.Localization;
 using Services._ConfigureServices;
-using Services.HomePageServices.ChooseUsServices;
-using Services.HomePageServices.NavBarItemServices;
 using Services.LanguageServices;
-using System.Drawing;
 using System.Globalization;
-using System.Security.Policy;
 
 
 var builder = WebApplication.CreateBuilder(args);
