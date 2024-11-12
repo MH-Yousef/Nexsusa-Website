@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Core.Domains.Enums;
 using Core.HomePage.HomePageItems;
 using Data.Context;
 using Data.Dtos.WorkingProcessDTOs;
@@ -15,26 +16,41 @@ namespace Services.HomePageServices.WorkingProcessServices
 {
     public class WorkingProcessService : BaseService, IWorkingProcessService
     {
-        public WorkingProcessService(AppDbContext dbContext, IMapper mapper) : base(dbContext, mapper)
+        private readonly Services._GenericServices.GenericService<WorkingProcess> _genericService;
+        public WorkingProcessService(AppDbContext dbContext, IMapper mapper, _GenericServices.GenericService<WorkingProcess> genericService) : base(dbContext, mapper)
         {
+            _genericService = genericService;
         }
 
-        public async Task<ResponseResult<List<WorkingProcessDTO>>> GetAll()
+        public async Task<ResponseResult<List<WorkingProcessDTO>>> GetList(int languageId)
         {
             try
             {
-                var workingProcesses = await _dbContext.WorkingProcesses
-                    .Where(x => !x.IsDeleted)
-                    .Include(x => x.WorkingProcessItems)
-                    .ToListAsync();
+                // Retrieve WorkingProcess data with translations
+                var workingProcesses = await _genericService.GetListAsync(languageId, StringResourceEnums.WorkingProcess);
 
-                if (workingProcesses == null || !workingProcesses.Any())
+                var workingProcessDtos = _mapper.Map<List<WorkingProcess>, List<WorkingProcessDTO>>(workingProcesses.Data);
+
+                // Apply translations for each WorkingProcess item
+                foreach (var item in workingProcessDtos)
                 {
-                    return Error<List<WorkingProcessDTO>>("No records found", HttpStatusCode.NotFound);
+                    item.LangId = languageId;
+                    item.Title = _genericService.ApplyTranslations<WorkingProcessDTO>(item, languageId, item.Id, StringResourceEnums.WorkingProcess).Title;
+                    item.SubTitle = _genericService.ApplyTranslations<WorkingProcessDTO>(item, languageId, item.Id, StringResourceEnums.WorkingProcess).SubTitle;
+
+                    // Apply translations for each WorkingProcessItem related to the WorkingProcess
+                    if (item.WorkingProcessItems != null)
+                    {
+                        foreach (var subItem in item.WorkingProcessItems)
+                        {
+                            subItem.LangId = languageId;
+                            subItem.Title = _genericService.ApplyTranslations<WorkingProcessItemDTO>(subItem, languageId, subItem.Id, StringResourceEnums.WorkingProcessItem).Title;
+                            subItem.Description = _genericService.ApplyTranslations<WorkingProcessItemDTO>(subItem, languageId, subItem.Id, StringResourceEnums.WorkingProcessItem).Description;
+                        }
+                    }
                 }
 
-                var workingProcessesDto = _mapper.Map<List<WorkingProcessDTO>>(workingProcesses);
-                return Success(workingProcessesDto);
+                return Success(workingProcessDtos);
             }
             catch (Exception ex)
             {
@@ -42,21 +58,31 @@ namespace Services.HomePageServices.WorkingProcessServices
             }
         }
 
-        public async Task<ResponseResult<WorkingProcessDTO>> GetById(int id)
+
+        public async Task<ResponseResult<WorkingProcessDTO>> GetById(int id, int languageId)
         {
             try
             {
-                var workingProcess = await _dbContext.WorkingProcesses
-                    .Where(x => x.Id == id && !x.IsDeleted)
-                    .Include(x => x.WorkingProcessItems)
-                    .FirstOrDefaultAsync();
+                var workingProcess = await _genericService.GetByIdAsync(id, languageId, StringResourceEnums.WorkingProcess);
 
-                if (workingProcess == null)
+                var workingProcessDto = _mapper.Map<WorkingProcess, WorkingProcessDTO>(workingProcess);
+
+                // Apply translations for the WorkingProcess item
+                workingProcessDto.LangId = languageId;
+                workingProcessDto.Title = _genericService.ApplyTranslations<WorkingProcessDTO>(workingProcessDto, languageId, workingProcessDto.Id, StringResourceEnums.WorkingProcess).Title;
+                workingProcessDto.SubTitle = _genericService.ApplyTranslations<WorkingProcessDTO>(workingProcessDto, languageId, workingProcessDto.Id, StringResourceEnums.WorkingProcess).SubTitle;
+
+                // Apply translations for each WorkingProcessItem
+                if (workingProcessDto.WorkingProcessItems != null)
                 {
-                    return Error<WorkingProcessDTO>("Record not found", HttpStatusCode.NotFound);
+                    foreach (var subItem in workingProcessDto.WorkingProcessItems)
+                    {
+                        subItem.LangId = languageId;
+                        subItem.Title = _genericService.ApplyTranslations<WorkingProcessItemDTO>(subItem, languageId, subItem.Id, StringResourceEnums.WorkingProcessItem).Title;
+                        subItem.Description = _genericService.ApplyTranslations<WorkingProcessItemDTO>(subItem, languageId, subItem.Id, StringResourceEnums.WorkingProcessItem).Description;
+                    }
                 }
 
-                var workingProcessDto = _mapper.Map<WorkingProcessDTO>(workingProcess);
                 return Success(workingProcessDto);
             }
             catch (Exception ex)
@@ -65,67 +91,70 @@ namespace Services.HomePageServices.WorkingProcessServices
             }
         }
 
-        public async Task<ResponseResult<WorkingProcessDTO>> Create(WorkingProcessDTO dto)
+        public async Task<ResponseResult<List<WorkingProcessDTO>>> Manage(List<WorkingProcessDTO> dtos)
         {
             try
             {
-                var workingProcess = _mapper.Map<WorkingProcess>(dto);
-                await _dbContext.WorkingProcesses.AddAsync(workingProcess);
-                await _dbContext.SaveChangesAsync();
+                var defaultLanguage = await _dbContext.Languages.FirstAsync(x => x.IsDefault);
+                var defaultModel = dtos.FirstOrDefault(x => x.LangId == defaultLanguage.Id);
 
-                dto.Id = workingProcess.Id;
-                return Success(dto);
-            }
-            catch (Exception ex)
-            {
-                return Error<WorkingProcessDTO>(ex);
-            }
-        }
+                var workingProcess = _mapper.Map<WorkingProcessDTO, WorkingProcess>(defaultModel);
 
-        public async Task<ResponseResult<WorkingProcessDTO>> Update(WorkingProcessDTO dto)
-        {
-            try
-            {
-                var workingProcess = await _dbContext.WorkingProcesses
-                    .FirstOrDefaultAsync(x => x.Id == dto.Id && !x.IsDeleted);
-
-                if (workingProcess == null)
+                if (defaultModel.Id > 0)
                 {
-                    return Error<WorkingProcessDTO>("Record not found", HttpStatusCode.NotFound);
+                    await _genericService.UpdateAsync(workingProcess);
+                }
+                else
+                {
+                    await _genericService.CreateAsync(workingProcess);
                 }
 
-                workingProcess = _mapper.Map(dto, workingProcess);
-                _dbContext.WorkingProcesses.Update(workingProcess);
-
-                await _dbContext.SaveChangesAsync();
-                return Success(dto);
-            }
-            catch (Exception ex)
-            {
-                return Error<WorkingProcessDTO>(ex);
-            }
-        }
-
-        public async Task<ResponseResult<WorkingProcessDTO>> Delete(int id)
-        {
-            try
-            {
-                var workingProcess = await _dbContext.WorkingProcesses
-                    .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
-
-                if (workingProcess == null)
+                // Add or Update Translations for WorkingProcess
+                foreach (var item in dtos)
                 {
-                    return Error<WorkingProcessDTO>("Record not found", HttpStatusCode.NotFound);
+                    var translations = new List<(string ColumnName, string ColumnValue)>
+                    {
+                        ("Title", item.Title),
+                        ("SubTitle", item.SubTitle)
+                    };
+
+                    if (item.Id > 0)
+                    {
+                        await _genericService.UpdateTranslationsAsync(StringResourceEnums.WorkingProcess, translations, workingProcess.Id, item.LangId);
+                    }
+                    else
+                    {
+                        await _genericService.AddTranslationsAsync(StringResourceEnums.WorkingProcess, translations, workingProcess.Id, item.LangId);
+                    }
+
+                    // Handle translations for related WorkingProcessItems
+                    if (item.WorkingProcessItems != null && item.WorkingProcessItems.Any())
+                    {
+                        foreach (var subItem in item.WorkingProcessItems)
+                        {
+                            var subTranslations = new List<(string ColumnName, string ColumnValue)>
+                            {
+                                ("Title", subItem.Title),
+                                ("Description", subItem.Description)
+                            };
+
+                            if (subItem.Id > 0)
+                            {
+                                await _genericService.UpdateTranslationsAsync(StringResourceEnums.WorkingProcessItem, subTranslations, subItem.Id, subItem.LangId);
+                            }
+                            else
+                            {
+                                await _genericService.AddTranslationsAsync(StringResourceEnums.WorkingProcessItem, subTranslations, subItem.Id, subItem.LangId);
+                            }
+                        }
+                    }
                 }
 
-                _dbContext.WorkingProcesses.Remove(workingProcess);
-                await _dbContext.SaveChangesAsync();
-
-                return Success<WorkingProcessDTO>();
+                return Success(dtos);
             }
             catch (Exception ex)
             {
-                return Error<WorkingProcessDTO>(ex);
+                return Error<List<WorkingProcessDTO>>(ex);
             }
         }
     }

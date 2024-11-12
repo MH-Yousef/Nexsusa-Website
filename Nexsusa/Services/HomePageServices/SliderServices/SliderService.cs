@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Core.Domains.Enums;
 using Core.HomePage.HomePageItems;
 using Data.Context;
 using Data.Dtos.SliderDTOs;
@@ -15,24 +16,29 @@ namespace Services.HomePageServices.SliderServices
 {
     public class SliderService : BaseService, ISliderService
     {
-        public SliderService(AppDbContext dbContext, IMapper mapper) : base(dbContext, mapper)
+        private readonly Services._GenericServices.GenericService<Slider> _genericService;
+        public SliderService(AppDbContext dbContext, IMapper mapper, _GenericServices.GenericService<Slider> genericService = null) : base(dbContext, mapper)
         {
+            _genericService = genericService;
         }
 
-        public async Task<ResponseResult<List<SliderDTO>>> GetAll()
+        public async Task<ResponseResult<List<SliderDTO>>> GetList(int languageId)
         {
             try
             {
-                var sliders = await _dbContext.Sliders
-                    .Where(x => !x.IsDeleted)
-                    .ToListAsync();
+                // Retrieve sliders with translations
+                var sliders = await _genericService.GetListAsync(languageId, StringResourceEnums.Slider);
 
-                if (sliders == null || !sliders.Any())
+                var sliderDtos = _mapper.Map<List<Slider>, List<SliderDTO>>(sliders.Data);
+
+                // Apply translations for each slider item
+                foreach (var slider in sliderDtos)
                 {
-                    return Error<List<SliderDTO>>("No sliders found", HttpStatusCode.NotFound);
+                    slider.LangId = languageId;
+                    slider.Title = _genericService.ApplyTranslations<SliderDTO>(slider, languageId, slider.Id, StringResourceEnums.Slider).Title;
+                    slider.Description = _genericService.ApplyTranslations<SliderDTO>(slider, languageId, slider.Id, StringResourceEnums.Slider).Description;
                 }
 
-                var sliderDtos = _mapper.Map<List<SliderDTO>>(sliders);
                 return Success(sliderDtos);
             }
             catch (Exception ex)
@@ -41,19 +47,19 @@ namespace Services.HomePageServices.SliderServices
             }
         }
 
-        public async Task<ResponseResult<SliderDTO>> GetById(int id)
+        public async Task<ResponseResult<SliderDTO>> GetById(int id, int languageId)
         {
             try
             {
-                var slider = await _dbContext.Sliders
-                    .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
+                var slider = await _genericService.GetByIdAsync(id, languageId, StringResourceEnums.Slider);
 
-                if (slider == null)
-                {
-                    return Error<SliderDTO>("Slider not found", HttpStatusCode.NotFound);
-                }
+                var sliderDto = _mapper.Map<Slider, SliderDTO>(slider);
 
-                var sliderDto = _mapper.Map<SliderDTO>(slider);
+                // Apply translations for the slider
+                sliderDto.LangId = languageId;
+                sliderDto.Title = _genericService.ApplyTranslations<SliderDTO>(sliderDto, languageId, sliderDto.Id, StringResourceEnums.Slider).Title;
+                sliderDto.Description = _genericService.ApplyTranslations<SliderDTO>(sliderDto, languageId, sliderDto.Id, StringResourceEnums.Slider).Description;
+
                 return Success(sliderDto);
             }
             catch (Exception ex)
@@ -62,67 +68,48 @@ namespace Services.HomePageServices.SliderServices
             }
         }
 
-        public async Task<ResponseResult<SliderDTO>> Create(SliderDTO dto)
+        public async Task<ResponseResult<List<SliderDTO>>> Manage(List<SliderDTO> dtos)
         {
             try
             {
-                var slider = _mapper.Map<Slider>(dto);
-                await _dbContext.Sliders.AddAsync(slider);
-                await _dbContext.SaveChangesAsync();
+                var defaultLanguage = await _dbContext.Languages.FirstAsync(x => x.IsDefault);
+                var defaultModel = dtos.FirstOrDefault(x => x.LangId == defaultLanguage.Id);
 
-                dto.Id = slider.Id;  // Assign the new slider Id to the DTO
-                return Success(dto);
-            }
-            catch (Exception ex)
-            {
-                return Error<SliderDTO>(ex);
-            }
-        }
+                var slider = _mapper.Map<SliderDTO, Slider>(defaultModel);
 
-        public async Task<ResponseResult<SliderDTO>> Update(SliderDTO dto)
-        {
-            try
-            {
-                var slider = await _dbContext.Sliders
-                    .FirstOrDefaultAsync(x => x.Id == dto.Id && !x.IsDeleted);
-
-                if (slider == null)
+                if (defaultModel.Id > 0)
                 {
-                    return Error<SliderDTO>("Slider not found", HttpStatusCode.NotFound);
+                    await _genericService.UpdateAsync(slider);
+                }
+                else
+                {
+                    await _genericService.CreateAsync(slider);
                 }
 
-                slider = _mapper.Map(dto, slider);
-                _dbContext.Update(slider);
-
-                await _dbContext.SaveChangesAsync();
-                return Success(dto);
-            }
-            catch (Exception ex)
-            {
-                return Error<SliderDTO>(ex);
-            }
-        }
-
-        public async Task<ResponseResult<SliderDTO>> Delete(int id)
-        {
-            try
-            {
-                var slider = await _dbContext.Sliders
-                    .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
-
-                if (slider == null)
+                // Add or Update Translations for each slider item
+                foreach (var item in dtos)
                 {
-                    return Error<SliderDTO>("Slider not found", HttpStatusCode.NotFound);
+                    var translations = new List<(string ColumnName, string ColumnValue)>
+                    {
+                        ("Title", item.Title),
+                        ("Description", item.Description)
+                    };
+
+                    if (item.Id > 0)
+                    {
+                        await _genericService.UpdateTranslationsAsync(StringResourceEnums.Slider, translations, slider.Id, item.LangId);
+                    }
+                    else
+                    {
+                        await _genericService.AddTranslationsAsync(StringResourceEnums.Slider, translations, slider.Id, item.LangId);
+                    }
                 }
 
-                _dbContext.Sliders.Remove(slider);
-                await _dbContext.SaveChangesAsync();
-
-                return Success<SliderDTO>();
+                return Success(dtos);
             }
             catch (Exception ex)
             {
-                return Error<SliderDTO>(ex);
+                return Error<List<SliderDTO>>(ex);
             }
         }
     }

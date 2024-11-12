@@ -10,10 +10,9 @@ namespace Services.HomePageServices.ServiceServices
 {
     public interface IServiceService
     {
-        Task<ResponseResult<List<ServiceDTO>>> GetAll();
-        Task<ResponseResult<ServiceDTO>> GetById(int id);
-        Task<ResponseResult<ServiceDTO>> Create(ServiceDTO dto);
-        Task<ResponseResult<ServiceDTO>> Update(ServiceDTO dto);
-        Task<ResponseResult<ServiceDTO>> Delete(int id);
+        Task<ResponseResult<List<ServiceDTO>>> Get(int langId);
+        Task<ResponseResult<ServiceDTO>> GetById(int id,int langId);
+        Task<ResponseResult<List<ServiceDTO>>> Manage(List<ServiceDTO> dtos);
+        
     }
 }

@@ -1,9 +1,13 @@
 ﻿using AutoMapper;
+using Core.Domains.Enums;
+using Core.Domains.Languages;
 using Core.HomePage.HomePageItems;
 using Data.Context;
+using Data.Dtos.NavBarDTOs;
 using Data.Dtos.RegularBlogsDTOs;
 using Microsoft.EntityFrameworkCore;
 using Services._Base;
+using Services._GenericServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,25 +19,36 @@ namespace Services.HomePageServices.RegularBlogsServices
 {
     public class RegularBlogsService : BaseService, IRegularBlogsService
     {
-        public RegularBlogsService(AppDbContext dbContext, IMapper mapper) : base(dbContext, mapper)
+        private readonly GenericService<RegularBlogs> _genericService;
+        public RegularBlogsService(AppDbContext dbContext, IMapper mapper, GenericService<RegularBlogs> genericService) : base(dbContext, mapper)
         {
+            _genericService = genericService;
         }
 
-        public async Task<ResponseResult<List<RegularBlogsDTO>>> Get()
+        public async Task<ResponseResult<List<RegularBlogsDTO>>> Get(int langId)
         {
             try
             {
-                var blogs = await _dbContext.RegularBlogs
-                    .Where(x => !x.IsDeleted)
-                    .ToListAsync();
+                // Get list of regular blogs with the related sub items or translations.
+                var regularBlogs = await _genericService.GetListAsync(langId, StringResourceEnums.RegularBlogs, x => x.RegularBlogsItems);
+                var dto = _mapper.Map<List<RegularBlogs>, List<RegularBlogsDTO>>(regularBlogs.Data);
 
-                if (blogs == null || !blogs.Any())
+                foreach (var item in dto)
                 {
-                    return Error<List<RegularBlogsDTO>>("Regular blogs not found", HttpStatusCode.NotFound);
+                    item.LangId = langId;
+                    if (item.RegularBlogsItems != null)
+                    {
+                        foreach (var sub in item.RegularBlogsItems)
+                        {
+                            sub.LangId = langId;
+                            sub.Title = _genericService.ApplyTranslations<RegularBlogsItemDTO>(sub, langId, sub.Id, StringResourceEnums.RegularBlogsItem).Title;
+                            sub.Content = _genericService.ApplyTranslations<RegularBlogsItemDTO>(sub, langId, sub.Id, StringResourceEnums.RegularBlogsItem).Content;
+                            
+                        }
+                    }
                 }
 
-                var blogDtos = _mapper.Map<List<RegularBlogsDTO>>(blogs);
-                return Success(blogDtos);
+                return Success(dto);
             }
             catch (Exception ex)
             {
@@ -41,61 +56,22 @@ namespace Services.HomePageServices.RegularBlogsServices
             }
         }
 
-        public async Task<ResponseResult<RegularBlogsDTO>> GetById(int id)
+        public async Task<ResponseResult<RegularBlogsDTO>> GetById(int id, int langId)
         {
             try
             {
-                var blog = await _dbContext.RegularBlogs
-                    .Where(x => x.Id == id && !x.IsDeleted)
-                    .FirstOrDefaultAsync();
+                var blog = await _genericService.GetByIdAsync(id, langId, StringResourceEnums.RegularBlogs, x => x.RegularBlogsItems);
+                var dto = _mapper.Map<RegularBlogs, RegularBlogsDTO>(blog);
 
-                if (blog == null)
+                if (dto.RegularBlogsItems != null)
                 {
-                    return Error<RegularBlogsDTO>("Regular blog not found", HttpStatusCode.NotFound);
+                    foreach (var item in dto.RegularBlogsItems)
+                    {
+                        item.LangId = langId;
+                        item.Title = _genericService.ApplyTranslations<RegularBlogsItemDTO>(item, langId, item.Id, StringResourceEnums.RegularBlogsItem).Title;
+                        item.Content = _genericService.ApplyTranslations<RegularBlogsItemDTO>(item, langId, item.Id, StringResourceEnums.RegularBlogsItem).Content;
+                    }
                 }
-
-                var blogDto = _mapper.Map<RegularBlogsDTO>(blog);
-                return Success(blogDto);
-            }
-            catch (Exception ex)
-            {
-                return Error<RegularBlogsDTO>(ex);
-            }
-        }
-
-        public async Task<ResponseResult<RegularBlogsDTO>> Create(RegularBlogsDTO dto)
-        {
-            try
-            {
-                var blog = _mapper.Map<RegularBlogs>(dto);
-                await _dbContext.RegularBlogs.AddAsync(blog);
-                await _dbContext.SaveChangesAsync();
-
-                dto.Id = blog.Id;
-                return Success(dto);
-            }
-            catch (Exception ex)
-            {
-                return Error<RegularBlogsDTO>(ex);
-            }
-        }
-
-        public async Task<ResponseResult<RegularBlogsDTO>> Update(RegularBlogsDTO dto)
-        {
-            try
-            {
-                var blog = await _dbContext.RegularBlogs
-                    .FirstOrDefaultAsync(x => x.Id == dto.Id && !x.IsDeleted);
-
-                if (blog == null)
-                {
-                    return Error<RegularBlogsDTO>("Regular blog not found", HttpStatusCode.NotFound);
-                }
-
-                blog = _mapper.Map(dto, blog);
-                _dbContext.Update(blog);
-
-                await _dbContext.SaveChangesAsync();
 
                 return Success(dto);
             }
@@ -105,28 +81,76 @@ namespace Services.HomePageServices.RegularBlogsServices
             }
         }
 
-        public async Task<ResponseResult<RegularBlogsDTO>> Delete(int id)
+        public async Task<ResponseResult<List<RegularBlogsDTO>>> Manage(List<RegularBlogsDTO> dtos)
         {
             try
             {
-                var blog = await _dbContext.RegularBlogs
-                    .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
+                var defaultLanguage = await _dbContext.Languages.FirstAsync(x => x.IsDefault);
+                var defaultModel = dtos.FirstOrDefault(x => x.LangId == defaultLanguage.Id);
+                var regularBlog = _mapper.Map<RegularBlogsDTO, RegularBlogs>(defaultModel);
 
-                if (blog == null)
+                if (defaultModel.Id > 0)
                 {
-                    return Error<RegularBlogsDTO>("Regular blog not found", HttpStatusCode.NotFound);
+                    await _genericService.UpdateAsync(regularBlog);
+                }
+                else
+                {
+                    await _genericService.CreateAsync(regularBlog);
                 }
 
-                _dbContext.RegularBlogs.Remove(blog);
-                await _dbContext.SaveChangesAsync();
+                // Add Translations for RegularBlog
+                foreach (var item in dtos)
+                {
+                    var translations = new List<(string ColumnName, string ColumnValue)>
+                    {
+                        ("Title", item.Title),
+                        ("Description", item.Description)
+                    };
 
-                return Success<RegularBlogsDTO>();
+                    if (item.Id > 0)
+                    {
+                        await _genericService.UpdateTranslationsAsync(StringResourceEnums.RegularBlogs, translations, regularBlog.Id, item.LangId);
+                    }
+                    else
+                    {
+                        await _genericService.AddTranslationsAsync(StringResourceEnums.RegularBlogs, translations, regularBlog.Id, item.LangId);
+                    }
+
+                    // Add Translations for RegularBlogItems
+                    if (item.RegularBlogsItems.Any())
+                    {
+                        foreach (var subItem in item.RegularBlogsItems)
+                        {
+                            var subBlog = await _dbContext.RegularBlogsItems.FirstOrDefaultAsync(x => x.Id == regularBlog.Id);
+                            var subTranslations = new List<(string ColumnName, string ColumnValue)>
+                            {
+                                ("Title", subItem.Title),
+                                ("Content", subItem.Content),
+                            };
+
+                            if (subItem.Id > 0)
+                            {
+                                await _genericService.UpdateTranslationsAsync(StringResourceEnums.RegularBlogsItem, subTranslations, subBlog.Id, subItem.LangId);
+                            }
+                            else
+                            {
+                                await _genericService.AddTranslationsAsync(StringResourceEnums.RegularBlogsItem, subTranslations, subBlog.Id, subItem.LangId);
+                            }
+                        }
+                    }
+                }
+
+                return Success(dtos);
             }
             catch (Exception ex)
             {
-                return Error<RegularBlogsDTO>(ex);
+                return Error<List<RegularBlogsDTO>>(ex);
             }
         }
+
+
+
+        
     }
 
 }

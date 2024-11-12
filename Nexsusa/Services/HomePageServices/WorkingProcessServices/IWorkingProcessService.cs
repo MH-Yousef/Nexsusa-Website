@@ -10,11 +10,16 @@ namespace Services.HomePageServices.WorkingProcessServices
 {
     public interface IWorkingProcessService
     {
-        Task<ResponseResult<List<WorkingProcessDTO>>> GetAll();
-        Task<ResponseResult<WorkingProcessDTO>> GetById(int id);
-        Task<ResponseResult<WorkingProcessDTO>> Create(WorkingProcessDTO dto);
-        Task<ResponseResult<WorkingProcessDTO>> Update(WorkingProcessDTO dto);
-        Task<ResponseResult<WorkingProcessDTO>> Delete(int id);
+        Task<ResponseResult<List<WorkingProcessDTO>>> GetList(int languageId);
+
+        // Get WorkingProcess by its Id with translations based on language
+        Task<ResponseResult<WorkingProcessDTO>> GetById(int id, int languageId);
+
+        // Create or Update WorkingProcess and its related WorkingProcessItems with translations
+        Task<ResponseResult<List<WorkingProcessDTO>>> Manage(List<WorkingProcessDTO> dtos);
+
+        // Delete WorkingProcess by Id (soft delete)
+      
     }
 
 

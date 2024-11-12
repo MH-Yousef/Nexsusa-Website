@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using Core.Domains.Enums;
 using Core.HomePage.HomePageItems;
 using Data.Context;
 using Data.Dtos.WhoWeAreDTOs;
 using Microsoft.EntityFrameworkCore;
 using Services._Base;
+using Services._GenericServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,24 +17,40 @@ namespace Services.HomePageServices.WhoWeAreServices
 {
     public class WhoWeAreService : BaseService, IWhoWeAreService
     {
-        public WhoWeAreService(AppDbContext dbContext, IMapper mapper) : base(dbContext, mapper)
+        private readonly GenericService<WhoWeAre> _genericService;
+        public WhoWeAreService(AppDbContext dbContext, IMapper mapper, GenericService<WhoWeAre> genericService = null) : base(dbContext, mapper)
         {
+            _genericService = genericService;
         }
 
-        public async Task<ResponseResult<List<WhoWeAreDTO>>> GetAll()
+        public async Task<ResponseResult<List<WhoWeAreDTO>>> GetList(int languageId)
         {
             try
             {
-                var whoWeAreList = await _dbContext.WhoWeAres
-                    .Where(x => !x.IsDeleted)
-                    .ToListAsync();
+                // Retrieve WhoWeAre data with translations
+                var whoWeAreItems = await _genericService.GetListAsync(languageId, StringResourceEnums.WhoWeAre);
 
-                if (whoWeAreList == null || !whoWeAreList.Any())
+                var whoWeAreDtos = _mapper.Map<List<WhoWeAre>, List<WhoWeAreDTO>>(whoWeAreItems.Data);
+
+                // Apply translations for each WhoWeAre item
+                foreach (var item in whoWeAreDtos)
                 {
-                    return Error<List<WhoWeAreDTO>>("No records found", HttpStatusCode.NotFound);
+                    item.LangId = languageId;
+                    item.Title = _genericService.ApplyTranslations<WhoWeAreDTO>(item, languageId, item.Id, StringResourceEnums.WhoWeAre).Title;
+                    item.Description = _genericService.ApplyTranslations<WhoWeAreDTO>(item, languageId, item.Id, StringResourceEnums.WhoWeAre).Description;
+
+                    // Apply translations for each WhoWeAreItem related to the WhoWeAre
+                    if (item.WhoWeAreItem != null)
+                    {
+                        foreach (var subItem in item.WhoWeAreItem)
+                        {
+                            subItem.LangId = languageId;
+                            subItem.Description = _genericService.ApplyTranslations<WhoWeAreItemDTO>(subItem, languageId, subItem.Id, StringResourceEnums.WhoWeAreItem).Description;
+                            
+                        }
+                    }
                 }
 
-                var whoWeAreDtos = _mapper.Map<List<WhoWeAreDTO>>(whoWeAreList);
                 return Success(whoWeAreDtos);
             }
             catch (Exception ex)
@@ -41,20 +59,29 @@ namespace Services.HomePageServices.WhoWeAreServices
             }
         }
 
-        public async Task<ResponseResult<WhoWeAreDTO>> GetById(int id)
+        public async Task<ResponseResult<WhoWeAreDTO>> GetById(int id, int languageId)
         {
             try
             {
-                var whoWeAre = await _dbContext.WhoWeAres
-                    .Include(x => x.WhoWeAreItem)
-                    .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
+                var whoWeAre = await _genericService.GetByIdAsync(id, languageId, StringResourceEnums.WhoWeAre);
 
-                if (whoWeAre == null)
+                var whoWeAreDto = _mapper.Map<WhoWeAre, WhoWeAreDTO>(whoWeAre);
+
+                // Apply translations for the WhoWeAre item
+                whoWeAreDto.LangId = languageId;
+                whoWeAreDto.Title = _genericService.ApplyTranslations<WhoWeAreDTO>(whoWeAreDto, languageId, whoWeAreDto.Id, StringResourceEnums.WhoWeAre).Title;
+                whoWeAreDto.Description = _genericService.ApplyTranslations<WhoWeAreDTO>(whoWeAreDto, languageId, whoWeAreDto.Id, StringResourceEnums.WhoWeAre).Description;
+
+                // Apply translations for each WhoWeAreItem
+                if (whoWeAreDto.WhoWeAreItem != null)
                 {
-                    return Error<WhoWeAreDTO>("Record not found", HttpStatusCode.NotFound);
+                    foreach (var subItem in whoWeAreDto.WhoWeAreItem)
+                    {
+                        subItem.LangId = languageId;
+                        subItem.Description = _genericService.ApplyTranslations<WhoWeAreItemDTO>(subItem, languageId, subItem.Id, StringResourceEnums.WhoWeAreItem).Description;
+                    }
                 }
 
-                var whoWeAreDto = _mapper.Map<WhoWeAreDTO>(whoWeAre);
                 return Success(whoWeAreDto);
             }
             catch (Exception ex)
@@ -63,89 +90,70 @@ namespace Services.HomePageServices.WhoWeAreServices
             }
         }
 
-        public async Task<ResponseResult<WhoWeAreDTO>> Create(WhoWeAreDTO dto)
+        // Manage (Create/Update) WhoWeAre and its Items with Translations
+        public async Task<ResponseResult<List<WhoWeAreDTO>>> Manage(List<WhoWeAreDTO> dtos)
         {
             try
             {
-                var whoWeAre = _mapper.Map<WhoWeAre>(dto);
-                await _dbContext.WhoWeAres.AddAsync(whoWeAre);
-                await _dbContext.SaveChangesAsync();
+                var defaultLanguage = await _dbContext.Languages.FirstAsync(x => x.IsDefault);
+                var defaultModel = dtos.FirstOrDefault(x => x.LangId == defaultLanguage.Id);
 
-                dto.Id = whoWeAre.Id;  // Return the generated Id
-                return Success(dto);
-            }
-            catch (Exception ex)
-            {
-                return Error<WhoWeAreDTO>(ex);
-            }
-        }
+                var whoWeAre = _mapper.Map<WhoWeAreDTO, WhoWeAre>(defaultModel);
 
-        public async Task<ResponseResult<WhoWeAreDTO>> Update(WhoWeAreDTO dto)
-        {
-            try
-            {
-                var whoWeAre = await _dbContext.WhoWeAres
-                    .FirstOrDefaultAsync(x => x.Id == dto.Id && !x.IsDeleted);
-
-                if (whoWeAre == null)
+                if (defaultModel.Id > 0)
                 {
-                    return Error<WhoWeAreDTO>("Record not found", HttpStatusCode.NotFound);
+                    await _genericService.UpdateAsync(whoWeAre);
+                }
+                else
+                {
+                    await _genericService.CreateAsync(whoWeAre);
                 }
 
-                whoWeAre = _mapper.Map(dto, whoWeAre);
-                _dbContext.WhoWeAres.Update(whoWeAre);
-
-                await _dbContext.SaveChangesAsync();
-                return Success(dto);
-            }
-            catch (Exception ex)
-            {
-                return Error<WhoWeAreDTO>(ex);
-            }
-        }
-
-        public async Task<ResponseResult<WhoWeAreDTO>> Delete(int id)
-        {
-            try
-            {
-                var whoWeAre = await _dbContext.WhoWeAres
-                    .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
-
-                if (whoWeAre == null)
+                // Add or Update Translations for WhoWeAre
+                foreach (var item in dtos)
                 {
-                    return Error<WhoWeAreDTO>("Record not found", HttpStatusCode.NotFound);
+                    var translations = new List<(string ColumnName, string ColumnValue)>
+                    {
+                        ("Title", item.Title),
+                        ("Description", item.Description)
+                    };
+
+                    if (item.Id > 0)
+                    {
+                        await _genericService.UpdateTranslationsAsync(StringResourceEnums.WhoWeAre, translations, whoWeAre.Id, item.LangId);
+                    }
+                    else
+                    {
+                        await _genericService.AddTranslationsAsync(StringResourceEnums.WhoWeAre, translations, whoWeAre.Id, item.LangId);
+                    }
+
+                    // Handle translations for related WhoWeAreItems
+                    if (item.WhoWeAreItem != null && item.WhoWeAreItem.Any())
+                    {
+                        foreach (var subItem in item.WhoWeAreItem)
+                        {
+                            var subTranslations = new List<(string ColumnName, string ColumnValue)>
+                            {
+                                ("Description", subItem.Description)
+                            };
+
+                            if (subItem.Id > 0)
+                            {
+                                await _genericService.UpdateTranslationsAsync(StringResourceEnums.WhoWeAreItem, subTranslations, subItem.Id, subItem.LangId);
+                            }
+                            else
+                            {
+                                await _genericService.AddTranslationsAsync(StringResourceEnums.WhoWeAreItem, subTranslations, subItem.Id, subItem.LangId);
+                            }
+                        }
+                    }
                 }
 
-                _dbContext.WhoWeAres.Remove(whoWeAre);
-                await _dbContext.SaveChangesAsync();
-
-                return Success<WhoWeAreDTO>();
+                return Success(dtos);
             }
             catch (Exception ex)
             {
-                return Error<WhoWeAreDTO>(ex);
-            }
-        }
-
-        public async Task<ResponseResult<List<WhoWeAreItemDTO>>> GetItemsByWhoWeAreId(int whoWeAreId)
-        {
-            try
-            {
-                var items = await _dbContext.WhoWeAreItems
-                    .Where(x => x.WhoWeAreId == whoWeAreId && !x.IsDeleted)
-                    .ToListAsync();
-
-                if (items == null || !items.Any())
-                {
-                    return Error<List<WhoWeAreItemDTO>>("No items found", HttpStatusCode.NotFound);
-                }
-
-                var itemsDto = _mapper.Map<List<WhoWeAreItemDTO>>(items);
-                return Success(itemsDto);
-            }
-            catch (Exception ex)
-            {
-                return Error<List<WhoWeAreItemDTO>>(ex);
+                return Error<List<WhoWeAreDTO>>(ex);
             }
         }
     }

@@ -10,11 +10,10 @@ namespace Services.HomePageServices.RegularBlogsServices
 {
     public interface IRegularBlogsService
     {
-        Task<ResponseResult<List<RegularBlogsDTO>>> Get();
-        Task<ResponseResult<RegularBlogsDTO>> GetById(int id);
-        Task<ResponseResult<RegularBlogsDTO>> Create(RegularBlogsDTO dto);
-        Task<ResponseResult<RegularBlogsDTO>> Update(RegularBlogsDTO dto);
-        Task<ResponseResult<RegularBlogsDTO>> Delete(int id);
+        Task<ResponseResult<List<RegularBlogsDTO>>> Get(int langId);
+        Task<ResponseResult<RegularBlogsDTO>> GetById(int id,int langId);
+        Task<ResponseResult<List<RegularBlogsDTO>>> Manage(List<RegularBlogsDTO> dtos);
+  
     }
 
 }

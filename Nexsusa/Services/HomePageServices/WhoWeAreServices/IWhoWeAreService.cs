@@ -10,13 +10,8 @@ namespace Services.HomePageServices.WhoWeAreServices
 {
     public interface IWhoWeAreService
     {
-        Task<ResponseResult<List<WhoWeAreDTO>>> GetAll();
-        Task<ResponseResult<WhoWeAreDTO>> GetById(int id);
-        Task<ResponseResult<WhoWeAreDTO>> Create(WhoWeAreDTO dto);
-        Task<ResponseResult<WhoWeAreDTO>> Update(WhoWeAreDTO dto);
-        Task<ResponseResult<WhoWeAreDTO>> Delete(int id);
-
-        Task<ResponseResult<List<WhoWeAreItemDTO>>> GetItemsByWhoWeAreId(int whoWeAreId);
-    }
+        Task<ResponseResult<List<WhoWeAreDTO>>> GetList(int languageId);
+        Task<ResponseResult<WhoWeAreDTO>> GetById(int id, int languageId);
+        Task<ResponseResult<List<WhoWeAreDTO>>> Manage(List<WhoWeAreDTO> dtos);
 
 }

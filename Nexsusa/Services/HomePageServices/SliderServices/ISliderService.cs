@@ -10,10 +10,8 @@ namespace Services.HomePageServices.SliderServices
 {
     public interface ISliderService
     {
-        Task<ResponseResult<List<SliderDTO>>> GetAll();
-        Task<ResponseResult<SliderDTO>> GetById(int id);
-        Task<ResponseResult<SliderDTO>> Create(SliderDTO dto);
-        Task<ResponseResult<SliderDTO>> Update(SliderDTO dto);
-        Task<ResponseResult<SliderDTO>> Delete(int id);
+        Task<ResponseResult<List<SliderDTO>>> GetList(int languageId);
+        Task<ResponseResult<SliderDTO>> GetById(int id, int languageId);
+        Task<ResponseResult<List<SliderDTO>>> Manage(List<SliderDTO> dtos);
     }
 }
