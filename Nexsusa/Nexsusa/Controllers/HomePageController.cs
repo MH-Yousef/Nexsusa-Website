@@ -9,11 +9,11 @@ namespace Nexsusa_Api.Controllers
     [ApiController]
     public class HomePageController(INavBarItemService _navbarService) : ControllerBase
     {
-        [HttpPost]
-        public async Task<ResponseResult<List<NavBarItemDTO>>> Create(List<NavBarItemDTO> dto)
-        {
-            var result = await _navbarService.Manage(dto);
-            return result;
-        }
+        //[HttpPost]
+        //public async Task<ResponseResult<List<NavBarItemDTO>>> Create(List<NavBarItemDTO> dto)
+        //{
+        //    var result = await _navbarService.Manage(dto);
+        //    return result;
+        //}
     }
 }

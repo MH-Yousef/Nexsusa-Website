@@ -34,7 +34,7 @@
 </head>
 
 <body class="v-light vertical-nav fix-header fix-sidebar">
-    
+
     <div id="preloader">
         <div class="loader">
             <svg class="circular" viewBox="25 25 50 50"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="3" stroke-miterlimit="10" /></svg>
@@ -48,9 +48,13 @@
         @await Html.PartialAsync("/Areas/Admin/Views/Partials/_Sidebar.cshtml")
         <!-- #/ sidebar -->
         <!-- content body -->
-        @RenderBody()
+        <div class="content-body">
+            <div class="container">
+                @RenderBody()
+            </div>
+        </div>
         <!-- #/ content body -->
-       @await Html.PartialAsync("/Areas/Admin/Views/Partials/_Footer.cshtml")
+        @await Html.PartialAsync("/Areas/Admin/Views/Partials/_Footer.cshtml")
 </body>
 
 </html>

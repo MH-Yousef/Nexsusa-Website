@@ -1,40 +1,51 @@
 ﻿using AutoMapper;
+using Core.Domains.Enums;
 using Core.HomePage.HomePageItems;
 using Data.Context;
 using Data.Dtos.FooterDTOs;
+using Data.Dtos.FooterServiceDTOs;
+using Data.Dtos.QuickLinkDTOs;
 using Microsoft.EntityFrameworkCore;
 using Services._Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Services._GenericServices;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Services.HomePageServices.FooterServices
 {
     public class FooterService : BaseService, IFooterService
     {
-        public FooterService(AppDbContext dbContext, IMapper mapper) : base(dbContext, mapper)
+        private readonly GenericService<Footer> genericService;
+        public FooterService(AppDbContext dbContext, IMapper mapper, GenericService<Footer> genericService) : base(dbContext, mapper)
         {
+            this.genericService = genericService;
         }
-        public async Task<ResponseResult<List<FooterDTO>>> Get()
+        public async Task<ResponseResult<List<FooterDTO>>> GetList(int LanguageId)
         {
             try
             {
-                var footers = await _dbContext.Footers
-                    .Where(x => !x.IsDeleted)
-                    .Include(x => x.services)
-                    .Include(x => x.QuickLinks)
-                    .ToListAsync();
-
-                if (footers == null || !footers.Any())
+                var items = await genericService.GetListAsync(LanguageId, StringResourceEnums.Footer, x => x.QuickLinks, x => x.Services);
+                var dto = _mapper.Map<List<Footer>, List<FooterDTO>>(items.Data);
+                foreach (var item in dto)
                 {
-                    return Error<List<FooterDTO>>("Footers not found", HttpStatusCode.NotFound);
+                    item.LangId = LanguageId;
+                    if (item.QuickLinks != null)
+                    {
+                        foreach (var sub in item.QuickLinks)
+                        {
+                            sub.LangId = LanguageId;
+                            sub.Title = genericService.ApplyTranslations<QuickLinkDTO>(sub, LanguageId, sub.Id, StringResourceEnums.QuickLink).Title;
+                        }
+                    }
+                    if (item.Services != null)
+                    {
+                        foreach (var sub in item.Services)
+                        {
+                            sub.LangId = LanguageId;
+                            sub.Title = genericService.ApplyTranslations<FooterServiceDTO>(sub, LanguageId, sub.Id, StringResourceEnums.FooterService).Title;
+                        }
+                    }
                 }
-
-                var footerDtos = _mapper.Map<List<FooterDTO>>(footers);
-                return Success(footerDtos);
+                return Success(dto);
             }
             catch (Exception ex)
             {
@@ -42,66 +53,29 @@ namespace Services.HomePageServices.FooterServices
             }
         }
 
-        public async Task<ResponseResult<FooterDTO>> GetById(int id)
+        public async Task<ResponseResult<FooterDTO>> GetById(int id, int LanguageId)
         {
             try
             {
-                var footer = await _dbContext.Footers
-                    .Where(x => x.Id == id && !x.IsDeleted)
-                    .Include(x => x.services)
-                    .Include(x => x.QuickLinks)
-                    .FirstOrDefaultAsync();
+                var model = await genericService.GetByIdAsync(id, LanguageId, StringResourceEnums.Footer, x => x.QuickLinks, x => x.Services);
+                var dto = _mapper.Map<Footer, FooterDTO>(model);
 
-                if (footer == null)
+                if (dto.QuickLinks != null)
                 {
-                    return Error<FooterDTO>("Footer not found", HttpStatusCode.NotFound);
+                    foreach (var item in dto.QuickLinks)
+                    {
+                        item.LangId = LanguageId;
+                        item.Title = genericService.ApplyTranslations<QuickLinkDTO>(item, LanguageId, item.Id, StringResourceEnums.QuickLink).Title;
+                    }
                 }
-
-                var footerDto = _mapper.Map<FooterDTO>(footer);
-                return Success(footerDto);
-            }
-            catch (Exception ex)
-            {
-                return Error<FooterDTO>(ex);
-            }
-        }
-
-        public async Task<ResponseResult<FooterDTO>> Create(FooterDTO dto)
-        {
-            try
-            {
-                var footer = _mapper.Map<Footer>(dto);
-                await _dbContext.Footers.AddAsync(footer);
-                await _dbContext.SaveChangesAsync();
-
-                dto.Id = footer.Id;
-                return Success(dto);
-            }
-            catch (Exception ex)
-            {
-                return Error<FooterDTO>(ex);
-            }
-        }
-
-        public async Task<ResponseResult<FooterDTO>> Update(FooterDTO dto)
-        {
-            try
-            {
-                var footer = await _dbContext.Footers
-                    .Where(x => x.Id == dto.Id && !x.IsDeleted)
-                    .Include(x => x.services)
-                    .Include(x => x.QuickLinks)
-                    .FirstOrDefaultAsync();
-
-                if (footer == null)
+                if (dto.Services != null)
                 {
-                    return Error<FooterDTO>("Footer not found", HttpStatusCode.NotFound);
+                    foreach (var item in dto.Services)
+                    {
+                        item.LangId = LanguageId;
+                        item.Title = genericService.ApplyTranslations<FooterServiceDTO>(item, LanguageId, item.Id, StringResourceEnums.FooterService).Title;
+                    }
                 }
-
-                footer = _mapper.Map(dto, footer);
-                _dbContext.Update(footer);
-
-                await _dbContext.SaveChangesAsync();
 
                 return Success(dto);
             }
@@ -110,29 +84,89 @@ namespace Services.HomePageServices.FooterServices
                 return Error<FooterDTO>(ex);
             }
         }
+        public async Task<ResponseResult<List<FooterDTO>>> Manage(List<FooterDTO> dtos)
+        {
+            try
+            {
+                var defultLanguage = await _dbContext.Languages.FirstAsync(x => x.IsDefault);
+                var defultModel = dtos.Where(x => x.LangId == defultLanguage.Id).FirstOrDefault();
+                var mainItem = _mapper.Map<FooterDTO, Footer>(defultModel);
+                if (defultModel.Id > 0)
+                {
+                    var result = await genericService.UpdateAsync(mainItem);
+                }
+                else
+                {
+                    var result = await genericService.CreateAsync(mainItem);
+                }
 
+                // Add Translations
+                foreach (var item in dtos)
+                {
+                    var translations = new List<(string ColumnName, string ColumnValue)>
+                            {
+                                ("Description", item.Description),
+                            };
+                    if (item.Id > 0)
+                    {
+                        await genericService.UpdateTranslationsAsync(StringResourceEnums.Footer, translations, mainItem.Id, item.LangId);
+                    }
+                    else
+                    {
+                        await genericService.AddTranslationsAsync(StringResourceEnums.Footer, translations, mainItem.Id, item.LangId);
+                    }
+                    if (item.QuickLinks.Any())
+                    {
+
+                        foreach (var subItem in item.QuickLinks)
+                        {
+                            var subItemModel = await _dbContext.QuickLinks.FirstOrDefaultAsync(x => x.FooterId == mainItem.Id);
+                            var Subtranslations = new List<(string ColumnName, string ColumnValue)>
+                            {
+                                ("Title", subItem.Title),
+                            };
+                            if (subItem.Id > 0)
+                            {
+                                await genericService.UpdateTranslationsAsync(StringResourceEnums.QuickLink, Subtranslations, subItemModel.Id, subItem.LangId);
+                            }
+                            else
+                            {
+                                await genericService.AddTranslationsAsync(StringResourceEnums.QuickLink, Subtranslations, subItemModel.Id, subItem.LangId);
+                            }
+                        }
+                    }
+                    if (item.Services.Any())
+                    {
+
+                        foreach (var subItem in item.Services)
+                        {
+                            var subItemModel = await _dbContext.FooterServices.FirstOrDefaultAsync(x => x.FooterId == mainItem.Id);
+                            var Subtranslations = new List<(string ColumnName, string ColumnValue)>
+                            {
+                                ("Title", subItem.Title),
+                            };
+                            if (subItem.Id > 0)
+                            {
+                                await genericService.UpdateTranslationsAsync(StringResourceEnums.FooterService, Subtranslations, subItemModel.Id, subItem.LangId);
+                            }
+                            else
+                            {
+                                await genericService.AddTranslationsAsync(StringResourceEnums.FooterService, Subtranslations, subItemModel.Id, subItem.LangId);
+                            }
+                        }
+                    }
+                }
+
+                return Success(dtos);
+            }
+            catch (Exception ex)
+            {
+                return Error<List<FooterDTO>>(ex);
+            }
+        }
         public async Task<ResponseResult<FooterDTO>> Delete(int id)
         {
-            try
-            {
-                var footer = await _dbContext.Footers
-                    .Where(x => x.Id == id && !x.IsDeleted)
-                    .FirstOrDefaultAsync();
-
-                if (footer == null)
-                {
-                    return Error<FooterDTO>("Footer not found", HttpStatusCode.NotFound);
-                }
-
-                _dbContext.Footers.Remove(footer);
-                await _dbContext.SaveChangesAsync();
-
-                return Success<FooterDTO>();
-            }
-            catch (Exception ex)
-            {
-                return Error<FooterDTO>(ex);
-            }
+            throw new NotImplementedException();
         }
     }
 }

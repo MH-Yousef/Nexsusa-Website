@@ -14,4 +14,5 @@ namespace Services.HomePageServices.WhoWeAreServices
         Task<ResponseResult<WhoWeAreDTO>> GetById(int id, int languageId);
         Task<ResponseResult<List<WhoWeAreDTO>>> Manage(List<WhoWeAreDTO> dtos);
 
+    }
 }

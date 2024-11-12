@@ -1,5 +1,7 @@
-﻿using Core.HomePage.HomePageItems;
+﻿using Core.Domains;
+using Core.HomePage.HomePageItems;
 using Data.Dtos.BaseDTOs;
+using Data.Dtos.ClientSaysItemDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,13 +12,10 @@ namespace Data.Dtos.ClientSaysDTOs
 {
     public class ClientSaysDTO:BaseDTO<int>
     {
+        [Translatable]
         public string Title { get; set; }
+        [Translatable]
         public string Description { get; set; }
-        public List<ClientSaysItem> ClientSaysItems { get; set; }
-    }
-    public abstract class GenericDTO
-    {
-        public object ClassDTO { get; set; }
-        public int LanguageId { get; set; }
+        public List<ClientSaysItemDTO> ClientSaysItems { get; set; }
     }
 }

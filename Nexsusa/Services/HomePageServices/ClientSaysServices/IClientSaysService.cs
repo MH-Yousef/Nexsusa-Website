@@ -12,13 +12,11 @@ namespace Services.HomePageServices.ClientSaysServices
 {
     public interface IClientSaysService
     {
-        Task<ResponseResult<List<ClientSaysDTO>>> Get();
+        Task<ResponseResult<List<ClientSaysDTO>>> GetList(int LanguageId);
         //====================================================================================================
-        Task<ResponseResult<ClientSaysDTO>> GetById(int id);
+        Task<ResponseResult<ClientSaysDTO>> GetById(int id, int LanguageId);
         //====================================================================================================
-        Task<ResponseResult<ClientSaysDTO>> Create(ClientSaysDTO dto);
-        //====================================================================================================
-        Task<ResponseResult<ClientSaysDTO>> Update(ClientSaysDTO dto);
+        Task<ResponseResult<List<ClientSaysDTO>>> Manage(List<ClientSaysDTO> dto);
         //====================================================================================================
         Task<ResponseResult<ClientSaysDTO>> Delete(int id);
         //====================================================================================================

@@ -10,7 +10,9 @@ namespace Core.HomePage.HomePageItems
 {
     public class WorkShowCaseService : _Base<int>
     {
+        [Translatable]
         public string Title { get; set; }
+        [Translatable]
         public string Description { get; set; }
         public string ImageUrl { get; set; }
         [ForeignKey(nameof(WorkShowCaseNavBarItemId))]

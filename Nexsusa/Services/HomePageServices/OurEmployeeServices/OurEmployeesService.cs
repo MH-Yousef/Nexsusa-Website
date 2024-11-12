@@ -1,40 +1,32 @@
 ﻿using AutoMapper;
+using Core.Domains.Enums;
 using Core.HomePage.HomePageItems;
 using Data.Context;
+using Data.Dtos.ClientSaysDTOs;
+using Data.Dtos.OurCompanyDTOs;
 using Data.Dtos.OurEmployeeDTOs;
 using Microsoft.EntityFrameworkCore;
 using Services._Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Services._GenericServices;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Services.HomePageServices.OurEmployeeServices
 {
     public class OurEmployeesService : BaseService, IOurEmployeesService
     {
-        public OurEmployeesService(AppDbContext dbContext, IMapper mapper) : base(dbContext, mapper)
+        private readonly GenericService<OurEmployees> genericService;
+        public OurEmployeesService(AppDbContext dbContext, IMapper mapper, GenericService<OurEmployees> genericService) : base(dbContext, mapper)
         {
+            this.genericService = genericService;
         }
 
-        public async Task<ResponseResult<List<OurEmployeesDTO>>> Get()
+        public async Task<ResponseResult<List<OurEmployeesDTO>>> GetList(int LanguageId)
         {
             try
             {
-                var employees = await _dbContext.OurEmployees
-                    .Where(x => !x.IsDeleted)
-                    .Include(x => x.OurEmployeesItems)  // Include to load related items
-                    .ToListAsync();
-
-                if (employees == null || !employees.Any())
-                {
-                    return Error<List<OurEmployeesDTO>>("Our employees not found", HttpStatusCode.NotFound);
-                }
-
-                var employeesDtos = _mapper.Map<List<OurEmployeesDTO>>(employees);
-                return Success(employeesDtos);
+                var items = await genericService.GetListAsync(LanguageId, StringResourceEnums.OurEmployee, x => x.OurEmployeesItems);
+                var dto = _mapper.Map<List<OurEmployees>, List<OurEmployeesDTO>>(items.Data);
+                return Success(dto);
             }
             catch (Exception ex)
             {
@@ -42,38 +34,12 @@ namespace Services.HomePageServices.OurEmployeeServices
             }
         }
 
-        public async Task<ResponseResult<OurEmployeesDTO>> GetById(int id)
+        public async Task<ResponseResult<OurEmployeesDTO>> GetById(int id, int LanguageId)
         {
             try
             {
-                var employee = await _dbContext.OurEmployees
-                    .Where(x => x.Id == id && !x.IsDeleted)
-                    .Include(x => x.OurEmployeesItems)  // Include to load related items
-                    .FirstOrDefaultAsync();
-
-                if (employee == null)
-                {
-                    return Error<OurEmployeesDTO>("Our employee not found", HttpStatusCode.NotFound);
-                }
-
-                var employeeDto = _mapper.Map<OurEmployeesDTO>(employee);
-                return Success(employeeDto);
-            }
-            catch (Exception ex)
-            {
-                return Error<OurEmployeesDTO>(ex);
-            }
-        }
-
-        public async Task<ResponseResult<OurEmployeesDTO>> Create(OurEmployeesDTO dto)
-        {
-            try
-            {
-                var employee = _mapper.Map<OurEmployees>(dto);
-                await _dbContext.OurEmployees.AddAsync(employee);
-                await _dbContext.SaveChangesAsync();
-
-                dto.Id = employee.Id;
+                var model = await genericService.GetByIdAsync(id, LanguageId, StringResourceEnums.OurEmployee);
+                var dto = _mapper.Map<OurEmployees, OurEmployeesDTO>(model);
                 return Success(dto);
             }
             catch (Exception ex)
@@ -82,52 +48,51 @@ namespace Services.HomePageServices.OurEmployeeServices
             }
         }
 
-        public async Task<ResponseResult<OurEmployeesDTO>> Update(OurEmployeesDTO dto)
+        public async Task<ResponseResult<List<OurEmployeesDTO>>> Manage(List<OurEmployeesDTO> dtos)
         {
             try
             {
-                var employee = await _dbContext.OurEmployees
-                    .FirstOrDefaultAsync(x => x.Id == dto.Id && !x.IsDeleted);
-
-                if (employee == null)
+                var defultLanguage = await _dbContext.Languages.FirstAsync(x => x.IsDefault);
+                var defultModel = dtos.Where(x => x.LangId == defultLanguage.Id).FirstOrDefault();
+                var mainItem = _mapper.Map<OurEmployeesDTO, OurEmployees>(defultModel);
+                if (defultModel.Id > 0)
                 {
-                    return Error<OurEmployeesDTO>("Our employee not found", HttpStatusCode.NotFound);
+                    var result = await genericService.UpdateAsync(mainItem);
+                }
+                else
+                {
+                    var result = await genericService.CreateAsync(mainItem);
                 }
 
-                employee = _mapper.Map(dto, employee);
-                _dbContext.Update(employee);
+                // Add Translations
+                foreach (var item in dtos)
+                {
+                    var translations = new List<(string ColumnName, string ColumnValue)>
+                            {
+                                ("Title", item.Title),
+                                ("Description", item.Description),
+                            };
+                    if (item.Id > 0)
+                    {
+                        await genericService.UpdateTranslationsAsync(StringResourceEnums.OurEmployee, translations, mainItem.Id, item.LangId);
+                    }
+                    else
+                    {
+                        await genericService.AddTranslationsAsync(StringResourceEnums.OurEmployee, translations, mainItem.Id, item.LangId);
+                    }
+                }
 
-                await _dbContext.SaveChangesAsync();
-
-                return Success(dto);
+                return Success(dtos);
             }
             catch (Exception ex)
             {
-                return Error<OurEmployeesDTO>(ex);
+                return Error<List<OurEmployeesDTO>>(ex);
             }
         }
 
-        public async Task<ResponseResult<OurEmployeesDTO>> Delete(int id)
+        public Task<ResponseResult<OurEmployeesDTO>> Delete(int id)
         {
-            try
-            {
-                var employee = await _dbContext.OurEmployees
-                    .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
-
-                if (employee == null)
-                {
-                    return Error<OurEmployeesDTO>("Our employee not found", HttpStatusCode.NotFound);
-                }
-
-                _dbContext.OurEmployees.Remove(employee);
-                await _dbContext.SaveChangesAsync();
-
-                return Success<OurEmployeesDTO>();
-            }
-            catch (Exception ex)
-            {
-                return Error<OurEmployeesDTO>(ex);
-            }
+            throw new NotImplementedException();
         }
     }
 

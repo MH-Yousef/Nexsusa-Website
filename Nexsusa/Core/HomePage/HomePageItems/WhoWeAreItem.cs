@@ -10,6 +10,7 @@ namespace Core.HomePage.HomePageItems
 {
     public class WhoWeAreItem : _Base<int>
     {
+        [Translatable]
         public string Description { get; set; }
         [ForeignKey(nameof(WhoWeAreId))]
         public int WhoWeAreId { get; set; }

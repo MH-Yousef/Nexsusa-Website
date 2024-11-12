@@ -23,7 +23,7 @@ namespace Services.HomePageServices.ServiceServices
             _genericService = genericService;
         }
 
-        public async Task<ResponseResult<List<ServiceDTO>>> Get(int langId)
+        public async Task<ResponseResult<List<ServiceDTO>>> GetList(int langId)
         {
             try
             {

@@ -1,4 +1,5 @@
-﻿using Data.Dtos.BaseDTOs;
+﻿using Core.Domains;
+using Data.Dtos.BaseDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,9 @@ namespace Data.Dtos.ServiceDTOs
 {
     public class ServiceDTO : BaseDTO<int>
     {
+        [Translatable]
         public string Title { get; set; }
+        [Translatable]
         public string Description { get; set; }
         public List<ServiceItemDTO> ServiceItems { get; set; }
     }

@@ -11,7 +11,9 @@ namespace Core.HomePage.HomePageItems
     public class WorkingProcessItem : _Base<int>
     {
         public string Icon { get; set; }
+        [Translatable]
         public string Title { get; set; }
+        [Translatable]
         public string Description { get; set; }
 
         [ForeignKey(nameof(WorkingProcessId))]

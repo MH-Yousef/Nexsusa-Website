@@ -1,4 +1,5 @@
-﻿using Data.Dtos.BaseDTOs;
+﻿using Core.Domains;
+using Data.Dtos.BaseDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,7 @@ namespace Data.Dtos.WorkShowCaseDTOs
 {
     public class WorkShowCaseNavBarDTO : BaseDTO<int>
     {
+        [Translatable]
         public string Name { get; set; }
         public string Url { get; set; }
         public string Icon { get; set; }

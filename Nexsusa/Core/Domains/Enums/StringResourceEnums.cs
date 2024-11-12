@@ -12,6 +12,7 @@ namespace Core.Domains.Enums
         ClientSaysItem,
         ClientSays,
         Footer,
+        FooterService,
         FooterSub,
         NavBarItem,
         NavBarSubItem,

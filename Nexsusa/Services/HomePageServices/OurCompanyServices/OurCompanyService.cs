@@ -1,9 +1,14 @@
 ﻿using AutoMapper;
+using Core.Domains.Enums;
 using Core.HomePage.HomePageItems;
 using Data.Context;
+using Data.Dtos.FooterDTOs;
+using Data.Dtos.FooterServiceDTOs;
 using Data.Dtos.OurCompanyDTOs;
+using Data.Dtos.QuickLinkDTOs;
 using Microsoft.EntityFrameworkCore;
 using Services._Base;
+using Services._GenericServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,25 +20,18 @@ namespace Services.HomePageServices.OurCompanyServices
 {
     public class OurCompanyService : BaseService, IOurCompanyService
     {
-        public OurCompanyService(AppDbContext dbContext, IMapper mapper) : base(dbContext, mapper)
+        private readonly GenericService<OurCompany> genericService;
+        public OurCompanyService(AppDbContext dbContext, IMapper mapper, GenericService<OurCompany> genericService) : base(dbContext, mapper)
         {
+            this.genericService = genericService;
         }
-
-        public async Task<ResponseResult<List<OurCompanyDTO>>> Get()
+        public async Task<ResponseResult<List<OurCompanyDTO>>> GetList(int LanguageId)
         {
             try
             {
-                var companies = await _dbContext.OurCompanys
-                    .Where(x => !x.IsDeleted)
-                    .ToListAsync();
-
-                if (companies == null || !companies.Any())
-                {
-                    return Error<List<OurCompanyDTO>>("Our companies not found", HttpStatusCode.NotFound);
-                }
-
-                var companyDtos = _mapper.Map<List<OurCompanyDTO>>(companies);
-                return Success(companyDtos);
+                var items = await genericService.GetListAsync(LanguageId, StringResourceEnums.OurCompany);
+                var dto = _mapper.Map<List<OurCompany>, List<OurCompanyDTO>>(items.Data);
+                return Success(dto);
             }
             catch (Exception ex)
             {
@@ -41,36 +39,12 @@ namespace Services.HomePageServices.OurCompanyServices
             }
         }
 
-        public async Task<ResponseResult<OurCompanyDTO>> GetById(int id)
+        public async Task<ResponseResult<OurCompanyDTO>> GetById(int id, int LanguageId)
         {
             try
             {
-                var company = await _dbContext.OurCompanys
-                    .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
-
-                if (company == null)
-                {
-                    return Error<OurCompanyDTO>("Our company not found", HttpStatusCode.NotFound);
-                }
-
-                var companyDto = _mapper.Map<OurCompanyDTO>(company);
-                return Success(companyDto);
-            }
-            catch (Exception ex)
-            {
-                return Error<OurCompanyDTO>(ex);
-            }
-        }
-
-        public async Task<ResponseResult<OurCompanyDTO>> Create(OurCompanyDTO dto)
-        {
-            try
-            {
-                var company = _mapper.Map<OurCompany>(dto);
-                await _dbContext.OurCompanys.AddAsync(company);
-                await _dbContext.SaveChangesAsync();
-
-                dto.Id = company.Id;
+                var model = await genericService.GetByIdAsync(id, LanguageId, StringResourceEnums.OurCompany);
+                var dto = _mapper.Map<OurCompany, OurCompanyDTO>(model);
                 return Success(dto);
             }
             catch (Exception ex)
@@ -78,54 +52,52 @@ namespace Services.HomePageServices.OurCompanyServices
                 return Error<OurCompanyDTO>(ex);
             }
         }
-
-        public async Task<ResponseResult<OurCompanyDTO>> Update(OurCompanyDTO dto)
+        
+        public async Task<ResponseResult<List<OurCompanyDTO>>> Manage(List<OurCompanyDTO> dtos)
         {
             try
             {
-                var company = await _dbContext.OurCompanys
-                    .FirstOrDefaultAsync(x => x.Id == dto.Id && !x.IsDeleted);
-
-                if (company == null)
+                var defultLanguage = await _dbContext.Languages.FirstAsync(x => x.IsDefault);
+                var defultModel = dtos.Where(x => x.LangId == defultLanguage.Id).FirstOrDefault();
+                var mainItem = _mapper.Map<OurCompanyDTO, OurCompany>(defultModel);
+                if (defultModel.Id > 0)
                 {
-                    return Error<OurCompanyDTO>("Our company not found", HttpStatusCode.NotFound);
+                    var result = await genericService.UpdateAsync(mainItem);
+                }
+                else
+                {
+                    var result = await genericService.CreateAsync(mainItem);
                 }
 
-                company = _mapper.Map(dto, company);
-                _dbContext.Update(company);
+                // Add Translations
+                foreach (var item in dtos)
+                {
+                    var translations = new List<(string ColumnName, string ColumnValue)>
+                            {
+                                ("Title", item.Title),
+                                ("Description", item.Description),
+                            };
+                    if (item.Id > 0)
+                    {
+                        await genericService.UpdateTranslationsAsync(StringResourceEnums.OurCompany, translations, mainItem.Id, item.LangId);
+                    }
+                    else
+                    {
+                        await genericService.AddTranslationsAsync(StringResourceEnums.OurCompany, translations, mainItem.Id, item.LangId);
+                    }
+                }
 
-                await _dbContext.SaveChangesAsync();
-
-                return Success(dto);
+                return Success(dtos);
             }
             catch (Exception ex)
             {
-                return Error<OurCompanyDTO>(ex);
+                return Error<List<OurCompanyDTO>>(ex);
             }
         }
 
-        public async Task<ResponseResult<OurCompanyDTO>> Delete(int id)
+        public Task<ResponseResult<OurCompanyDTO>> Delete(int id)
         {
-            try
-            {
-                var company = await _dbContext.OurCompanys
-                    .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
-
-                if (company == null)
-                {
-                    return Error<OurCompanyDTO>("Our company not found", HttpStatusCode.NotFound);
-                }
-
-                _dbContext.OurCompanys.Remove(company);
-                await _dbContext.SaveChangesAsync();
-
-                return Success<OurCompanyDTO>();
-            }
-            catch (Exception ex)
-            {
-                return Error<OurCompanyDTO>(ex);
-            }
+            throw new NotImplementedException();
         }
     }
-
 }

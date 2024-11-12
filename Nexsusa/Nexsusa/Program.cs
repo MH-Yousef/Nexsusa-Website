@@ -116,6 +116,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.UseStaticFiles();
 app.MapRazorPages();
+app.UseRouting();
 app.MapControllerRoute(
     name: "Areas",
     pattern: "{area:exists}/{controller=Dashboard}/{action=Dashboard}/{id?}");

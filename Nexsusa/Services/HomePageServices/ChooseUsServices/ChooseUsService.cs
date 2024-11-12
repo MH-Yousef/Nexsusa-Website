@@ -35,8 +35,8 @@ namespace Services.HomePageServices.ChooseUsServices
                         foreach (var sub in item.Questions)
                         {
                             sub.LangId = LanguageId;
-                            sub.Title = genericService.ApplyTranslations<QuestionDTO>(sub, LanguageId, sub.Id, StringResourceEnums.ChooseUs).Title;
-                            sub.Description = genericService.ApplyTranslations<QuestionDTO>(sub, LanguageId, sub.Id, StringResourceEnums.ChooseUs).Description;
+                            sub.Title = genericService.ApplyTranslations<QuestionDTO>(sub, LanguageId, sub.Id, StringResourceEnums.Question).Title;
+                            sub.Description = genericService.ApplyTranslations<QuestionDTO>(sub, LanguageId, sub.Id, StringResourceEnums.Question).Description;
                         }
                     }
                 }
@@ -59,8 +59,8 @@ namespace Services.HomePageServices.ChooseUsServices
                     foreach (var sub in dto.Questions)
                     {
                         sub.LangId = LanguageId;
-                        sub.Title = genericService.ApplyTranslations<QuestionDTO>(sub, LanguageId, sub.Id, StringResourceEnums.ChooseUs).Title;
-                        sub.Description = genericService.ApplyTranslations<QuestionDTO>(sub, LanguageId, sub.Id, StringResourceEnums.ChooseUs).Description;
+                        sub.Title = genericService.ApplyTranslations<QuestionDTO>(sub, LanguageId, sub.Id, StringResourceEnums.Question).Title;
+                        sub.Description = genericService.ApplyTranslations<QuestionDTO>(sub, LanguageId, sub.Id, StringResourceEnums.Question).Description;
                     }
                 }
                 return Success(dto);
@@ -96,11 +96,11 @@ namespace Services.HomePageServices.ChooseUsServices
                     };
                     if (item.Id > 0)
                     {
-                        await genericService.UpdateTranslationsAsync(StringResourceEnums.NavBarItem, translations, MainItem.Id, item.LangId);
+                        await genericService.UpdateTranslationsAsync(StringResourceEnums.ChooseUs, translations, MainItem.Id, item.LangId);
                     }
                     else
                     {
-                        await genericService.AddTranslationsAsync(StringResourceEnums.NavBarItem, translations, MainItem.Id, item.LangId);
+                        await genericService.AddTranslationsAsync(StringResourceEnums.ChooseUs, translations, MainItem.Id, item.LangId);
                     }
                     if (item.Questions.Any())
                     {
@@ -115,11 +115,11 @@ namespace Services.HomePageServices.ChooseUsServices
                             };
                             if (subTtem.Id > 0)
                             {
-                                await genericService.UpdateTranslationsAsync(StringResourceEnums.NavBarSubItem, Subtranslations, subNavBar.Id, subTtem.LangId);
+                                await genericService.UpdateTranslationsAsync(StringResourceEnums.Question, Subtranslations, subNavBar.Id, subTtem.LangId);
                             }
                             else
                             {
-                                await genericService.AddTranslationsAsync(StringResourceEnums.NavBarSubItem, Subtranslations, subNavBar.Id, subTtem.LangId);
+                                await genericService.AddTranslationsAsync(StringResourceEnums.Question, Subtranslations, subNavBar.Id, subTtem.LangId);
                             }
                         }
                     }

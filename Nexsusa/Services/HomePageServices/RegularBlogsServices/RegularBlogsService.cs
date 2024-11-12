@@ -25,7 +25,7 @@ namespace Services.HomePageServices.RegularBlogsServices
             _genericService = genericService;
         }
 
-        public async Task<ResponseResult<List<RegularBlogsDTO>>> Get(int langId)
+        public async Task<ResponseResult<List<RegularBlogsDTO>>> GetList(int langId)
         {
             try
             {

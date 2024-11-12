@@ -1,38 +1,43 @@
 ﻿using AutoMapper;
+using Core.Domains.Enums;
 using Core.HomePage.HomePageItems;
 using Data.Context;
 using Data.Dtos.ClientSaysDTOs;
+using Data.Dtos.ClientSaysItemDTOs;
 using Microsoft.EntityFrameworkCore;
 using Services._Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Services._GenericServices;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Services.HomePageServices.ClientSaysServices
 {
     public class ClientSaysService : BaseService, IClientSaysService
     {
-        public ClientSaysService(AppDbContext dbContext, IMapper mapper) : base(dbContext, mapper)
+        private readonly GenericService<ClientSays> genericService;
+        public ClientSaysService(AppDbContext dbContext, IMapper mapper, GenericService<ClientSays> genericService) : base(dbContext, mapper)
         {
+            this.genericService = genericService;
         }
-        public async Task<ResponseResult<List<ClientSaysDTO>>> Get()
+        public async Task<ResponseResult<List<ClientSaysDTO>>> GetList(int LanguageId)
         {
+
             try
             {
-                var clientSaysList = await _dbContext.ClientSays
-                    .Where(x => !x.IsDeleted)
-                    .ToListAsync();
-
-                if (clientSaysList == null || !clientSaysList.Any())
+                var items = await genericService.GetListAsync(LanguageId, StringResourceEnums.ClientSays, x => x.ClientSaysItems);
+                var dto = _mapper.Map<List<ClientSays>, List<ClientSaysDTO>>(items.Data);
+                foreach (var item in dto)
                 {
-                    return Error<List<ClientSaysDTO>>("ClientSays not found", HttpStatusCode.NotFound);
+                    item.LangId = LanguageId;
+                    if (item.ClientSaysItems != null)
+                    {
+                        foreach (var sub in item.ClientSaysItems)
+                        {
+                            sub.LangId = LanguageId;
+                            sub.Description = genericService.ApplyTranslations<ClientSaysItemDTO>(sub, LanguageId, sub.Id, StringResourceEnums.ClientSaysItem).Description;
+                        }
+                    }
                 }
-
-                var clientSaysDtoList = _mapper.Map<List<ClientSaysDTO>>(clientSaysList);
-                return Success(clientSaysDtoList);
+                return Success(dto);
             }
             catch (Exception ex)
             {
@@ -40,36 +45,22 @@ namespace Services.HomePageServices.ClientSaysServices
             }
         }
 
-        public async Task<ResponseResult<ClientSaysDTO>> GetById(int id)
+        public async Task<ResponseResult<ClientSaysDTO>> GetById(int id, int LanguageId)
         {
             try
             {
-                var clientSay = await _dbContext.ClientSays
-                    .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
+                var model = await genericService.GetByIdAsync(id, LanguageId, StringResourceEnums.NavBarItem, x => x.ClientSaysItems);
+                var dto = _mapper.Map<ClientSays, ClientSaysDTO>(model);
 
-                if (clientSay == null)
+                if (dto.ClientSaysItems != null)
                 {
-                    return Error<ClientSaysDTO>("ClientSays not found", HttpStatusCode.NotFound);
+                    foreach (var item in dto.ClientSaysItems)
+                    {
+                        item.LangId = LanguageId;
+                        item.Description = genericService.ApplyTranslations<ClientSaysItemDTO>(item, LanguageId, item.Id, StringResourceEnums.NavBarSubItem).Description;
+                    }
                 }
 
-                var clientSaysDto = _mapper.Map<ClientSaysDTO>(clientSay);
-                return Success(clientSaysDto);
-            }
-            catch (Exception ex)
-            {
-                return Error<ClientSaysDTO>(ex);
-            }
-        }
-
-        public async Task<ResponseResult<ClientSaysDTO>> Create(ClientSaysDTO dto)
-        {
-            try
-            {
-                var clientSay = _mapper.Map<ClientSays>(dto);
-                await _dbContext.ClientSays.AddAsync(clientSay);
-                await _dbContext.SaveChangesAsync();
-
-                dto.Id = clientSay.Id;
                 return Success(dto);
             }
             catch (Exception ex)
@@ -78,28 +69,69 @@ namespace Services.HomePageServices.ClientSaysServices
             }
         }
 
-        public async Task<ResponseResult<ClientSaysDTO>> Update(ClientSaysDTO dto)
+        public async Task<ResponseResult<List<ClientSaysDTO>>> Manage(List<ClientSaysDTO> dtos)
         {
             try
             {
-                var clientSay = await _dbContext.ClientSays.FirstOrDefaultAsync(x => x.Id == dto.Id && !x.IsDeleted);
-                if (clientSay == null)
+                var defultLanguage = await _dbContext.Languages.FirstAsync(x => x.IsDefault);
+                var defultModel = dtos.Where(x => x.LangId == defultLanguage.Id).FirstOrDefault();
+                var mainItem = _mapper.Map<ClientSaysDTO, ClientSays>(defultModel);
+                if (defultModel.Id > 0)
                 {
-                    return Error<ClientSaysDTO>("ClientSays not found", HttpStatusCode.NotFound);
+                    var result = await genericService.UpdateAsync(mainItem);
+                }
+                else
+                {
+                    var result = await genericService.CreateAsync(mainItem);
                 }
 
-                clientSay = _mapper.Map(dto, clientSay);
-                _dbContext.Update(clientSay);
+                // Add Translations
+                foreach (var item in dtos)
+                {
+                    var translations = new List<(string ColumnName, string ColumnValue)>
+                            {
+                                ("Title", item.Title),
+                                ("Description", item.Description),
+                            };
+                    if (item.Id > 0)
+                    {
+                        await genericService.UpdateTranslationsAsync(StringResourceEnums.NavBarItem, translations, mainItem.Id, item.LangId);
+                    }
+                    else
+                    {
+                        await genericService.AddTranslationsAsync(StringResourceEnums.NavBarItem, translations, mainItem.Id, item.LangId);
+                    }
+                    if (item.ClientSaysItems.Any())
+                    {
 
-                await _dbContext.SaveChangesAsync();
+                        foreach (var subItem in item.ClientSaysItems)
+                        {
+                            var subItemModel = await _dbContext.ClientSaysItems.FirstOrDefaultAsync(x => x.ClientSaysId == mainItem.Id);
+                            var Subtranslations = new List<(string ColumnName, string ColumnValue)>
+                            {
+                                ("Description", subItem.Description),
+                            };
+                            if (subItem.Id > 0)
+                            {
+                                await genericService.UpdateTranslationsAsync(StringResourceEnums.NavBarSubItem, Subtranslations, subItemModel.Id, subItem.LangId);
+                            }
+                            else
+                            {
+                                await genericService.AddTranslationsAsync(StringResourceEnums.NavBarSubItem, Subtranslations, subItemModel.Id, subItem.LangId);
+                            }
+                        }
+                    }
+                }
 
-                return Success(dto);
+                return Success(dtos);
             }
             catch (Exception ex)
             {
-                return Error<ClientSaysDTO>(ex);
+                return Error<List<ClientSaysDTO>>(ex);
             }
         }
+
+
 
         public async Task<ResponseResult<ClientSaysDTO>> Delete(int id)
         {

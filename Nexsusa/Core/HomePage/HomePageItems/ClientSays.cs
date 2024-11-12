@@ -9,7 +9,9 @@ namespace Core.HomePage.HomePageItems
 {
     public class ClientSays : _Base<int>
     {
+        [Translatable]
         public string Title { get; set; }
+        [Translatable]
         public string Description { get; set; }
         public List<ClientSaysItem> ClientSaysItems { get; set; }
     }

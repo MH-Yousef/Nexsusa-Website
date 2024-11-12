@@ -1,4 +1,5 @@
-﻿using Data.Dtos.BaseDTOs;
+﻿using Core.Domains;
+using Data.Dtos.BaseDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,9 @@ namespace Data.Dtos.RegularBlogsDTOs
 {
     public class RegularBlogsDTO : BaseDTO<int>
     {
+        [Translatable]
         public string Title { get; set; }
+        [Translatable]
         public string Description { get; set; }
         public List<RegularBlogsItemDTO> RegularBlogsItems { get; set; }
     }

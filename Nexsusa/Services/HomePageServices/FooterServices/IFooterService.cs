@@ -10,10 +10,9 @@ namespace Services.HomePageServices.FooterServices
 {
     public interface IFooterService
     {
-        Task<ResponseResult<List<FooterDTO>>> Get();
-        Task<ResponseResult<FooterDTO>> GetById(int id);
-        Task<ResponseResult<FooterDTO>> Create(FooterDTO dto);
-        Task<ResponseResult<FooterDTO>> Update(FooterDTO dto);
+        Task<ResponseResult<List<FooterDTO>>> GetList(int LanguageId);
+        Task<ResponseResult<FooterDTO>> GetById(int id, int LanguageId);
+        Task<ResponseResult<List<FooterDTO>>> Manage(List<FooterDTO> dtos);
         Task<ResponseResult<FooterDTO>> Delete(int id);
     }
 }

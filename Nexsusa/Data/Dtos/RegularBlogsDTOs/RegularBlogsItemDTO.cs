@@ -1,4 +1,5 @@
-﻿using Core.HomePage.HomePageItems;
+﻿using Core.Domains;
+using Core.HomePage.HomePageItems;
 using Data.Dtos.BaseDTOs;
 using System;
 using System.Collections.Generic;
@@ -9,13 +10,15 @@ using System.Threading.Tasks;
 
 namespace Data.Dtos.RegularBlogsDTOs
 {
-   
-        public class RegularBlogsItemDTO : BaseDTO<int>
-        {
-            public string Title { get; set; }
-            public string Content { get; set; }
-            public int RegularBlogsId { get; set; }
-        }
 
-    
+    public class RegularBlogsItemDTO : BaseDTO<int>
+    {
+        [Translatable]
+        public string Title { get; set; }
+        [Translatable]
+        public string Content { get; set; }
+        public int RegularBlogsId { get; set; }
+    }
+
+
 }
