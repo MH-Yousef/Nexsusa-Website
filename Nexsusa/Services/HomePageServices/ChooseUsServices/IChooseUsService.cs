@@ -11,14 +11,11 @@ namespace Services.HomePageServices.ChooseUsServices
 {
     public interface IChooseUsService
     {
-        Task<ResponseResult<List<ChooseUsDTO>>> Get();
-
+        Task<ResponseResult<List<ChooseUsDTO>>> GetList(int LanguageId);
         //====================================================================================================
-        Task<ResponseResult<ChooseUsDTO>> GetById(int id);
+        Task<ResponseResult<ChooseUsDTO>> GetById(int id, int LanguageId);
         //====================================================================================================
-        Task<ResponseResult<List<ChooseUsDTO>>> Create(List<ChooseUsDTO> dto);
-        //====================================================================================================
-        Task<ResponseResult<ChooseUsDTO>> Update(ChooseUsDTO dto);
+        Task<ResponseResult<List<ChooseUsDTO>>> Manage(List<ChooseUsDTO> dto);
         //====================================================================================================
         Task<ResponseResult<ChooseUsDTO>> Delete(int id);
         //====================================================================================================

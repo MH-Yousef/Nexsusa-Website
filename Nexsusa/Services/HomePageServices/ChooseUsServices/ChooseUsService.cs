@@ -1,158 +1,139 @@
 ﻿using AutoMapper;
+using Core.Domains.Enums;
 using Core.Domains.Languages;
 using Core.HomePage.HomePageItems;
 using Data.Context;
 using Data.Dtos.ChooseUsDTOs;
+using Data.Dtos.QuestionDTOs;
 using Microsoft.EntityFrameworkCore;
 using Services._Base;
+using Services._GenericServices;
 using Services._GenericServices.Test;
 
 namespace Services.HomePageServices.ChooseUsServices
 {
     public class ChooseUsService : BaseService, IChooseUsService
     {
-        private readonly ITestGeneric<List<ChooseUsDTO>> testGeneric;
-        public ChooseUsService(AppDbContext context, IMapper mapper, ITestGeneric<List<ChooseUsDTO>> testGeneric) : base(context, mapper)
+        private readonly GenericService<ChooseUs> genericService;
+
+        public ChooseUsService(AppDbContext dbContext, IMapper mapper, GenericService<ChooseUs> genericService) : base(dbContext, mapper)
         {
-            this.testGeneric = testGeneric;
+            this.genericService = genericService;
         }
-        public async Task<ResponseResult<List<ChooseUsDTO>>> Create(List<ChooseUsDTO> dtos)
+
+        public async Task<ResponseResult<List<ChooseUsDTO>>> GetList(int LanguageId)
         {
             try
             {
-                var result = await testGeneric.Create(dtos);
-
-
-
-                var defultLang = await _dbContext.Languages.FirstOrDefaultAsync(x => x.IsDefault);
-                var dto = dtos.Where(x => x.LangId == defultLang?.Id).FirstOrDefault();
-                var chooseUs = _mapper.Map<ChooseUsDTO, ChooseUs>(dto);
-                await _dbContext.AddAsync(chooseUs);
-
-                foreach (var item in dtos)
+                var choosUsItems = await genericService.GetListAsync(LanguageId, StringResourceEnums.ChooseUs, x => x.Questions);
+                var dto = _mapper.Map<List<ChooseUs>, List<ChooseUsDTO>>(choosUsItems.Data);
+                foreach (var item in dto)
                 {
-                    _dbContext.StringResources.Add(new StringResource
+                    item.LangId = LanguageId;
+                    if (item.Questions != null)
                     {
-                        Key = nameof(item.Title),
-                        CreatedDate = DateTime.Now,
-                        UpdatedDate = DateTime.Now,
-                        IsDeleted = false,
-                        LanguageId = item.LangId,
-                        ResourceId = item.Id,
-                        Value = item.Title,
-                    });
-                    _dbContext.StringResources.Add(new StringResource
-                    {
-                        Key = nameof(item.Description),
-                        CreatedDate = DateTime.Now,
-                        UpdatedDate = DateTime.Now,
-                        IsDeleted = false,
-                        LanguageId = item.LangId,
-                        ResourceId = item.Id,
-                        Value = item.Description,
-                    });
+                        foreach (var sub in item.Questions)
+                        {
+                            sub.LangId = LanguageId;
+                            sub.Title = genericService.ApplyTranslations<QuestionDTO>(sub, LanguageId, sub.Id, StringResourceEnums.ChooseUs).Title;
+                            sub.Description = genericService.ApplyTranslations<QuestionDTO>(sub, LanguageId, sub.Id, StringResourceEnums.ChooseUs).Description;
+                        }
+                    }
                 }
-
-
-                await _dbContext.SaveChangesAsync();
-                return Success(dtos);
-
-            }
-            catch (Exception ex)
-            {
-
-                return Error<List<ChooseUsDTO>>(ex);
-            }
-        }
-
-        public async Task<ResponseResult<ChooseUsDTO>> Delete(int id)
-        {
-            try
-            {
-                var chooseUs = await _dbContext.ChooseUs.FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
-                if (chooseUs == null)
-                {
-                    return Error<ChooseUsDTO>("ChooseUs Not Found");
-                }
-                _dbContext.Remove(chooseUs);
-                await _dbContext.SaveChangesAsync();
-                return Success<ChooseUsDTO>();
-            }
-            catch (Exception ex)
-            {
-
-                return Error<ChooseUsDTO>(ex);
-            }
-        }
-
-        public async Task<ResponseResult<List<ChooseUsDTO>>> Get()
-        {
-            try
-            {
-                var chooseUs = await _dbContext.ChooseUs.AsNoTracking().ToListAsync();
-                var dtos = chooseUs.Select(x => _mapper.Map<ChooseUs, ChooseUsDTO>(x));
-                return Success(dtos.ToList());
-            }
-            catch (Exception ex)
-            {
-
-                return Error<List<ChooseUsDTO>>(ex);
-            }
-
-
-        }
-
-        public async Task<ResponseResult<ChooseUsDTO>> GetById(int id)
-        {
-            try
-            {
-                var chooseUs = await _dbContext.ChooseUs
-                 .AsNoTracking()
-                  .FirstOrDefaultAsync(x => x.Id == id);
-
-                if (chooseUs == null)
-                {
-                    return Error<ChooseUsDTO>("ChooseUs Not Found");
-                }
-
-                var dto = _mapper.Map<ChooseUs, ChooseUsDTO>(chooseUs);
                 return Success(dto);
             }
             catch (Exception ex)
             {
-
-                return Error<ChooseUsDTO>(ex);
+                return Error<List<ChooseUsDTO>>(ex);
             }
-
         }
 
-        public async Task<ResponseResult<ChooseUsDTO>> Update(ChooseUsDTO dto)
+        public async Task<ResponseResult<ChooseUsDTO>> GetById(int id, int LanguageId)
         {
             try
             {
-                var chooseUs = await _dbContext.ChooseUs
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.Id == dto.Id);
-
-                if (chooseUs == null)
+                var entity = await genericService.GetByIdAsync(id, LanguageId, StringResourceEnums.ChooseUs, x => x.Questions);
+                var dto = _mapper.Map<ChooseUs, ChooseUsDTO>(entity);
+                if (dto.Questions != null)
                 {
-                    return Error<ChooseUsDTO>("ChooseUs Not Found");
+                    foreach (var sub in dto.Questions)
+                    {
+                        sub.LangId = LanguageId;
+                        sub.Title = genericService.ApplyTranslations<QuestionDTO>(sub, LanguageId, sub.Id, StringResourceEnums.ChooseUs).Title;
+                        sub.Description = genericService.ApplyTranslations<QuestionDTO>(sub, LanguageId, sub.Id, StringResourceEnums.ChooseUs).Description;
+                    }
                 }
-
-                chooseUs = _mapper.Map<ChooseUsDTO, ChooseUs>(dto);
-
-                _dbContext.ChooseUs.Update(chooseUs);
-                await _dbContext.SaveChangesAsync();
-
-
-                return Success<ChooseUsDTO>();
+                return Success(dto);
             }
             catch (Exception ex)
             {
-
                 return Error<ChooseUsDTO>(ex);
             }
+        }
 
+        public async Task<ResponseResult<List<ChooseUsDTO>>> Manage(List<ChooseUsDTO> dto)
+        {
+            try
+            {
+                var defultLanguage = await _dbContext.Languages.FirstAsync(x => x.IsDefault);
+                var defultModel = dto.FirstOrDefault(x => x.LangId == defultLanguage.Id);
+                var MainItem = _mapper.Map<ChooseUs>(defultModel);
+                if (MainItem.Id == 0)
+                {
+                    await genericService.CreateAsync(MainItem);
+                }
+                else
+                {
+                    await genericService.UpdateAsync(MainItem);
+                }
+                // Add Translations
+                foreach (var item in dto)
+                {
+                    var translations = new List<(string ColumnName, string ColumnValue)>
+                    {
+                        ("Title", item.Title),
+                        ("Description", item.Description)
+                    };
+                    if (item.Id > 0)
+                    {
+                        await genericService.UpdateTranslationsAsync(StringResourceEnums.NavBarItem, translations, MainItem.Id, item.LangId);
+                    }
+                    else
+                    {
+                        await genericService.AddTranslationsAsync(StringResourceEnums.NavBarItem, translations, MainItem.Id, item.LangId);
+                    }
+                    if (item.Questions.Any())
+                    {
+
+                        foreach (var subTtem in item.Questions)
+                        {
+                            var subNavBar = await _dbContext.NavBarItemSubItems.FirstOrDefaultAsync(x => x.NavBarItemId == MainItem.Id);
+                            var Subtranslations = new List<(string ColumnName, string ColumnValue)>
+                            {
+                                ("Title", subTtem.Title),
+                                ("Description", subTtem.Description)
+                            };
+                            if (subTtem.Id > 0)
+                            {
+                                await genericService.UpdateTranslationsAsync(StringResourceEnums.NavBarSubItem, Subtranslations, subNavBar.Id, subTtem.LangId);
+                            }
+                            else
+                            {
+                                await genericService.AddTranslationsAsync(StringResourceEnums.NavBarSubItem, Subtranslations, subNavBar.Id, subTtem.LangId);
+                            }
+                        }
+                    }
+                }
+                return Success(dto);
+            }
+            catch (Exception ex)
+            {
+                return Error<List<ChooseUsDTO>>(ex);
+            }
+        }
+        public Task<ResponseResult<ChooseUsDTO>> Delete(int id)
+        {
+            throw new NotImplementedException();
         }
     }
 }

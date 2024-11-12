@@ -28,7 +28,13 @@ namespace Nexsusa_Api.Areas.Admin.Controllers
         [HttpPost]
         public async Task<ResponseResult<List<NavBarItemDTO>>> Manage(List<NavBarItemDTO> dto)
         {
-            var result = await _navBarItemService.Create(dto);
+            var result = await _navBarItemService.Manage(dto);
+            return result;
+        }
+        [HttpDelete("{id}")]
+        public async Task<ResponseResult<NavBarItemDTO>> Delete(int id)
+        {
+            var result = await _navBarItemService.Delete(id);
             return result;
         }
 

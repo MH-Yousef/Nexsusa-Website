@@ -12,7 +12,7 @@ namespace Nexsusa_Api.Controllers
         [HttpPost]
         public async Task<ResponseResult<List<NavBarItemDTO>>> Create(List<NavBarItemDTO> dto)
         {
-            var result = await _navbarService.Create(dto);
+            var result = await _navbarService.Manage(dto);
             return result;
         }
     }

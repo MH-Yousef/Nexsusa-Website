@@ -11,11 +11,9 @@ namespace Services.HomePageServices.NavBarItemServices
 {
     public interface INavBarItemService
     {
-        Task<ResponseResult<List<NavBarItemDTO>>> Get(int LanguageId);
         Task<ResponseResult<List<NavBarItemDTO>>> GetList(int LanguageId);
         Task<ResponseResult<NavBarItemDTO>> GetById(int id, int languageId);
-        Task<ResponseResult<List<NavBarItemDTO>>> Create(List<NavBarItemDTO> dto);
-        Task<ResponseResult<NavBarItemDTO>> Update(NavBarItemDTO dto);
+        Task<ResponseResult<List<NavBarItemDTO>>> Manage(List<NavBarItemDTO> dto);
         Task<ResponseResult<NavBarItemDTO>> Delete(int id);
     }
 }

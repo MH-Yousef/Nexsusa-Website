@@ -16,10 +16,17 @@ namespace Services._GenericServices
         {
         }
 
-        public async Task<ResponseResult<T>> CreateAync<T>(T dto)
+        public async Task<ResponseResult<T>> CreateAsync<T>(T dto)
         {
             var entity = _mapper.Map<T>(dto);
             await _dbContext.AddAsync(entity);
+            await _dbContext.SaveChangesAsync();
+            return Success(dto);
+        }
+        public async Task<ResponseResult<T>> UpdateAsync<T>(T dto)
+        {
+            var entity = _mapper.Map<T>(dto);
+            _dbContext.Update(entity);
             await _dbContext.SaveChangesAsync();
             return Success(dto);
         }
@@ -123,6 +130,7 @@ namespace Services._GenericServices
 
             return Success(filteredEntities);
         }
+
         public T ApplyTranslations<T>(T entity, int langId, int resourceId, StringResourceEnums groupKey)
         {
             var properties = typeof(T).GetProperties();
@@ -179,5 +187,6 @@ namespace Services._GenericServices
 
             return hasTranslation;
         }
+
     }
 }

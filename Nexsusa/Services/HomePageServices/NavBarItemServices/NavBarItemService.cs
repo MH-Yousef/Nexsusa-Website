@@ -23,46 +23,7 @@ namespace Services.HomePageServices.NavBarItemServices
             this.genericService = genericService;
         }
 
-        public async Task<ResponseResult<List<NavBarItemDTO>>> Get(int LanguageId)
-        {
-            try
-            {
-                var navbarItems = await _dbContext.NavBarItems.AsNoTracking()
-                    .Include(x => x.NavBarItemSubItems)
-                    .Where(x => !x.IsDeleted).Select(x => new NavBarItemDTO
-                    {
-                        Id = x.Id,
-                        CreatedDate = x.CreatedDate,
-                        HasSubItem = x.HasSubItem,
-                        Icon = x.Icon,
-                        IsVisible = x.IsVisible,
-                        Name = _dbContext.StringResources.Where(t => t.ResourceId == x.Id && t.Key == nameof(x.Name) && t.LanguageId == LanguageId && t.GroupKey == StringResourceEnums.NavBarItem).FirstOrDefault().Value,
-                        LangId = LanguageId,
-                        UpdatedDate = x.UpdatedDate,
-                        Url = x.Url,
-                        NavBarItemSubItems = x.NavBarItemSubItems.Select(s => new NavBarItemSubItemDTO
-                        {
-                            Id = s.Id,
-                            CreatedDate = s.CreatedDate,
-                            Icon = s.Icon,
-                            IsVisible = s.IsVisible,
-                            Name = _dbContext.StringResources.Where(t => t.ResourceId == s.Id && t.Key == nameof(s.Name) && t.LanguageId == LanguageId && t.GroupKey == StringResourceEnums.NavBarSubItem).FirstOrDefault().Value,
-                            UpdatedDate = s.UpdatedDate,
-                            Url = s.Url
-                        }).ToList()
-                    }).ToListAsync();
-                if (navbarItems == null)
-                {
-                    return Error<List<NavBarItemDTO>>("NavBar item not found", HttpStatusCode.NotFound);
-                }
-                return Success(navbarItems);
-            }
-            catch (Exception ex)
-            {
-                return Error<List<NavBarItemDTO>>(ex);
-            }
 
-        }
         public async Task<ResponseResult<List<NavBarItemDTO>>> GetList(int LanguageId)
         {
             try
@@ -113,15 +74,22 @@ namespace Services.HomePageServices.NavBarItemServices
             }
         }
 
-        public async Task<ResponseResult<List<NavBarItemDTO>>> Create(List<NavBarItemDTO> dtos)
+        public async Task<ResponseResult<List<NavBarItemDTO>>> Manage(List<NavBarItemDTO> dtos)
         {
             try
             {
                 var defultLanguage = await _dbContext.Languages.FirstAsync(x => x.IsDefault);
                 var defultModel = dtos.Where(x => x.LangId == defultLanguage.Id).FirstOrDefault();
-                var all = _mapper.Map<List<NavBarItem>>(dtos);
                 var navBarItem = _mapper.Map<NavBarItemDTO, NavBarItem>(defultModel);
-                var result = await genericService.CreateAync(navBarItem);
+                if (defultModel.Id > 0)
+                {
+                    var result = await genericService.UpdateAsync(navBarItem);
+                }
+                else
+                {
+                    var result = await genericService.CreateAsync(navBarItem);
+                }
+
                 // Add Translations
                 foreach (var item in dtos)
                 {
@@ -132,13 +100,33 @@ namespace Services.HomePageServices.NavBarItemServices
                     if (item.Id > 0)
                     {
                         await genericService.UpdateTranslationsAsync(StringResourceEnums.NavBarItem, translations, navBarItem.Id, item.LangId);
-
                     }
                     else
                     {
                         await genericService.AddTranslationsAsync(StringResourceEnums.NavBarItem, translations, navBarItem.Id, item.LangId);
                     }
+                    if (item.NavBarItemSubItems.Any())
+                    {
+
+                        foreach (var subTtem in item.NavBarItemSubItems)
+                        {
+                            var subNavBar = await _dbContext.NavBarItemSubItems.FirstOrDefaultAsync(x => x.NavBarItemId == navBarItem.Id);
+                            var Subtranslations = new List<(string ColumnName, string ColumnValue)>
+                            {
+                                ("Name", subTtem.Name),
+                            };
+                            if (subTtem.Id > 0)
+                            {
+                                await genericService.UpdateTranslationsAsync(StringResourceEnums.NavBarSubItem, Subtranslations, subNavBar.Id, subTtem.LangId);
+                            }
+                            else
+                            {
+                                await genericService.AddTranslationsAsync(StringResourceEnums.NavBarSubItem, Subtranslations, subNavBar.Id, subTtem.LangId);
+                            }
+                        }
+                    }
                 }
+
                 return Success(dtos);
             }
             catch (Exception ex)
@@ -146,54 +134,35 @@ namespace Services.HomePageServices.NavBarItemServices
                 return Error<List<NavBarItemDTO>>(ex);
             }
         }
-
-        public async Task<ResponseResult<NavBarItemDTO>> Update(NavBarItemDTO dto)
-        {
-            try
-            {
-                var navBarItem = await _dbContext.NavBarItems
-                    .FirstOrDefaultAsync(x => x.Id == dto.Id && !x.IsDeleted);
-
-                if (navBarItem == null)
-                {
-                    return Error<NavBarItemDTO>("NavBar item not found", HttpStatusCode.NotFound);
-                }
-
-                navBarItem = _mapper.Map(dto, navBarItem);
-                _dbContext.Update(navBarItem);
-
-                await _dbContext.SaveChangesAsync();
-
-                return Success(dto);
-            }
-            catch (Exception ex)
-            {
-                return Error<NavBarItemDTO>(ex);
-            }
-        }
-
         public async Task<ResponseResult<NavBarItemDTO>> Delete(int id)
         {
             try
             {
-                var navBarItem = await _dbContext.NavBarItems
-                    .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
-
-                if (navBarItem == null)
+                var model = await _dbContext.NavBarItems.Include(x => x.NavBarItemSubItems).FirstOrDefaultAsync(x => x.Id == id);
+                if (model == null)
                 {
-                    return Error<NavBarItemDTO>("NavBar item not found", HttpStatusCode.NotFound);
+                    return Error<NavBarItemDTO>("NavBarItem not found", HttpStatusCode.NotFound);
                 }
+                model.IsDeleted = true;
+                foreach (var item in model.NavBarItemSubItems)
+                {
+                    item.IsDeleted = true;
 
-                navBarItem.IsDeleted = true;
+                }
+                _dbContext.Update(model);
                 var translations = await _dbContext.StringResources.Where(x => x.ResourceId == id && x.GroupKey == StringResourceEnums.NavBarItem).ToListAsync();
+                var subtranslations = await _dbContext.StringResources.Where(x => x.ResourceId == id && x.GroupKey == StringResourceEnums.NavBarSubItem).ToListAsync();
                 foreach (var item in translations)
                 {
                     item.IsDeleted = true;
                     _dbContext.Update(item);
                 }
-                _dbContext.Update(navBarItem);
+                foreach (var item in subtranslations)
+                {
+                    item.IsDeleted = true;
+                    _dbContext.Update(item);
+                }
                 await _dbContext.SaveChangesAsync();
-
                 return Success<NavBarItemDTO>();
             }
             catch (Exception ex)
