@@ -14,16 +14,21 @@ namespace Services.LanguageServices
         {
         }
 
-        public async Task<IEnumerable<Language>> Get()
+        public async Task<ResponseResult<List<Language>>> Get()
         {
             try
             {
-                return await _dbContext.Languages.AsNoTracking()
+                var languages = await _dbContext.Languages.AsNoTracking()
                     .Where(x => !x.IsDeleted).ToListAsync();
+                if(languages == null || !languages.Any())
+                {
+                    return Error<List<Language>>("Languages not found");
+                }
+            return Success(languages);
             }
-            catch
+            catch (Exception ex)
             {
-                return null;
+                return Error<List<Language>>(ex);
             }
         }
 

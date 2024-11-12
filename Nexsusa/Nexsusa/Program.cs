@@ -44,7 +44,7 @@ var serviceProvider = builder.Services.BuildServiceProvider();
 
 var languageService = serviceProvider.GetRequiredService<ILanguageService>();
 var languages = await languageService.Get();
-if (!languages.Any())
+if (!languages.Data.Any())
 {
     var language = new Language
     {
@@ -61,7 +61,7 @@ if (!languages.Any())
     };
     await languageService.Create(language);
 }
-var cultures = languages?.Select(x => new CultureInfo(x.Culture)).ToArray();
+var cultures = languages.Data?.Select(x => new CultureInfo(x.Culture)).ToArray();
 builder.Services.Configure<RequestLocalizationOptions>(options =>
 {
     var englishCulture = cultures.FirstOrDefault(x => x.Name == "en-US");

@@ -6,7 +6,7 @@ namespace Services.LanguageServices
 {
     public interface ILanguageService
     {
-        Task<IEnumerable<Language>> Get();
+        Task<ResponseResult<List<Language>>> Get();
         //====================================================================================================
         Task<ResponseResult<LanguageDTO>> GetById(int id);
         //====================================================================================================
