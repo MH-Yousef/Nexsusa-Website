@@ -2,6 +2,8 @@
 using Core.Domains.Languages;
 using Data.Context;
 using Data.Dtos.LanguageDTOs;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Services._Base;
 
@@ -9,9 +11,10 @@ namespace Services.LanguageServices
 {
     public class LanguageService : BaseService, ILanguageService
     {
-
-        public LanguageService(AppDbContext dbContext, IMapper mapper) : base(dbContext, mapper)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public LanguageService(AppDbContext dbContext, IMapper mapper, IHttpContextAccessor httpContextAccessor) : base(dbContext, mapper)
         {
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<ResponseResult<List<Language>>> Get()
@@ -117,6 +120,26 @@ namespace Services.LanguageServices
 
                 return Error<LanguageDTO>(ex);
 
+            }
+        }
+
+
+        public async void SetLanguage(string culture)
+        {
+
+            var languages = await Get();
+            var validCulture = languages.Data.FirstOrDefault(x => x.Culture == culture);
+
+            if (validCulture != null)
+            {
+                var httpContext = _httpContextAccessor.HttpContext;
+
+                // Cookie'ye dil ayarını kaydet
+                httpContext.Response.Cookies.Append(
+                    CookieRequestCultureProvider.DefaultCookieName,
+                    CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)),
+                    new CookieOptions { Expires = DateTimeOffset.UtcNow.AddMonths(1) }
+                );
             }
         }
     }

@@ -12,7 +12,6 @@ namespace Core.Domains.Enums
         ClientSaysItem,
         ClientSays,
         Footer,
-        FooterService,
         FooterSub,
         NavBarItem,
         NavBarSubItem,
@@ -33,6 +32,7 @@ namespace Core.Domains.Enums
         WorkShowCaseNavBarItem,
         WorkShowCaseNavBar,
         WorkShowCase,
-        WorkShowCaseServiceServices
+        WorkShowCaseServiceServices,
+        FooterService
     }
 }

@@ -17,8 +17,9 @@ namespace Services.HomePageServices.WorkShowCaseServices
     public class WorkShowCaseService : BaseService, IWorkShowCaseService
     {
         private readonly Services._GenericServices.GenericService<WorkShowCase> _genericService;
-        public WorkShowCaseService(AppDbContext dbContext, IMapper mapper) : base(dbContext, mapper)
+        public WorkShowCaseService(AppDbContext dbContext, IMapper mapper, _GenericServices.GenericService<WorkShowCase> genericService) : base(dbContext, mapper)
         {
+            _genericService = genericService;
         }
 
         public async Task<ResponseResult<List<WorkShowCaseDTO>>> GetList(int languageId)

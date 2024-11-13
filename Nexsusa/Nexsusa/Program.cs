@@ -20,6 +20,9 @@ builder.Services.Configure<ConnectionStrings>(builder.Configuration.GetSection("
 builder.Services.Dependencies(builder.Configuration);
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
+
+builder.Services.AddHttpContextAccessor();
+
 // Add Interfaces and Services
 builder.Services.ConfigureApplicationServices();
 

@@ -18,5 +18,13 @@ namespace Nexsusa_Api.Areas.Admin.Controllers
             return result;
         }
 
+        [HttpPost]
+        // set Langage
+        public IActionResult Create(string culture)
+        {
+            _languageService.SetLanguage(culture);
+            return Ok();
+        }
+
     }
 }

@@ -33,7 +33,7 @@ namespace Services.HomePageServices
         private readonly IClientSaysService _clientSaysService;
         private readonly IRegularBlogsService _regularBlogsService;
         private readonly IFooterService _footerService;
-        public HomePageService(AppDbContext dbContext, IMapper mapper, INavBarItemService navBarItemService, ISliderService sliderService, IOurCompanyService ourCompanyService, IWorkingProcessService workingProcessService, IWorkShowCaseService workShowCaseService, IWhoWeAreService whoWeAreService, IOurEmployeesService ourEmployeesService, IClientSaysService clientSaysService, IRegularBlogsService regularBlogsService, IFooterService footerService, IServiceService serviceService) : base(dbContext, mapper)
+        public HomePageService(AppDbContext dbContext, IMapper mapper, INavBarItemService navBarItemService, ISliderService sliderService, IOurCompanyService ourCompanyService, IWorkingProcessService workingProcessService, IWorkShowCaseService workShowCaseService, IWhoWeAreService whoWeAreService, IOurEmployeesService ourEmployeesService, IClientSaysService clientSaysService, IRegularBlogsService regularBlogsService, IFooterService footerService, IServiceService serviceService, IChooseUsService chooseUsService) : base(dbContext, mapper)
         {
             _navBarItemService = navBarItemService;
             _sliderService = sliderService;
@@ -46,6 +46,7 @@ namespace Services.HomePageServices
             _regularBlogsService = regularBlogsService;
             _footerService = footerService;
             _serviceService = serviceService;
+            _chooseUsService = chooseUsService;
         }
 
         public async Task<ResponseResult<HomePageDTO>> GetHomePage(int languageId)
@@ -55,18 +56,18 @@ namespace Services.HomePageServices
                 var model = new HomePageDTO
                 {
                     HomePageInfo = (await GetHomePageInfo()).Data,
-                    NavBarItems =  (await _navBarItemService.GetList(languageId)).Data,
-                    Slider = (await _sliderService.GetList(languageId)).Data[1],
-                    Services = (await _serviceService.GetList(languageId)).Data[1],
-                    OurCompany = (await _ourCompanyService.GetList(languageId)).Data[1],
-                    ChooseUs = (await _chooseUsService.GetList(languageId)).Data[1],
-                    WorkingProcess = (await _workingProcessService.GetList(languageId)).Data[1],
-                    WorkShowCase = (await _workShowCaseService.GetList(languageId)).Data[1],
-                    WhoWeAre = (await _whoWeAreService.GetList(languageId)).Data[1],
-                    OurEmployees = (await _ourEmployeesService.GetList(languageId)).Data[1],
-                    ClientSays = (await _clientSaysService.GetList(languageId)).Data[1],
-                    RegularBlogs = (await _regularBlogsService.GetList(languageId)).Data[1],
-                    Footer = (await _footerService.GetList(languageId)).Data[1]
+                    NavBarItems = (await _navBarItemService.GetList(languageId)).Data,
+                    Slider = (await _sliderService.GetList(languageId)).Data.FirstOrDefault(),
+                    Services = (await _serviceService.GetList(languageId)).Data.FirstOrDefault(),
+                    OurCompany = (await _ourCompanyService.GetList(languageId)).Data.FirstOrDefault(),
+                    ChooseUs = (await _chooseUsService.GetList(languageId)).Data.FirstOrDefault(),
+                    WorkingProcess = (await _workingProcessService.GetList(languageId)).Data.FirstOrDefault(),
+                    WorkShowCase = (await _workShowCaseService.GetList(languageId)).Data.FirstOrDefault(),
+                    WhoWeAre = (await _whoWeAreService.GetList(languageId)).Data.FirstOrDefault(),
+                    OurEmployees = (await _ourEmployeesService.GetList(languageId)).Data.FirstOrDefault(),
+                    ClientSays = (await _clientSaysService.GetList(languageId)).Data.FirstOrDefault(),
+                    RegularBlogs = (await _regularBlogsService.GetList(languageId)).Data.FirstOrDefault(),
+                    Footer = (await _footerService.GetList(languageId)).Data.FirstOrDefault()
                 };
                 return Success(model);
             }

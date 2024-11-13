@@ -25,6 +25,7 @@ namespace Services._ConfigureServices
 
             services.AddScoped<ILanguageService, LanguageService>();
             services.AddScoped<IHomePageServices, HomePageService>();
+            
 
             services.AddScoped<INavBarItemService, NavBarItemService>();
             services.AddScoped<IChooseUsService, ChooseUsService>();

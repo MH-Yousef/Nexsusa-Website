@@ -21,7 +21,6 @@ namespace Services.HomePageServices.WorkingProcessServices
         {
             _genericService = genericService;
         }
-
         public async Task<ResponseResult<List<WorkingProcessDTO>>> GetList(int languageId)
         {
             try
@@ -35,8 +34,8 @@ namespace Services.HomePageServices.WorkingProcessServices
                 foreach (var item in workingProcessDtos)
                 {
                     item.LangId = languageId;
-                    item.Title = _genericService.ApplyTranslations<WorkingProcessDTO>(item, languageId, item.Id, StringResourceEnums.WorkingProcess).Title;
-                    item.SubTitle = _genericService.ApplyTranslations<WorkingProcessDTO>(item, languageId, item.Id, StringResourceEnums.WorkingProcess).SubTitle;
+                    //item.Title = _genericService.ApplyTranslations<WorkingProcessDTO>(item, languageId, item.Id, StringResourceEnums.WorkingProcess).Title;
+                    //item.SubTitle = _genericService.ApplyTranslations<WorkingProcessDTO>(item, languageId, item.Id, StringResourceEnums.WorkingProcess).SubTitle;
 
                     // Apply translations for each WorkingProcessItem related to the WorkingProcess
                     if (item.WorkingProcessItems != null)
@@ -57,8 +56,6 @@ namespace Services.HomePageServices.WorkingProcessServices
                 return Error<List<WorkingProcessDTO>>(ex);
             }
         }
-
-
         public async Task<ResponseResult<WorkingProcessDTO>> GetById(int id, int languageId)
         {
             try
@@ -90,7 +87,6 @@ namespace Services.HomePageServices.WorkingProcessServices
                 return Error<WorkingProcessDTO>(ex);
             }
         }
-
         public async Task<ResponseResult<List<WorkingProcessDTO>>> Manage(List<WorkingProcessDTO> dtos)
         {
             try
