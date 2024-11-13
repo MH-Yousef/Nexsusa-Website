@@ -1,15 +1,7 @@
 ﻿using AutoMapper;
-using Core.HomePage.HomePageItems;
 using Data.Context;
-using Data.Dtos.ImageDTOs;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
 using Services._Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Services.ImageServices
 {
@@ -19,113 +11,34 @@ namespace Services.ImageServices
         {
         }
 
-        public async Task<ResponseResult<List<ImageDTO>>> Get()
+        public async Task<string> UploadImage(IFormFile file)
         {
             try
             {
-                var images = await _dbContext.Images
-                    .Where(x => !x.IsDeleted)
-                    .ToListAsync();
-
-                if (images == null || !images.Any())
+                var directory = Directory.GetCurrentDirectory();
+                var path = Path.Combine(directory, "Images");
+                if (!Directory.Exists(path))
                 {
-                    return Error<List<ImageDTO>>("Images not found", HttpStatusCode.NotFound);
+                    Directory.CreateDirectory(path);
                 }
 
-                var imageDtos = _mapper.Map<List<ImageDTO>>(images);
-                return Success(imageDtos);
-            }
-            catch (Exception ex)
-            {
-                return Error<List<ImageDTO>>(ex);
-            }
-        }
-
-        public async Task<ResponseResult<ImageDTO>> GetById(int id)
-        {
-            try
-            {
-                var image = await _dbContext.Images
-                    .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
-
-                if (image == null)
+                if (file != null)
                 {
-                    return Error<ImageDTO>("Image not found", HttpStatusCode.NotFound);
+                    var extension = Path.GetExtension(file.FileName);
+                    var fileName = Guid.NewGuid() + extension;
+                    var saveLocation = Path.Combine(path, fileName);
+                    var stream = new FileStream(saveLocation, FileMode.Create);
+                    await file.CopyToAsync(stream);
+
+                    return fileName;
                 }
-
-                var imageDto = _mapper.Map<ImageDTO>(image);
-                return Success(imageDto);
+                return null;
             }
             catch (Exception ex)
             {
-                return Error<ImageDTO>(ex);
+                return null;
             }
         }
 
-        public async Task<ResponseResult<ImageDTO>> Create(ImageDTO dto)
-        {
-            try
-            {
-                var image = _mapper.Map<Image>(dto);
-                await _dbContext.Images.AddAsync(image);
-                await _dbContext.SaveChangesAsync();
-
-                dto.Id = image.Id;
-                return Success(dto);
-            }
-            catch (Exception ex)
-            {
-                return Error<ImageDTO>(ex);
-            }
-        }
-
-        public async Task<ResponseResult<ImageDTO>> Update(ImageDTO dto)
-        {
-            try
-            {
-                var image = await _dbContext.Images
-                    .FirstOrDefaultAsync(x => x.Id == dto.Id && !x.IsDeleted);
-
-                if (image == null)
-                {
-                    return Error<ImageDTO>("Image not found", HttpStatusCode.NotFound);
-                }
-
-                image = _mapper.Map(dto, image);
-                _dbContext.Update(image);
-
-                await _dbContext.SaveChangesAsync();
-
-                return Success(dto);
-            }
-            catch (Exception ex)
-            {
-                return Error<ImageDTO>(ex);
-            }
-        }
-
-        public async Task<ResponseResult<ImageDTO>> Delete(int id)
-        {
-            try
-            {
-                var image = await _dbContext.Images
-                    .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
-
-                if (image == null)
-                {
-                    return Error<ImageDTO>("Image not found", HttpStatusCode.NotFound);
-                }
-
-                _dbContext.Images.Remove(image);
-                await _dbContext.SaveChangesAsync();
-
-                return Success<ImageDTO>();
-            }
-            catch (Exception ex)
-            {
-                return Error<ImageDTO>(ex);
-            }
-        }
     }
-
 }

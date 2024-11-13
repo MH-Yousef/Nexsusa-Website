@@ -1,11 +1,9 @@
 ﻿using Core.Domains.Languages;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-//using Microsoft.CodeAnalysis.Host;
 using Services._Base;
 using Services.LanguageServices;
 
-namespace Nexsusa_Api.Areas.Admin.Controllers
+namespace Nexsusa_Api.Controllers
 {
     [Route("[controller]/[action]")]
     [ApiController]

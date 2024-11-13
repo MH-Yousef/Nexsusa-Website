@@ -1,19 +1,21 @@
-﻿using Data.Dtos.NavBarDTOs;
+﻿using Data.Dtos.HomePageDTOs;
+using Data.Dtos.NavBarDTOs;
 using Microsoft.AspNetCore.Mvc;
 using Services._Base;
+using Services.HomePageServices;
 using Services.HomePageServices.NavBarItemServices;
 
 namespace Nexsusa_Api.Controllers
 {
     [Route("[controller]/[action]")]
     [ApiController]
-    public class HomePageController(INavBarItemService _navbarService) : ControllerBase
+    public class HomePageController(IHomePageServices _homePageServices) : ControllerBase
     {
-        //[HttpPost]
-        //public async Task<ResponseResult<List<NavBarItemDTO>>> Create(List<NavBarItemDTO> dto)
-        //{
-        //    var result = await _navbarService.Manage(dto);
-        //    return result;
-        //}
+        [HttpGet]
+        public async Task<ResponseResult<HomePageDTO>> GetHomePage(int languageId)
+        {
+            var result = await _homePageServices.GetHomePage(languageId);
+            return result;
+        }
     }
 }

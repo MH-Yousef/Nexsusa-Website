@@ -1,9 +1,10 @@
 ﻿using Data.Dtos.ChooseUsDTOs;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services._Base;
 using Services.HomePageServices.ChooseUsServices;
 
-namespace Nexsusa_Api.Areas.Admin.Controllers
+namespace Nexsusa_Api.Controllers
 {
     [Route("[controller]/[action]")]
     [ApiController]

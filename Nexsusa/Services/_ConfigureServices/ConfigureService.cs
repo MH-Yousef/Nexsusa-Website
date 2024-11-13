@@ -13,6 +13,7 @@ using Services.HomePageServices.SliderServices;
 using Services.HomePageServices.WhoWeAreServices;
 using Services.HomePageServices.WorkingProcessServices;
 using Services.HomePageServices.WorkShowCaseServices;
+using Services.ImageServices;
 using Services.LanguageServices;
 
 namespace Services._ConfigureServices
@@ -39,6 +40,7 @@ namespace Services._ConfigureServices
             services.AddScoped<IWhoWeAreService, WhoWeAreService>();
             services.AddScoped<IWorkingProcessService, WorkingProcessService>();
             services.AddScoped<IWorkShowCaseService, WorkShowCaseService>();
+            services.AddScoped<IImageService, ImageService>();
 
             #endregion
             services.AddScoped(typeof(GenericService<>));

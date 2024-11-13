@@ -1,15 +1,15 @@
-﻿using Core.HomePage.HomePageItems;
-using Data.Dtos.NavBarDTOs;
+﻿using Data.Dtos.NavBarDTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services._Base;
 using Services.HomePageServices.NavBarItemServices;
+using Services.ImageServices;
 
-namespace Nexsusa_Api.Areas.Admin.Controllers
+namespace Nexsusa_Api.Controllers
 {
     [Route("[controller]/[action]")]
     [ApiController]
-    public class NavBarItemController(INavBarItemService _navBarItemService) : ControllerBase
+    public class NavBarItemController(INavBarItemService _navBarItemService, IImageService imageService) : ControllerBase
     {
         [HttpGet]
         public async Task<ResponseResult<List<NavBarItemDTO>>> Get(int languageId)
@@ -38,6 +38,12 @@ namespace Nexsusa_Api.Areas.Admin.Controllers
             return result;
         }
 
-
+        //[HttpPost]
+        //// upload image
+        //public async Task<IActionResult> UploadImage(IFormFile file)
+        //{
+        //    var result = await imageService.UploadImage(file);
+        //    return Ok(result);
+        //}
     }
 }

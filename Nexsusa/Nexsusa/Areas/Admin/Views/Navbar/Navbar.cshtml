@@ -1,7 +1,9 @@
-﻿@{
+﻿@using Data.Dtos.NavBarDTOs
+@{
     ViewData["Title"] = "Navbar";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
+@model List<NavBarItemDTO>
 
 <div class="row">
     <div class="col-lg-12">
@@ -54,76 +56,30 @@
                                 <td>
                                     <span><a href="#" data-toggle="tooltip" data-placement="top" title="Edit"><i class="fa fa-pencil color-muted m-r-5"></i> </a><a href="#" data-toggle="tooltip" data-placement="top" title="Close"><i class="fa fa-close color-danger"></i></a></span>
                                 </td>
-                            
+
                             </tr>
-                              
-                            <tr>
-                                <td></td>
-                                <td>About</td>
-                                <td></td>
-                                <td>13 November 2024</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td>
-                                    <span><a href="#" data-toggle="tooltip" data-placement="top" title="Edit"><i class="fa fa-pencil color-muted m-r-5"></i> </a><a href="#" data-toggle="tooltip" data-placement="top" title="Close"><i class="fa fa-close color-danger"></i></a></span>
-                                </td>
-                            </tr>
-                           
-                            <tr>
-                                <td></td>
-                                <td>Solutions</td>
-                                <td></td>
-                                <td>13 November 2024</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td>
-                                    <span><a href="#" data-toggle="tooltip" data-placement="top" title="Edit"><i class="fa fa-pencil color-muted m-r-5"></i> </a><a href="#" data-toggle="tooltip" data-placement="top" title="Close"><i class="fa fa-close color-danger"></i></a></span>
-                                </td>
-                            </tr>
-                             
-                            <tr>
-                                <td></td>
-                                <td>Blog</td>
-                                <td></td>
-                                <td>13 November 2024</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td>
-                                    <span><a href="#" data-toggle="tooltip" data-placement="top" title="Edit"><i class="fa fa-pencil color-muted m-r-5"></i> </a><a href="#" data-toggle="tooltip" data-placement="top" title="Close"><i class="fa fa-close color-danger"></i></a></span>
-                                </td>
-                            </tr>
-                             
-                            <tr>
-                                <td></td>
-                                <td>Pages</td>
-                                <td></td>
-                                <td>13 November 2024</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td>
-                                    <span><a href="#" data-toggle="tooltip" data-placement="top" title="Edit"><i class="fa fa-pencil color-muted m-r-5"></i> </a><a href="#" data-toggle="tooltip" data-placement="top" title="Close"><i class="fa fa-close color-danger"></i></a></span>
-                                </td>
-                            </tr>
-                            
-                            <tr>
-                                <td></td>
-                                <td>Contact</td>
-                                <td></td>
-                                <td>13 November 2024</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td>
-                                    <span><a href="#" data-toggle="tooltip" data-placement="top" title="Edit"><i class="fa fa-pencil color-muted m-r-5"></i> </a><a href="#" data-toggle="tooltip" data-placement="top" title="Close"><i class="fa fa-close color-danger"></i></a></span>
-                                </td>
-                            </tr>
-                                
-                       
-                        <tr>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.Id</td>
+                                    <td>@item.Name</td>
+                                    <td>@item.Url</td>
+                                    <td>@item.CreatedDate</td>
+                                    <td>@item.UpdatedDate</td>
+                                    <td>@item.HasSubItem</td>
+                                    <td>@item.IsVisible</td>
+                                    <td>
+                                        <span>
+                                            <a href="/Admin/Navbar/Edit/@item.Id" data-toggle="tooltip" data-placement="top" title="Edit">
+                                                <i class="fa fa-pencil color-muted m-r-5"></i>
+                                            </a><a href="#" data-toggle="tooltip" data-placement="top" title="Close">
+                                                <i class="fa fa-close color-danger"></i>
+                                            </a>
+                                        </span>
+                                    </td>
+
+                                </tr>
+                            }
                         </tbody>
                     </table>
                 </div>
@@ -131,4 +87,8 @@
         </div>
     </div>
 </div>
-
+<script>
+    $(document).ready(function () {
+        console.log("Navbar Page Loaded");
+    });
+</script>
