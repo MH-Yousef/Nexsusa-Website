@@ -10,7 +10,7 @@ namespace Nexsusa_Api.Areas.Admin.Controllers
         public async Task<IActionResult> Navbar()
         {
             //var currentLanguage = HttpContext.Session.GetString("CurrentLanguage");
-            var result = (await _navBarItemService.GetList(1)).Data;
+            var result = (await _navBarItemService.GetList(2)).Data;
             return View(result);
         }
         public async Task<IActionResult> Edit(int id)
