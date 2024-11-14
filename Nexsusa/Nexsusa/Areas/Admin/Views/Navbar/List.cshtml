@@ -1,7 +1,8 @@
 ﻿@using Data.Dtos.NavBarDTOs
 @{
-    ViewData["Title"] = "Navbar";
+    ViewData["Title"] = "List";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    int deletedItemId = 0; 
 }
 @model List<NavBarItemDTO>
 
@@ -16,24 +17,24 @@
                             <label for="languageSelect">Dil Seçin:</label>
                             <form action="/Admin/Navbar/Navbar" method="get">
                                 <select name="langId" class="form-control" id="languageSelect">
-                              
-                                @foreach (var item in ViewBag.Languages)
-                                {
-                                       
-                                   bool isSelected = ViewBag.SelectedLanguageId == item.Id;
+
+                                    @foreach (var item in ViewBag.Languages)
+                                    {
+
+                                        bool isSelected = ViewBag.SelectedLanguageId == item.Id;
                                         if (isSelected)
                                         {
-                                            
-                                            <option selected value="@item.Id"  >@item.Name</option>
+
+                                            <option selected value="@item.Id">@item.Name</option>
                                         }
                                         else
                                         {
-                                            <option  value="@item.Id">@item.Name</option>
+                                            <option value="@item.Id">@item.Name</option>
 
                                         }
                                     }
-                            </select>
-                            <br />
+                                </select>
+                                <br />
                                 <button class="btn btn-success" type="submit">Filtrele</button>
                             </form>
                         </div>
@@ -74,12 +75,15 @@
                                     <td>@item.IsVisible</td>
                                     <td>
                                         <span>
-                                            <a href="/Admin/Navbar/Edit/@item.Id" data-toggle="tooltip" data-placement="top" title="Düzenle">
+                                            <a href="/Admin/Navbar/Manage/@item.Id?languageId=@ViewBag.SelectedLanguageId" data-toggle="tooltip" data-placement="top" title="Düzenle">
                                                 <i class="fa fa-pencil color-muted m-r-5"></i>
                                             </a>
-                                            <a href="#" data-toggle="tooltip" data-placement="top" title="Kapat">
+                                            <a data-toggle="modal" data-target="#DeleteModal" data-toggle="tooltip" data-placement="top" title="Kapat" style="cursor : pointer;">
                                                 <i class="fa fa-close color-danger"></i>
                                             </a>
+                                            @{
+                                                deletedItemId = item.Id;
+                                            }
                                         </span>
                                     </td>
                                 </tr>
@@ -92,3 +96,26 @@
     </div>
 </div>
 
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="DeleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <a href="/Admin/Navbar/Manage/@deletedItemId" type="button" class="btn btn-primary">Save changes</a>
+            </div>
+        </div>
+    </div>
+</div>

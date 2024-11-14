@@ -38,12 +38,12 @@ namespace Nexsusa_Api.Controllers
             return result;
         }
 
-        //[HttpPost]
-        //// upload image
-        //public async Task<IActionResult> UploadImage(IFormFile file)
-        //{
-        //    var result = await imageService.UploadImage(file);
-        //    return Ok(result);
-        //}
+        [HttpPost]
+        // upload image
+        public async Task<IActionResult> UploadImage(IFormFile file)
+        {
+            var result = await imageService.UploadImage(file);
+            return Ok(result);
+        }
     }
 }

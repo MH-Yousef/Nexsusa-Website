@@ -16,7 +16,7 @@ namespace Services.ImageServices
             try
             {
                 var directory = Directory.GetCurrentDirectory();
-                var path = Path.Combine(directory, "Images");
+                var path = Path.Combine(directory,"wwwroot", "Images");
                 if (!Directory.Exists(path))
                 {
                     Directory.CreateDirectory(path);
