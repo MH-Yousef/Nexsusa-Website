@@ -8,7 +8,7 @@ using Microsoft.Extensions.Options;
 
 namespace Data.Context
 {
-    public class AppDbContext : IdentityDbContext
+    public class AppDbContext : DbContext
     {
         private readonly string _connectionString;
         public AppDbContext(DbContextOptions<AppDbContext> dbContextOptions,IOptions<ConnectionStrings> options):base(dbContextOptions)

@@ -9,58 +9,62 @@
     <div class="col-lg-12">
         <div class="card">
             <div class="card-body">
-                <h4 class="card-title">Language List</h4>
+                <h4 class="card-title">Dil Seçin</h4>
                 <div class="basic-form">
                     <form>
                         <div class="form-group">
-                            <label>Select Language (select one):</label>
-                            <select class="form-control" id="sel1">
-                                <option itemid="">English</option>
-                                <option>Turkish</option>
-                                <option>German</option>
-                                <option>Russian</option>
+                            <label for="languageSelect">Dil Seçin:</label>
+                            <form action="/Admin/Navbar/Navbar" method="get">
+                                <select name="langId" class="form-control" id="languageSelect">
+                              
+                                @foreach (var item in ViewBag.Languages)
+                                {
+                                       
+                                   bool isSelected = ViewBag.SelectedLanguageId == item.Id;
+                                        if (isSelected)
+                                        {
+                                            
+                                            <option selected value="@item.Id"  >@item.Name</option>
+                                        }
+                                        else
+                                        {
+                                            <option  value="@item.Id">@item.Name</option>
+
+                                        }
+                                    }
                             </select>
+                            <br />
+                                <button class="btn btn-success" type="submit">Filtrele</button>
+                            </form>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
+
     <div class="col-lg-12">
         <div class="card">
             <div class="card-body">
-                <h4 class="card-title">Navbar Items</h4>
+                <h4 class="card-title">Navbar Öğeleri</h4>
                 <div class="table-responsive">
-                    <table class="table table-bordered verticle-middle">
+                    <table class="table table-bordered verticle-middle" id="navbarTable">
                         <thead>
                             <tr>
                                 <th scope="col">ID</th>
-                                <th scope="col">Name</th>
-                                <th scope="col">Url</th>
-                                <th scope="col">Created Date</th>
-                                <th scope="col">Updated Date</th>
-                                <th scope="col">Has Sub Item</th>
-                                <th scope="col">Is Visible</th>
-                                <th scope="col">Action</th>
+                                <th scope="col">Ad</th>
+                                <th scope="col">URL</th>
+                                <th scope="col">Oluşturulma Tarihi</th>
+                                <th scope="col">Güncellenme Tarihi</th>
+                                <th scope="col">Alt Menü</th>
+                                <th scope="col">Görünürlük</th>
+                                <th scope="col">İşlem</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td></td>
-                                <td>Home</td>
-                                <td></td>
-                                <td>13 November 2024</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td>
-                                    <span><a href="#" data-toggle="tooltip" data-placement="top" title="Edit"><i class="fa fa-pencil color-muted m-r-5"></i> </a><a href="#" data-toggle="tooltip" data-placement="top" title="Close"><i class="fa fa-close color-danger"></i></a></span>
-                                </td>
-
-                            </tr>
                             @foreach (var item in Model)
                             {
-                                <tr>
+                                <tr data-lang="@item.LangId">
                                     <td>@item.Id</td>
                                     <td>@item.Name</td>
                                     <td>@item.Url</td>
@@ -70,14 +74,14 @@
                                     <td>@item.IsVisible</td>
                                     <td>
                                         <span>
-                                            <a href="/Admin/Navbar/Edit/@item.Id" data-toggle="tooltip" data-placement="top" title="Edit">
+                                            <a href="/Admin/Navbar/Edit/@item.Id" data-toggle="tooltip" data-placement="top" title="Düzenle">
                                                 <i class="fa fa-pencil color-muted m-r-5"></i>
-                                            </a><a href="#" data-toggle="tooltip" data-placement="top" title="Close">
+                                            </a>
+                                            <a href="#" data-toggle="tooltip" data-placement="top" title="Kapat">
                                                 <i class="fa fa-close color-danger"></i>
                                             </a>
                                         </span>
                                     </td>
-
                                 </tr>
                             }
                         </tbody>
@@ -87,10 +91,4 @@
         </div>
     </div>
 </div>
-<script>
-    $(document).ready(function () {
-        console.log("Navbar Page Loaded");
-    });
 
-
-</script>
