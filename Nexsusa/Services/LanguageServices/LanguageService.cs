@@ -17,12 +17,21 @@ namespace Services.LanguageServices
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<ResponseResult<List<Language>>> Get()
+        public async Task<ResponseResult<List<Language>>> Get(bool IsActiveDisable = false)
         {
             try
             {
-                var languages = await _dbContext.Languages.AsNoTracking()
+                var languages = new List<Language>();
+                if (!IsActiveDisable)
+                {
+                     languages = await _dbContext.Languages.AsNoTracking()
+                    .Where(x => !x.IsDeleted && x.IsActive).ToListAsync();
+                }
+                else
+                {
+                     languages = await _dbContext.Languages.AsNoTracking()
                     .Where(x => !x.IsDeleted).ToListAsync();
+                }
                 if(languages == null || !languages.Any())
                 {
                     return Error<List<Language>>("Languages not found");

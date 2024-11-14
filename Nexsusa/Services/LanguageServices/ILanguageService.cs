@@ -6,7 +6,7 @@ namespace Services.LanguageServices
 {
     public interface ILanguageService
     {
-        Task<ResponseResult<List<Language>>> Get();
+        Task<ResponseResult<List<Language>>> Get(bool IsActiveDisable = false);
         //====================================================================================================
         Task<ResponseResult<LanguageDTO>> GetById(int id);
         //====================================================================================================

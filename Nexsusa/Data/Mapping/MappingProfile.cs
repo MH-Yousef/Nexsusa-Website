@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
+using Core.AboutPage;
 using Core.Domains.Languages;
 using Core.HomePage;
 using Core.HomePage.HomePageItems;
+using Core.ServicesPage;
+using Data.Dtos.AboutDTOs;
 using Data.Dtos.ChooseUsDTOs;
 using Data.Dtos.ClientSaysDTOs;
 using Data.Dtos.ClientSaysItemDTOs;
@@ -16,6 +19,7 @@ using Data.Dtos.QuestionDTOs;
 using Data.Dtos.QuickLinkDTOs;
 using Data.Dtos.RegularBlogsDTOs;
 using Data.Dtos.ServiceDTOs;
+using Data.Dtos.ServicePageDTOs;
 using Data.Dtos.SliderDTOs;
 using Data.Dtos.WhoWeAreDTOs;
 using Data.Dtos.WorkingProcessDTOs;
@@ -27,10 +31,14 @@ namespace Data.Mapping
     {
         public MappingProfile()
         {
-            CreateMap<Language, LanguageDTO>();
+            CreateMap<Language, LanguageDTO>().ReverseMap();
             //====================================================================================================
-            CreateMap<HomePage, HomePageDTO>();
-            CreateMap<HomePageInfo, HomePageInfoDTO>();
+            CreateMap<HomePage, HomePageDTO>().ReverseMap();
+            CreateMap<HomePageInfo, HomePageInfoDTO>().ReverseMap();
+            //====================================================================================================
+            CreateMap<About, AboutDTO>().ReverseMap();
+            //====================================================================================================
+            CreateMap<ServicePage, ServicePageDTO>().ReverseMap();
             //====================================================================================================
             CreateMap<NavBarItem, NavBarItemDTO>().ReverseMap();
             CreateMap<NavBarItemSubItem, NavBarItemSubItemDTO>().ReverseMap();
@@ -58,8 +66,8 @@ namespace Data.Mapping
             //====================================================================================================
             CreateMap<Slider, SliderDTO>();
             //====================================================================================================
-            CreateMap<WhoWeAre, WhoWeAreDTO>();
-            CreateMap<WhoWeAreItem, WhoWeAreItemDTO>();
+            CreateMap<WhoWeAre, WhoWeAreDTO>().ReverseMap();
+            CreateMap<WhoWeAreItem, WhoWeAreItemDTO>().ReverseMap();
             //====================================================================================================
             CreateMap<WorkingProcess, WorkingProcessDTO>();
             CreateMap<WorkingProcessItem, WorkingProcessItemDTO>();

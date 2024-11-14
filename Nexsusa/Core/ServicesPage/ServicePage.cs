@@ -3,8 +3,10 @@ using Core.HomePage.HomePageItems;
 
 namespace Core.ServicesPage
 {
-    public class Services : _Base<int>
+    public class ServicePage : _Base<int>
     {
+        [Translatable]
+        public string Title { get; set; }
         public Service Service { get; set; }
     }
 }

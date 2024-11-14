@@ -6,4 +6,9 @@
     <Nullable>disable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="HomePage\NewFolder\" />
+    <Folder Include="gerh\" />
+  </ItemGroup>
+
 </Project>

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Services._GenericServices;
+using Services.AboutServices;
 using Services.HomePageServices;
 using Services.HomePageServices.ChooseUsServices;
 using Services.HomePageServices.ClientSaysServices;
@@ -15,6 +16,7 @@ using Services.HomePageServices.WorkingProcessServices;
 using Services.HomePageServices.WorkShowCaseServices;
 using Services.ImageServices;
 using Services.LanguageServices;
+using Services.ServicePageServices;
 
 namespace Services._ConfigureServices
 {
@@ -26,6 +28,8 @@ namespace Services._ConfigureServices
 
             services.AddScoped<ILanguageService, LanguageService>();
             services.AddScoped<IHomePageServices, HomePageService>();
+            services.AddScoped<IAboutService, AboutService>();
+            services.AddScoped<IServicePageService, ServicePageService>();
             
 
             services.AddScoped<INavBarItemService, NavBarItemService>();

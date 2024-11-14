@@ -12,7 +12,7 @@ namespace Nexsusa_Api.Areas.Admin.Controllers
         {
             List<NavBarItemDTO> result;
             //var currentLanguage = HttpContext.Session.GetString("CurrentLanguage");
-            ViewBag.Languages = (await _languageService.Get()).Data;
+            ViewBag.Languages = (await _languageService.Get(true)).Data;
             if (langId != null)
             {
 

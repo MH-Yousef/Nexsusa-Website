@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialDb : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -254,7 +254,7 @@ namespace Data.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ChooseUsId = table.Column<int>(type: "int", nullable: true),
+                    ChooseUsId = table.Column<int>(type: "int", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
@@ -266,7 +266,8 @@ namespace Data.Migrations
                         name: "FK_Questions_ChooseUs_ChooseUsId",
                         column: x => x.ChooseUsId,
                         principalTable: "ChooseUs",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -350,6 +351,7 @@ namespace Data.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Url = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     HomePageInfoId = table.Column<int>(type: "int", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -465,6 +467,43 @@ namespace Data.Migrations
                         name: "FK_ServiceItems_Services_ServiceId",
                         column: x => x.ServiceId,
                         principalTable: "Services",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Abouts",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SubTitle = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    VideoUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    OurCompanyId = table.Column<int>(type: "int", nullable: true),
+                    WhoWeAreId = table.Column<int>(type: "int", nullable: true),
+                    ClientSaysId = table.Column<int>(type: "int", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Abouts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Abouts_ClientSays_ClientSaysId",
+                        column: x => x.ClientSaysId,
+                        principalTable: "ClientSays",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Abouts_OurCompanys_OurCompanyId",
+                        column: x => x.OurCompanyId,
+                        principalTable: "OurCompanys",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Abouts_WhoWeAres_WhoWeAreId",
+                        column: x => x.WhoWeAreId,
+                        principalTable: "WhoWeAres",
                         principalColumn: "Id");
                 });
 
@@ -751,6 +790,21 @@ namespace Data.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Abouts_ClientSaysId",
+                table: "Abouts",
+                column: "ClientSaysId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Abouts_OurCompanyId",
+                table: "Abouts",
+                column: "OurCompanyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Abouts_WhoWeAreId",
+                table: "Abouts",
+                column: "WhoWeAreId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ClientSaysItems_ClientSaysId",
                 table: "ClientSaysItems",
                 column: "ClientSaysId");
@@ -895,6 +949,9 @@ namespace Data.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Abouts");
+
             migrationBuilder.DropTable(
                 name: "ClientSaysItems");
 

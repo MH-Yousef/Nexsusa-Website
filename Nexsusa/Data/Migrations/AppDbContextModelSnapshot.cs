@@ -22,6 +22,56 @@ namespace Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Core.AboutPage.About", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnOrder(0);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("ClientSaysId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("OurCompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SubTitle")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("VideoUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("WhoWeAreId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClientSaysId");
+
+                    b.HasIndex("OurCompanyId");
+
+                    b.HasIndex("WhoWeAreId");
+
+                    b.ToTable("Abouts");
+                });
+
             modelBuilder.Entity("Core.Domains.Languages.Language", b =>
                 {
                     b.Property<int>("Id")
@@ -625,7 +675,7 @@ namespace Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("ChooseUsId")
+                    b.Property<int>("ChooseUsId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDate")
@@ -868,6 +918,9 @@ namespace Data.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
@@ -1158,6 +1211,27 @@ namespace Data.Migrations
                     b.ToTable("WorkingProcessItems");
                 });
 
+            modelBuilder.Entity("Core.AboutPage.About", b =>
+                {
+                    b.HasOne("Core.HomePage.HomePageItems.ClientSays", "ClientSays")
+                        .WithMany()
+                        .HasForeignKey("ClientSaysId");
+
+                    b.HasOne("Core.HomePage.HomePageItems.OurCompany", "OurCompany")
+                        .WithMany()
+                        .HasForeignKey("OurCompanyId");
+
+                    b.HasOne("Core.HomePage.HomePageItems.WhoWeAre", "WhoWeAre")
+                        .WithMany()
+                        .HasForeignKey("WhoWeAreId");
+
+                    b.Navigation("ClientSays");
+
+                    b.Navigation("OurCompany");
+
+                    b.Navigation("WhoWeAre");
+                });
+
             modelBuilder.Entity("Core.Domains.Languages.StringResource", b =>
                 {
                     b.HasOne("Core.Domains.Languages.Language", "Language")
@@ -1296,9 +1370,13 @@ namespace Data.Migrations
 
             modelBuilder.Entity("Core.HomePage.HomePageItems.Question", b =>
                 {
-                    b.HasOne("Core.HomePage.HomePageItems.ChooseUs", null)
+                    b.HasOne("Core.HomePage.HomePageItems.ChooseUs", "ChooseUs")
                         .WithMany("Questions")
-                        .HasForeignKey("ChooseUsId");
+                        .HasForeignKey("ChooseUsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ChooseUs");
                 });
 
             modelBuilder.Entity("Core.HomePage.HomePageItems.QuickLink", b =>

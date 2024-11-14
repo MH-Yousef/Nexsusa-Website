@@ -33,6 +33,8 @@ namespace Core.Domains.Enums
         WorkShowCaseNavBar,
         WorkShowCase,
         WorkShowCaseServiceServices,
-        FooterService
+        FooterService,
+        About,
+        ServicePage
     }
 }

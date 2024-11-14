@@ -43,38 +43,38 @@ builder.Services.AddCors(options =>
 
 var serviceProvider = builder.Services.BuildServiceProvider();
 
-//#region Add En Language
+#region Add En Language
 
-//var languageService = serviceProvider.GetRequiredService<ILanguageService>();
-//var languages = await languageService.Get();
-//if (!languages.Data.Any())
-//{
-//    var language = new Language
-//    {
-//        Shortcut = "en",
-//        CreatedDate = DateTime.Now,
-//        IsDeleted = false,
-//        StringResources = new List<StringResource>(),
-//        UpdatedDate = DateTime.Now,
-//        Culture = "en-US",
-//        Name = "English",
-//        IsDefault = true,
-//        IsActive = true,
-//        IsRtl = false,
-//    };
-//    await languageService.Create(language);
-//}
-//var cultures = languages.Data?.Select(x => new CultureInfo(x.Culture)).ToArray();
-//builder.Services.Configure<RequestLocalizationOptions>(options =>
-//{
-//    var englishCulture = cultures.FirstOrDefault(x => x.Name == "en-US");
-//    options.DefaultRequestCulture = new RequestCulture(englishCulture?.Name ?? "en-US");
+var languageService = serviceProvider.GetRequiredService<ILanguageService>();
+var languages = await languageService.Get();
+if (languages.Data == null)
+{
+    var language = new Language
+    {
+        Shortcut = "en",
+        CreatedDate = DateTime.Now,
+        IsDeleted = false,
+        StringResources = new List<StringResource>(),
+        UpdatedDate = DateTime.Now,
+        Culture = "en-US",
+        Name = "English",
+        IsDefault = true,
+        IsActive = true,
+        IsRtl = false,
+    };
+    await languageService.Create(language);
+}
+var cultures = languages.Data?.Select(x => new CultureInfo(x.Culture)).ToArray();
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    var englishCulture = cultures.FirstOrDefault(x => x.Name == "en-US");
+    options.DefaultRequestCulture = new RequestCulture(englishCulture?.Name ?? "en-US");
 
-//    options.SupportedCultures = cultures;
-//    options.SupportedUICultures = cultures;
-//});
+    options.SupportedCultures = cultures;
+    options.SupportedUICultures = cultures;
+});
 
-//#endregion
+#endregion
 
 //Test
 //var NavbarService = serviceProvider.GetRequiredService<INavBarItemService>();

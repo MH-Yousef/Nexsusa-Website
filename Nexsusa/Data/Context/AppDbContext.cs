@@ -1,9 +1,9 @@
-﻿using Core.Domains.Languages;
+﻿using Core.AboutPage;
+using Core.Domains.Languages;
 using Core.HomePage;
 using Core.HomePage.HomePageItems;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Core.ServicesPage;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 
 namespace Data.Context
@@ -35,6 +35,9 @@ namespace Data.Context
 
         public DbSet<HomePage> HomePages { get; set; }
         public DbSet<HomePageInfo> HomePageInfos { get; set; }
+
+        public DbSet<About> Abouts { get; set; }
+        public DbSet<ServicePage> ServicePages { get; set; }
 
 
 
