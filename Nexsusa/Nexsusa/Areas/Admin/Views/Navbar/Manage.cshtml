@@ -10,25 +10,38 @@
         <div class="card-body">
             <h4 class="card-title">Navbar Edit</h4>
             <div class="basic-form">
-                <form asp-area="Admin" asp-controller="Navbar" asp-action="Save">
-                    <div class="form-group">
-                        <input asp-for="Id" type="text" class="form-control input-default" placeholder="Input Default" readonly hidden>
-                    </div>
-                    <div class="form-group">
-                        <input asp-for="Name" type="text" class="form-control input-default" placeholder="Input Default">
-                    </div>
-                     <div class="form-group">
-                        <input type="text" asp-for="Url" class="form-control input-default" placeholder="Input Default">
+              
+
+                    <div class="form-group row">
+                        <label for="Name" class="col-md-2 col-form-label">Name Enter</label>
+                        <div class="col-md-10">
+                            <input asp-for="Name" type="text" class="form-control input-default">
+                        </div>
                     </div>
 
-                    <div class="form-check">
-                        <input class="form-check-input" asp-for="IsVisible" type="checkbox">
-                        <label class="form-check-label">Is Visible</label>
+                    <div class="form-group row">
+                        <label for="Url" class="col-md-2 col-form-label">Url Enter</label>
+                        <div class="col-md-10">
+                            <input asp-for="Url" type="text" class="form-control input-default">
+                        </div>
                     </div>
-                    <br />
-                    <button type="submit" class="btn btn-dark">Save</button>
-                </form>
 
+                    <div class="form-group row">
+                        <label class="col-md-2 col-form-label">Is Visible</label>
+                        <div class="col-md-10">
+                            <div class="form-check">
+                                <input class="form-check-input" asp-for="IsVisible" type="checkbox">
+                                <label class="form-check-label" for="IsVisible">Yes</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <div class="col-md-10 offset-md-2">
+                            <button type="submit" class="btn btn-dark">Save</button>
+                        </div>
+                    </div>
+                
             </div>
         </div>
     </div>
