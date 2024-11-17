@@ -41,11 +41,18 @@ namespace Nexsusa_Api.Areas.Admin.Controllers
                 var model = await _navBarItemService.GetById(id, languageId.Value);
                 return View(model.Data);
             }
+            ViewBag.Languages = (await _languageService.Get(true)).Data;
             return View();
 
         }
-        public async Task<IActionResult> Save(NavBarItemDTO dto)
+        public async Task<IActionResult> Delete(int id)
         {
+            var result = await _navBarItemService.Delete(id);
+            return Json(result);
+        }
+        public async Task<IActionResult> Save(List<NavBarItemDTO> dto)
+        {
+            var result = await _navBarItemService.Manage(dto);
             return Json(dto);
         }
     }

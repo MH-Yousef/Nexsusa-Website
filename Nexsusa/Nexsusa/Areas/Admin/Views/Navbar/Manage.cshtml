@@ -5,44 +5,80 @@
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 @model NavBarItemDTO
+
 <div class="col-lg-12">
     <div class="card">
         <div class="card-body">
             <h4 class="card-title">Navbar Edit</h4>
             <div class="basic-form">
-              
 
-                    <div class="form-group row">
-                        <label for="Name" class="col-md-2 col-form-label">Name Enter</label>
-                        <div class="col-md-10">
-                            <input asp-for="Name" type="text" class="form-control input-default">
+
+                <div class="form-group row">
+                    <label for="Name" class="col-md-2 col-form-label">Name Enter</label>
+                    <input asp-for="Id" type="text" class="form-control input-default" >
+                    <input asp-for="LangId" type="text" class="form-control input-default" >
+                    <div class="col-md-10">
+                        <input asp-for="Name" type="text" class="form-control input-default">
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label for="Url" class="col-md-2 col-form-label">Url Enter</label>
+                    <div class="col-md-10">
+                        <input asp-for="Url" type="text" class="form-control input-default">
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-md-2 col-form-label">Is Visible</label>
+                    <div class="col-md-10">
+                        <div class="form-check">
+                            <input class="form-check-input" asp-for="IsVisible" type="checkbox">
+                            <label class="form-check-label" for="IsVisible">Yes</label>
                         </div>
                     </div>
+                </div>
 
-                    <div class="form-group row">
-                        <label for="Url" class="col-md-2 col-form-label">Url Enter</label>
-                        <div class="col-md-10">
-                            <input asp-for="Url" type="text" class="form-control input-default">
-                        </div>
+                <div class="form-group row">
+                    <div class="col-md-10 offset-md-2">
+                        <button type="submit" id="submitBtn" class="btn btn-dark">Save</button>
                     </div>
+                </div>
 
-                    <div class="form-group row">
-                        <label class="col-md-2 col-form-label">Is Visible</label>
-                        <div class="col-md-10">
-                            <div class="form-check">
-                                <input class="form-check-input" asp-for="IsVisible" type="checkbox">
-                                <label class="form-check-label" for="IsVisible">Yes</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <div class="col-md-10 offset-md-2">
-                            <button type="submit" class="btn btn-dark">Save</button>
-                        </div>
-                    </div>
-                
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    $(document).ready(function () {
+        let searchParams = new URLSearchParams(window.location.search)
+        let langId = searchParams.get('langId');
+        $('#LangId').val(langId);
+        $(document).on('click', '#submitBtn', function () {
+            var data = {
+                Id: $('#Id').val(),
+                LangId: $('#LangId').val(),
+                Name: $('#Name').val(),
+                Url: $('#Url').val(),
+                IsVisible: $('#IsVisible').is(':checked')
+            };
+            $.ajax({
+                type: 'POST',
+                url: '/Admin/Navbar/Save',
+                data: data,
+                success: function (response) {
+                    if (response) {
+                        alert('Success');
+                    } else {
+                        alert('Error');
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+
+
+

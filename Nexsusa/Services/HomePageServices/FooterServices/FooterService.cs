@@ -164,7 +164,7 @@ namespace Services.HomePageServices.FooterServices
                 return Error<List<FooterDTO>>(ex);
             }
         }
-        public async Task<ResponseResult<FooterDTO>> Delete(int id)
+        public Task<ResponseResult<FooterDTO>> Delete(int id)
         {
             throw new NotImplementedException();
         }

@@ -10,7 +10,7 @@ using System.Reflection;
 
 namespace Services._GenericServices
 {
-    public class GenericService<T> : BaseService where T : class
+    public class GenericService<C> : BaseService where C : class
     {
         public GenericService(AppDbContext dbContext, IMapper mapper) : base(dbContext, mapper)
         {
@@ -91,9 +91,9 @@ namespace Services._GenericServices
         }
 
 
-        public async Task<T> GetByIdAsync(int id, int langId, StringResourceEnums groupKey, params Expression<Func<T, object>>[] includes)
+        public async Task<C> GetByIdAsync(int id, int langId, StringResourceEnums groupKey, params Expression<Func<C, object>>[] includes)
         {
-            var query = _dbContext.Set<T>().AsNoTracking().AsQueryable();
+            var query = _dbContext.Set<C>().AsNoTracking().AsQueryable();
             if (includes != null)
             {
                 foreach (var include in includes)
@@ -110,9 +110,9 @@ namespace Services._GenericServices
             return entity;
         }
         // Get List 
-        public async Task<ResponseResult<List<T>>> GetListAsync(int langId, StringResourceEnums groupKey, params Expression<Func<T, object>>[] includes)
+        public async Task<ResponseResult<List<C>>> GetListAsync(int langId, StringResourceEnums groupKey, params Expression<Func<C, object>>[] includes)
         {
-            var query = _dbContext.Set<T>().AsNoTracking().AsQueryable();
+            var query = _dbContext.Set<C>().AsNoTracking().AsQueryable();
 
             // Apply includes if provided
             if (includes != null)
@@ -148,7 +148,7 @@ namespace Services._GenericServices
                         .FirstOrDefault()?.Value;
 
                     // Apply the translation if available, otherwise keep the original value
-                    property.SetValue(entity, translatedValue ?? originalValue);
+                    property.SetValue(entity, translatedValue);
                 }
             }
 

@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Core.Domains.Enums;
-using Core.Domains.Languages;
 using Core.HomePage.HomePageItems;
 using Data.Context;
 using Data.Dtos.ChooseUsDTOs;
@@ -8,24 +7,23 @@ using Data.Dtos.QuestionDTOs;
 using Microsoft.EntityFrameworkCore;
 using Services._Base;
 using Services._GenericServices;
-using Services._GenericServices.Test;
 
 namespace Services.HomePageServices.ChooseUsServices
 {
     public class ChooseUsService : BaseService, IChooseUsService
     {
-        private readonly GenericService<ChooseUs> genericService;
+        private readonly GenericService<ChooseUs> _genericService;
 
         public ChooseUsService(AppDbContext dbContext, IMapper mapper, GenericService<ChooseUs> genericService) : base(dbContext, mapper)
         {
-            this.genericService = genericService;
+            this._genericService = genericService;
         }
 
         public async Task<ResponseResult<List<ChooseUsDTO>>> GetList(int LanguageId)
         {
             try
             {
-                var choosUsItems = await genericService.GetListAsync(LanguageId, StringResourceEnums.ChooseUs, x => x.Questions);
+                var choosUsItems = await _genericService.GetListAsync(LanguageId, StringResourceEnums.ChooseUs, x => x.Questions);
                 var dto = _mapper.Map<List<ChooseUs>, List<ChooseUsDTO>>(choosUsItems.Data);
                 foreach (var item in dto)
                 {
@@ -35,8 +33,8 @@ namespace Services.HomePageServices.ChooseUsServices
                         foreach (var sub in item.Questions)
                         {
                             sub.LangId = LanguageId;
-                            sub.Title = genericService.ApplyTranslations<QuestionDTO>(sub, LanguageId, sub.Id, StringResourceEnums.Question).Title;
-                            sub.Description = genericService.ApplyTranslations<QuestionDTO>(sub, LanguageId, sub.Id, StringResourceEnums.Question).Description;
+                            sub.Title = _genericService.ApplyTranslations<QuestionDTO>(sub, LanguageId, sub.Id, StringResourceEnums.Question).Title;
+                            sub.Description = _genericService.ApplyTranslations<QuestionDTO>(sub, LanguageId, sub.Id, StringResourceEnums.Question).Description;
                         }
                     }
                 }
@@ -52,15 +50,15 @@ namespace Services.HomePageServices.ChooseUsServices
         {
             try
             {
-                var entity = await genericService.GetByIdAsync(id, LanguageId, StringResourceEnums.ChooseUs, x => x.Questions);
+                var entity = await _genericService.GetByIdAsync(id, LanguageId, StringResourceEnums.ChooseUs, x => x.Questions);
                 var dto = _mapper.Map<ChooseUs, ChooseUsDTO>(entity);
                 if (dto.Questions != null)
                 {
                     foreach (var sub in dto.Questions)
                     {
                         sub.LangId = LanguageId;
-                        sub.Title = genericService.ApplyTranslations<QuestionDTO>(sub, LanguageId, sub.Id, StringResourceEnums.Question).Title;
-                        sub.Description = genericService.ApplyTranslations<QuestionDTO>(sub, LanguageId, sub.Id, StringResourceEnums.Question).Description;
+                        sub.Title = _genericService.ApplyTranslations<QuestionDTO>(sub, LanguageId, sub.Id, StringResourceEnums.Question).Title;
+                        sub.Description = _genericService.ApplyTranslations<QuestionDTO>(sub, LanguageId, sub.Id, StringResourceEnums.Question).Description;
                     }
                 }
                 return Success(dto);
@@ -71,69 +69,130 @@ namespace Services.HomePageServices.ChooseUsServices
             }
         }
 
-        public async Task<ResponseResult<List<ChooseUsDTO>>> Manage(List<ChooseUsDTO> dto)
+        public async Task<ResponseResult<ChooseUsDTO>> Manage(ChooseUsDTO dto)
         {
             try
             {
-                var defultLanguage = await _dbContext.Languages.FirstAsync(x => x.IsDefault);
-                var defultModel = dto.FirstOrDefault(x => x.LangId == defultLanguage.Id);
-                var MainItem = _mapper.Map<ChooseUs>(defultModel);
-                if (MainItem.Id == 0)
+                var defaultLanguage = await _dbContext.Languages.FirstAsync(x => x.IsDefault);
+                bool isDefualtExists = await _dbContext.Services.AnyAsync();
+                bool IsDefultModel = dto.LangId == defaultLanguage.Id;
+                bool IsTranslateionExixts = await _dbContext.StringResources.AnyAsync(x => x.ResourceId == dto.Id && x.GroupKey == StringResourceEnums.ChooseUs && x.LanguageId == dto.LangId);
+                var mainItem = _mapper.Map<ChooseUsDTO, ChooseUs>(dto);
+                if (IsDefultModel)
                 {
-                    await genericService.CreateAsync(MainItem);
-                }
-                else
-                {
-                    await genericService.UpdateAsync(MainItem);
-                }
-                // Add Translations
-                foreach (var item in dto)
-                {
-                    var translations = new List<(string ColumnName, string ColumnValue)>
+                    if (dto.Id > 0)
                     {
-                        ("Title", item.Title),
-                        ("Description", item.Description)
-                    };
-                    if (item.Id > 0)
-                    {
-                        await genericService.UpdateTranslationsAsync(StringResourceEnums.ChooseUs, translations, MainItem.Id, item.LangId);
+                        await _genericService.UpdateAsync(mainItem);
                     }
                     else
                     {
-                        await genericService.AddTranslationsAsync(StringResourceEnums.ChooseUs, translations, MainItem.Id, item.LangId);
+                        await _genericService.CreateAsync(mainItem);
                     }
-                    if (item.Questions.Any())
-                    {
-
-                        foreach (var subTtem in item.Questions)
-                        {
-                            var subNavBar = await _dbContext.NavBarItemSubItems.FirstOrDefaultAsync(x => x.NavBarItemId == MainItem.Id);
-                            var Subtranslations = new List<(string ColumnName, string ColumnValue)>
+                    var translations = new List<(string ColumnName, string ColumnValue)>
                             {
-                                ("Title", subTtem.Title),
-                                ("Description", subTtem.Description)
+                                ("Title", dto.Title),
+                                ("Description", dto.Description)
                             };
-                            if (subTtem.Id > 0)
-                            {
-                                await genericService.UpdateTranslationsAsync(StringResourceEnums.Question, Subtranslations, subNavBar.Id, subTtem.LangId);
-                            }
-                            else
-                            {
-                                await genericService.AddTranslationsAsync(StringResourceEnums.Question, Subtranslations, subNavBar.Id, subTtem.LangId);
-                            }
-                        }
+
+                    if (dto.Id > 0)
+                    {
+                        await _genericService.UpdateTranslationsAsync(StringResourceEnums.ChooseUs, translations, mainItem.Id, dto.LangId);
+                    }
+                    else
+                    {
+                        await _genericService.AddTranslationsAsync(StringResourceEnums.ChooseUs, translations, mainItem.Id, dto.LangId);
                     }
                 }
+                else
+                {
+                    if (isDefualtExists)
+                    {
+                        var translations = new List<(string ColumnName, string ColumnValue)>
+                            {
+                                ("Title", dto.Title),
+                                ("Description", dto.Description)
+                            };
+
+                        if (dto.Id > 0 && IsTranslateionExixts)
+                        {
+                            await _genericService.UpdateTranslationsAsync(StringResourceEnums.ChooseUs, translations, dto.Id, dto.LangId);
+                        }
+                        else
+                        {
+                            await _genericService.AddTranslationsAsync(StringResourceEnums.ChooseUs, translations, dto.Id, dto.LangId);
+                        }
+
+
+                    }
+                    else
+                    {
+                        return Error<ChooseUsDTO>("Only default language can be managed first");
+                    }
+                }
+
                 return Success(dto);
             }
             catch (Exception ex)
             {
-                return Error<List<ChooseUsDTO>>(ex);
+                return Error<ChooseUsDTO>(ex);
+            }
+        }
+        // Mabnage SubItem
+        public async Task<ResponseResult<QuestionDTO>> ManageSubItem(QuestionDTO subDto)
+        {
+            try
+            {
+                var defaultLanguage = await _dbContext.Languages.FirstAsync(x => x.IsDefault);
+                bool IsTranslateionExists = await _dbContext.StringResources.AnyAsync(x => x.ResourceId == subDto.Id && x.GroupKey == StringResourceEnums.ServiceItem && x.LanguageId == subDto.LangId);
+                var subItem = _mapper.Map<QuestionDTO, Question>(subDto);
+                if (subDto.LangId == defaultLanguage.Id)
+                {
+                    if (subDto.Id > 0)
+                    {
+                        await _genericService.UpdateAsync(subItem);
+                    }
+                    else
+                    {
+                        await _genericService.CreateAsync(subItem);
+                    }
+                }
+                var subTranslations = new List<(string ColumnName, string ColumnValue)>
+                            {
+                                ("Title", subDto.Title),
+                                ("Description", subDto.Description)
+                             };
+                if (subDto.Id > 0 && IsTranslateionExists)
+                {
+                    await _genericService.UpdateTranslationsAsync(StringResourceEnums.Question, subTranslations, subItem.Id, subDto.LangId);
+                }
+                else
+                {
+                    await _genericService.AddTranslationsAsync(StringResourceEnums.Question, subTranslations, subItem.Id, subDto.LangId);
+                }
+                return Success(subDto);
+            }
+            catch (Exception ex)
+            {
+                return Error<QuestionDTO>(ex);
             }
         }
         public Task<ResponseResult<ChooseUsDTO>> Delete(int id)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<ResponseResult<ChooseUsDTO>> GetFirst()
+        {
+            try
+            {
+                var result = await _dbContext.ChooseUs.Include(x => x.Questions).FirstOrDefaultAsync();
+                var serviceDto = _mapper.Map<ChooseUsDTO>(result);
+                return Success(serviceDto);
+            }
+            catch (Exception ex)
+            {
+                return Error<ChooseUsDTO>(ex);
+            }
         }
     }
 }

@@ -2,6 +2,7 @@
 using Core.Domains.Enums;
 using Core.HomePage.HomePageItems;
 using Data.Context;
+using Data.Dtos.OurCompanyDTOs;
 using Data.Dtos.SliderDTOs;
 using Microsoft.EntityFrameworkCore;
 using Services._Base;
@@ -68,48 +69,87 @@ namespace Services.HomePageServices.SliderServices
             }
         }
 
-        public async Task<ResponseResult<List<SliderDTO>>> Manage(List<SliderDTO> dtos)
+        public async Task<ResponseResult<SliderDTO>> Manage(SliderDTO dto)
         {
             try
             {
                 var defaultLanguage = await _dbContext.Languages.FirstAsync(x => x.IsDefault);
-                var defaultModel = dtos.FirstOrDefault(x => x.LangId == defaultLanguage.Id);
+                bool isDefualtExists = await _dbContext.Sliders.AnyAsync();
+                bool IsDefultModel = dto.LangId == defaultLanguage.Id;
+                bool IsTranslateionExixts = await _dbContext.StringResources.AnyAsync(x => x.ResourceId == dto.Id && x.GroupKey == StringResourceEnums.Slider && x.LanguageId == dto.LangId);   
+                var mainItem = _mapper.Map<SliderDTO, Slider>(dto);
 
-                var slider = _mapper.Map<SliderDTO, Slider>(defaultModel);
-
-                if (defaultModel.Id > 0)
+                if (IsDefultModel)
                 {
-                    await _genericService.UpdateAsync(slider);
-                }
-                else
-                {
-                    await _genericService.CreateAsync(slider);
-                }
-
-                // Add or Update Translations for each slider item
-                foreach (var item in dtos)
-                {
-                    var translations = new List<(string ColumnName, string ColumnValue)>
+                    if (dto.Id > 0)
                     {
-                        ("Title", item.Title),
-                        ("Description", item.Description)
-                    };
-
-                    if (item.Id > 0)
-                    {
-                        await _genericService.UpdateTranslationsAsync(StringResourceEnums.Slider, translations, slider.Id, item.LangId);
+                        await _genericService.UpdateAsync(mainItem);
                     }
                     else
                     {
-                        await _genericService.AddTranslationsAsync(StringResourceEnums.Slider, translations, slider.Id, item.LangId);
+                        await _genericService.CreateAsync(mainItem);
+                    }
+                    var translations = new List<(string ColumnName, string ColumnValue)>
+                            {
+                                ("Title", dto.Title),
+                                ("Description", dto.Description)
+                            };
+
+                    if (dto.Id > 0)
+                    {
+                        await _genericService.UpdateTranslationsAsync(StringResourceEnums.Slider, translations, mainItem.Id, dto.LangId);
+                    }
+                    else
+                    {
+                        await _genericService.AddTranslationsAsync(StringResourceEnums.Slider, translations, mainItem.Id, dto.LangId);
                     }
                 }
+                else
+                {
+                    if (isDefualtExists)
+                    {
+                        var translations = new List<(string ColumnName, string ColumnValue)>
+                            {
+                                ("Title", dto.Title),
+                                ("Description", dto.Description)
+                            };
 
-                return Success(dtos);
+                        if (dto.Id > 0 && IsTranslateionExixts)
+                        {
+                            await _genericService.UpdateTranslationsAsync(StringResourceEnums.Slider, translations, dto.Id, dto.LangId);
+                        }
+                        else
+                        {
+                            await _genericService.AddTranslationsAsync(StringResourceEnums.Slider, translations, dto.Id, dto.LangId);
+                        }
+
+
+                    }
+                    else
+                    {
+                        return Error<SliderDTO>("Only default language can be managed first");
+                    }
+                }
+                return Success(dto);
             }
             catch (Exception ex)
             {
-                return Error<List<SliderDTO>>(ex);
+                return Error<SliderDTO>(ex);
+            }
+        }
+
+        public async Task<ResponseResult<SliderDTO>> GetFirst()
+        {
+            try
+            {
+                var result = await _dbContext.Sliders.FirstOrDefaultAsync();
+                var sliderDto = _mapper.Map<Slider, SliderDTO>(result);
+                return Success(sliderDto);
+
+            }
+            catch (Exception ex)
+            {
+                return Error<SliderDTO>(ex);
             }
         }
     }

@@ -43,10 +43,10 @@ namespace Data.Mapping
             CreateMap<NavBarItem, NavBarItemDTO>().ReverseMap();
             CreateMap<NavBarItemSubItem, NavBarItemSubItemDTO>().ReverseMap();
             //====================================================================================================
-            CreateMap<ChooseUs, ChooseUsDTO>().ReverseMap();
+            CreateMap<ChooseUs, ChooseUsDTO>().ReverseMap().ForMember(x => x.Questions, opt => opt.MapFrom(src => src.Questions));
             CreateMap<Question, QuestionDTO>().ReverseMap();
             //====================================================================================================
-            CreateMap<ClientSays, ClientSaysDTO>().ReverseMap();
+            CreateMap<ClientSays, ClientSaysDTO>().ReverseMap().ForMember(x => x.ClientSaysItems, opt => opt.MapFrom(src => src.ClientSaysItems));
             CreateMap<ClientSaysItem, ClientSaysItemDTO>().ReverseMap();
             //====================================================================================================
             CreateMap<Footer, FooterDTO>().ReverseMap();
@@ -55,27 +55,27 @@ namespace Data.Mapping
             //====================================================================================================
             CreateMap<OurCompany, OurCompanyDTO>().ReverseMap();
             //====================================================================================================
-            CreateMap<OurEmployees, OurEmployeesDTO>();
-            CreateMap<OurEmployeesItem, OurEmployeesItemDTO>();
+            CreateMap<OurEmployees, OurEmployeesDTO>().ReverseMap();
+            CreateMap<OurEmployeesItem, OurEmployeesItemDTO>().ReverseMap();
             //====================================================================================================
-            CreateMap<RegularBlogs, RegularBlogsDTO>();
-            CreateMap<RegularBlogsItem, RegularBlogsItemDTO>();
+            CreateMap<RegularBlogs, RegularBlogsDTO>().ReverseMap();
+            CreateMap<RegularBlogsItem, RegularBlogsItemDTO>().ReverseMap();
             //====================================================================================================
-            CreateMap<Service, ServiceDTO>();
-            CreateMap<ServiceItem, ServiceItemDTO>();
+            CreateMap<Service, ServiceDTO>().ReverseMap().ForMember(x => x.ServiceItems, opt => opt.MapFrom(src => src.ServiceItems));
+            CreateMap<ServiceItem, ServiceItemDTO>().ReverseMap();
             //====================================================================================================
-            CreateMap<Slider, SliderDTO>();
+            CreateMap<Slider, SliderDTO>().ReverseMap();
             //====================================================================================================
             CreateMap<WhoWeAre, WhoWeAreDTO>().ReverseMap();
             CreateMap<WhoWeAreItem, WhoWeAreItemDTO>().ReverseMap();
             //====================================================================================================
-            CreateMap<WorkingProcess, WorkingProcessDTO>();
-            CreateMap<WorkingProcessItem, WorkingProcessItemDTO>();
+            CreateMap<WorkingProcess, WorkingProcessDTO>().ReverseMap().ForMember(x => x.WorkingProcessItems, opt => opt.MapFrom(src => src.WorkingProcessItems));
+            CreateMap<WorkingProcessItem, WorkingProcessItemDTO>().ReverseMap();
             //====================================================================================================
-            CreateMap<WorkShowCase, WorkShowCaseDTO>();
-            CreateMap<WorkShowCaseNavBar, WorkShowCaseNavBarDTO>();
-            CreateMap<WorkShowCaseNavBarItem, WorkShowCaseNavBarItemDTO>();
-            CreateMap<WorkShowCaseService, WorkShowCaseServiceDTO>();
+            CreateMap<WorkShowCase, WorkShowCaseDTO>().ReverseMap();
+            CreateMap<WorkShowCaseNavBar, WorkShowCaseNavBarDTO>().ReverseMap();
+            CreateMap<WorkShowCaseNavBarItem, WorkShowCaseNavBarItemDTO>().ReverseMap();
+            CreateMap<WorkShowCaseService, WorkShowCaseServiceDTO>().ReverseMap();
             //====================================================================================================
         }
     }

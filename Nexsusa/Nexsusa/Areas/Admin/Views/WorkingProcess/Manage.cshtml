@@ -1,0 +1,299 @@
+﻿@using Data.Dtos.WorkingProcessDTOs
+
+
+@{
+    ViewData["Title"] = "Manage";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    int deletedItemId = 0;
+}
+@model WorkingProcessDTO
+<div class="col-lg-12">
+    <div class="card">
+        <div style="margin: 20px">
+            <select name="langId" class=" form-control" id="languageSelect">
+                @foreach (var item in ViewBag.Languages)
+                {
+                    bool isSelected = ViewBag.SelectedLanguageId == item.Id;
+                    if (isSelected)
+                    {
+                        <option selected value="@item.Id">@item.Name</option>
+                    }
+                    else
+                    {
+                        <option value="@item.Id">@item.Name</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">Working Process Edit</h4>
+            <div class="basic-form">
+                <div class="form-group row">
+                    <input id="Id" asp-for="Id" type="text" class="form-control input-default">
+                    <input id="LangId" asp-for="LangId" type="text" class="form-control input-default">
+                </div>
+                <div class="form-group row">
+                    <label class="col-md-2 col-form-label">Title Enter</label>
+
+                    <div class="col-md-10">
+                        <input id="Title" asp-for="Title" type="text" class="form-control input-default" value="@Model.Title" required>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-md-2 col-form-label">Description Enter</label>
+                    <div class="col-md-10">
+                        <input id="SubTitle" asp-for="SubTitle" type="text" class="form-control input-default" value="@Model.SubTitle" required>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-md-10 offset-md-2">
+                        <button type="submit" id="submitBtn" class="btn btn-dark">Save</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-lg-12">
+    <div class="card">
+        <div class="card-body">
+            <a class="btn btn-primary" data-target="#SubModal" data-toggle="modal" data-placement="top" title="add sub service" style="cursor : pointer; color:white">
+                <i class="fa fa-plus "></i> Add Item
+            </a>
+            <br />
+            <br />
+            <div class="table-responsive">
+                <table class="table table-bordered verticle-middle" id="navbarTable">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Title</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.WorkingProcessItems != null && Model.WorkingProcessItems.Any())
+                        {
+                            foreach (var item in Model.WorkingProcessItems)
+                            {
+                                if (item.Title != null)
+                                {
+                                    <tr data-lang="@item.LangId">
+                                        <td>@item.Id</td>
+                                        <td>@item.Title</td>
+                                        <td>@item.Description</td>
+                                        <td>@item.CreatedDate</td>
+                                        <td>@item.UpdatedDate</td>
+                                        <td>
+                                            <span>
+                                                <a onclick="getSubItem(@item.Id)" data-target="#SubModal" data-toggle="modal" data-placement="top" title="Düzenle">
+                                                    <i class="fa fa-pencil color-muted m-r-5"></i>
+                                                </a>
+                                                <a data-target="#DeleteModal" data-toggle="tooltip" data-placement="top" title="Kapat" style="cursor : pointer;">
+                                                    <i class="fa fa-close color-danger"></i>
+                                                </a>
+                                                @{
+                                                    deletedItemId = item.Id;
+                                                }
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center">No items found.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="DeleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <a href="/Admin/Navbar/Manage/@deletedItemId" type="button" class="btn btn-primary">Save changes</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Sub Modal -->
+<div class="modal fade" id="SubModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <select name="langId" class=" form-control" id="SublanguageSelect">
+                    @foreach (var item in ViewBag.Languages)
+                    {
+                        bool isSelected = ViewBag.SelectedLanguageId == item.Id;
+                        if (isSelected)
+                        {
+                            <option selected value="@item.Id">@item.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@item.Id">@item.Name</option>
+                        }
+                    }
+                </select>
+                <div class="card-body">
+                    <h4 class="card-title">Sub Item</h4>
+                    <div class="basic-form">
+                        <div class="form-group row">
+                            <input id="SubId" type="text" class="form-control input-default">
+                            <input id="SubLangId" type="text" class="form-control input-default">
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-md-2 col-form-label">Title</label>
+
+                            <div class="col-md-10">
+                                <input id="SubItemTitle" type="text" class="form-control input-default" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-md-2 col-form-label">Description</label>
+                            <div class="col-md-10">
+                                <input id="SubDescription" type="text" class="form-control input-default" required>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-md-2 col-form-label">Image</label>
+                            <div class="col-md-10">
+                                <input id="File" type="file" class="form-control input-default">
+                                <div style="display: flex;justify-content: center;max-height: 500px;padding:10px">
+                                    <img style="max-width: 100%;object-fit: contain;" id="ImagePreview" src="~/Images/main.png" alt="Alternate Text" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="submitSubBtn" type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        let LanguageId = $('#languageSelect').val();
+        $('#LangId').val(LanguageId);
+
+        $(document).on('change', '#languageSelect', function () {
+            let LanguageId = $('#languageSelect').val();
+            window.location.href = `/Admin/WorkingProcess/Manage?languageId=${LanguageId}`;
+        });
+        // SublanguageSelect
+        let SubLanguageId = $('#SublanguageSelect').val();
+        $('#SubLangId').val(SubLanguageId);
+        $(document).on('change', '#SublanguageSelect', function () {
+            let SubLanguageId = $('#SublanguageSelect').val();
+            $('#SubLangId').val(SubLanguageId);
+            let id = $('#SubId').val();
+            getSubItem(id);
+        });
+            // Save Item
+        $(document).on('click', '#submitBtn', function () {
+            var data = {
+                Id: $('#Id').val(),
+                LangId: $('#LangId').val(),
+                Title: $('#Title').val(),
+                SubTitle: $('#SubTitle').val()
+            }
+            $.ajax({
+                type: "POST",
+                url: "/Admin/WorkingProcess/Save",
+                data: data,
+                success: function (response) {
+                    if (response == "success") {
+                        window.location.href = "/Admin/Slider/List";
+                    }
+                }
+            });
+        });
+
+        // submit Sub Item
+        $(document).on('click', '#submitSubBtn', function () {
+            var formData = new FormData();
+            formData.append('Id', $('#SubId').val());
+            formData.append('WorkingProcessId', $('#Id').val());
+            formData.append('LangId', $('#SubLangId').val());
+            formData.append('Title', $('#SubItemTitle').val());
+            formData.append('Description', $('#SubDescription').val());
+            formData.append('File', $('#File')[0].files[0]);
+            $.ajax({
+                type: "POST",
+                url: "/Admin/WorkingProcess/ManageSubItem",
+                contentType: false,
+                processData: false,
+                data: formData,
+                success: function (response) {
+                    if (response == "success") {
+                        window.location.href = "/Admin/WorkingProcess/Manage";
+                    }
+                }
+            });
+        });
+        $(document).on('change', '#File', function () {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $('#ImagePreview').attr('src', e.target.result);
+            }
+            reader.readAsDataURL(this.files[0]);
+        });
+    });
+
+    function getSubItem(id) {
+        $.ajax({
+            type: "GET",
+            url: "/Admin/WorkingProcess/GetSubItem",
+            data: { id: id, parentId: $('#Id').val(), languageId: $('#SubLangId').val() },
+            success: function (response) {
+                $('#SubId').val(response.id);
+                $('#SubItemTitle').val(response.title);
+                $('#SubDescription').val(response.description);
+                if(response.imageUrl != null)
+                    {
+                        $('#ImagePreview').attr('src', '/Images/'+response.imageUrl);
+                    }
+
+            },
+            error: function () {
+                alert('An unexpected error occurred.');
+            }
+        });
+    }
+
+
+</script>

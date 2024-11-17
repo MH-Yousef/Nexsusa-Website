@@ -8,6 +8,6 @@ namespace Core.HomePage.HomePageItems
         public string Title { get; set; }
         [Translatable]
         public string Description { get; set; }
-        public List<ServiceItem> ServiceItem { get; set; }
+        public List<ServiceItem> ServiceItems { get; set; }
     }
 }

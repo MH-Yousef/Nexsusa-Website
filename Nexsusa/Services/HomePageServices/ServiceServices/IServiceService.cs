@@ -12,7 +12,8 @@ namespace Services.HomePageServices.ServiceServices
     {
         Task<ResponseResult<List<ServiceDTO>>> GetList(int langId);
         Task<ResponseResult<ServiceDTO>> GetById(int id,int langId);
-        Task<ResponseResult<List<ServiceDTO>>> Manage(List<ServiceDTO> dtos);
-        
+        Task<ResponseResult<ServiceDTO>> Manage(ServiceDTO dtos);
+        Task<ResponseResult<ServiceDTO>> GetFirst();
+        Task<ResponseResult<ServiceItemDTO>> ManageSubItem(ServiceItemDTO subDto);
     }
 }

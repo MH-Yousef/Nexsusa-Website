@@ -10,12 +10,14 @@ namespace Core.HomePage.HomePageItems
         [Translatable]
         public string Description { get; set; }
         public string IconUrl { get; set; }
-        public List<Image> Images { get; set; }
+        public string Images1 { get; set; }
+        public string Images2 { get; set; }
+        public string Images3 { get; set; }
 
 
         #region Relations
-        [ForeignKey(nameof(ServicesId))]
-        public int ServicesId { get; set; }
+        [ForeignKey(nameof(ServiceId))]
+        public int ServiceId { get; set; }
         #endregion
     }
 }

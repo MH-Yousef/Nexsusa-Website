@@ -469,9 +469,6 @@ namespace Data.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("ServiceItemId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
 
@@ -479,8 +476,6 @@ namespace Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ServiceItemId");
 
                     b.ToTable("Images");
                 });
@@ -850,13 +845,19 @@ namespace Data.Migrations
                     b.Property<string>("IconUrl")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Images1")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Images2")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Images3")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("ServiceId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ServicesId")
+                    b.Property<int>("ServiceId")
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
@@ -1189,7 +1190,7 @@ namespace Data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Icon")
+                    b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
@@ -1209,6 +1210,37 @@ namespace Data.Migrations
                     b.HasIndex("WorkingProcessId");
 
                     b.ToTable("WorkingProcessItems");
+                });
+
+            modelBuilder.Entity("Core.ServicesPage.ServicePage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnOrder(0);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("ServiceId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ServiceId");
+
+                    b.ToTable("ServicePages");
                 });
 
             modelBuilder.Entity("Core.AboutPage.About", b =>
@@ -1334,13 +1366,6 @@ namespace Data.Migrations
                     b.Navigation("Footer");
                 });
 
-            modelBuilder.Entity("Core.HomePage.HomePageItems.Image", b =>
-                {
-                    b.HasOne("Core.HomePage.HomePageItems.ServiceItem", null)
-                        .WithMany("Images")
-                        .HasForeignKey("ServiceItemId");
-                });
-
             modelBuilder.Entity("Core.HomePage.HomePageItems.NavBarItem", b =>
                 {
                     b.HasOne("Core.HomePage.HomePage", null)
@@ -1404,8 +1429,10 @@ namespace Data.Migrations
             modelBuilder.Entity("Core.HomePage.HomePageItems.ServiceItem", b =>
                 {
                     b.HasOne("Core.HomePage.HomePageItems.Service", null)
-                        .WithMany("ServiceItem")
-                        .HasForeignKey("ServiceId");
+                        .WithMany("ServiceItems")
+                        .HasForeignKey("ServiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Core.HomePage.HomePageItems.SocialLink", b =>
@@ -1468,6 +1495,15 @@ namespace Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Core.ServicesPage.ServicePage", b =>
+                {
+                    b.HasOne("Core.HomePage.HomePageItems.Service", "Service")
+                        .WithMany()
+                        .HasForeignKey("ServiceId");
+
+                    b.Navigation("Service");
+                });
+
             modelBuilder.Entity("Core.Domains.Languages.Language", b =>
                 {
                     b.Navigation("StringResources");
@@ -1517,12 +1553,7 @@ namespace Data.Migrations
 
             modelBuilder.Entity("Core.HomePage.HomePageItems.Service", b =>
                 {
-                    b.Navigation("ServiceItem");
-                });
-
-            modelBuilder.Entity("Core.HomePage.HomePageItems.ServiceItem", b =>
-                {
-                    b.Navigation("Images");
+                    b.Navigation("ServiceItems");
                 });
 
             modelBuilder.Entity("Core.HomePage.HomePageItems.WhoWeAre", b =>

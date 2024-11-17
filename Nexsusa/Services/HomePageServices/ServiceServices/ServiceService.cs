@@ -6,12 +6,6 @@ using Data.Dtos.ServiceDTOs;
 using Microsoft.EntityFrameworkCore;
 using Services._Base;
 using Services._GenericServices;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Services.HomePageServices.ServiceServices
 {
@@ -27,7 +21,7 @@ namespace Services.HomePageServices.ServiceServices
         {
             try
             {
-                var services = await _genericService.GetListAsync(langId, StringResourceEnums.Service, x => x.ServiceItem);
+                var services = await _genericService.GetListAsync(langId, StringResourceEnums.Service, x => x.ServiceItems);
                 var dto = _mapper.Map<List<Service>, List<ServiceDTO>>(services.Data);
 
                 // Iterate through the services and their items for translations
@@ -42,17 +36,6 @@ namespace Services.HomePageServices.ServiceServices
                             item.LangId = langId;
                             item.Title = _genericService.ApplyTranslations<ServiceItemDTO>(item, langId, item.Id, StringResourceEnums.ServiceItem).Title;
                             item.Description = _genericService.ApplyTranslations<ServiceItemDTO>(item, langId, item.Id, StringResourceEnums.ServiceItem).Description;
-
-                            // Handle images if there are any
-                            if (item.Images != null)
-                            {
-                                foreach (var image in item.Images)
-                                {
-                                    image.LangId = langId;
-                                    
-
-                                }
-                            }
                         }
                     }
                 }
@@ -70,7 +53,7 @@ namespace Services.HomePageServices.ServiceServices
         {
             try
             {
-                var service = await _genericService.GetByIdAsync(id, langId, StringResourceEnums.Service, x => x.ServiceItem);
+                var service = await _genericService.GetByIdAsync(id, langId, StringResourceEnums.Service, x => x.ServiceItems);
                 var dto = _mapper.Map<Service, ServiceDTO>(service);
 
                 if (dto.ServiceItems != null)
@@ -81,14 +64,14 @@ namespace Services.HomePageServices.ServiceServices
                         item.Title = _genericService.ApplyTranslations<ServiceItemDTO>(item, langId, item.Id, StringResourceEnums.ServiceItem).Title;
                         item.Description = _genericService.ApplyTranslations<ServiceItemDTO>(item, langId, item.Id, StringResourceEnums.ServiceItem).Description;
 
-                        // Handle images if there are any
-                        if (item.Images != null)
-                        {
-                            foreach (var image in item.Images)
-                            {
-                                image.LangId = langId;
-                            }
-                        }
+                        //// Handle images if there are any
+                        //if (item.Images != null)
+                        //{
+                        //    foreach (var image in item.Images)
+                        //    {
+                        //        image.LangId = langId;
+                        //    }
+                        //}
                     }
                 }
 
@@ -100,73 +83,124 @@ namespace Services.HomePageServices.ServiceServices
             }
         }
 
-        public async Task<ResponseResult<List<ServiceDTO>>> Manage(List<ServiceDTO> dtos)
+        public async Task<ResponseResult<ServiceDTO>> Manage(ServiceDTO dto)
         {
             try
             {
                 var defaultLanguage = await _dbContext.Languages.FirstAsync(x => x.IsDefault);
-                var defaultModel = dtos.FirstOrDefault(x => x.LangId == defaultLanguage.Id);
-                var service = _mapper.Map<ServiceDTO, Service>(defaultModel);
-
-                if (defaultModel.Id > 0)
+                bool isDefualtExists = await _dbContext.Services.AnyAsync();
+                bool IsDefultModel = dto.LangId == defaultLanguage.Id;
+                bool IsTranslateionExixts = await _dbContext.StringResources.AnyAsync(x => x.ResourceId == dto.Id && x.GroupKey == StringResourceEnums.Service && x.LanguageId == dto.LangId);
+                var service = _mapper.Map<ServiceDTO, Service>(dto);
+                if (IsDefultModel)
                 {
-                    await _genericService.UpdateAsync(service);
-                }
-                else
-                {
-                    await _genericService.CreateAsync(service);
-                }
-
-                // Add or Update Translations for Service
-                foreach (var item in dtos)
-                {
-                    var translations = new List<(string ColumnName, string ColumnValue)>
+                    if (dto.Id > 0)
                     {
-                        ("Title", item.Title),
-                        ("Description", item.Description)
-                    };
-
-                    if (item.Id > 0)
-                    {
-                        await _genericService.UpdateTranslationsAsync(StringResourceEnums.Service, translations, service.Id, item.LangId);
+                        await _genericService.UpdateAsync(service);
                     }
                     else
                     {
-                        await _genericService.AddTranslationsAsync(StringResourceEnums.Service, translations, service.Id, item.LangId);
+                        await _genericService.CreateAsync(service);
                     }
-
-                    // Add or Update Translations for ServiceItems
-                    if (item.ServiceItems != null && item.ServiceItems.Any())
-                    {
-                        foreach (var subItem in item.ServiceItems)
-                        {
-                            var subService = await _dbContext.ServiceItems.FirstOrDefaultAsync(x => x.ServicesId == service.Id);
-                            var subTranslations = new List<(string ColumnName, string ColumnValue)>
+                    var translations = new List<(string ColumnName, string ColumnValue)>
                             {
-                                ("Title", subItem.Title),
-                                ("Description", subItem.Description)
+                                ("Title", dto.Title),
+                                ("Description", dto.Description)
                             };
 
-                            if (subItem.Id > 0)
-                            {
-                                await _genericService.UpdateTranslationsAsync(StringResourceEnums.ServiceItem, subTranslations, subService.Id, subItem.LangId);
-                            }
-                            else
-                            {
-                                await _genericService.AddTranslationsAsync(StringResourceEnums.ServiceItem, subTranslations, subService.Id, subItem.LangId);
-                            }
-
-                         
-                            }
-                        }
+                    if (dto.Id > 0)
+                    {
+                        await _genericService.UpdateTranslationsAsync(StringResourceEnums.Service, translations, service.Id, dto.LangId);
                     }
-                
+                    else
+                    {
+                        await _genericService.AddTranslationsAsync(StringResourceEnums.Service, translations, service.Id, dto.LangId);
+                    }
+                }
+                else
+                {
+                    if (isDefualtExists)
+                    {
+                        var translations = new List<(string ColumnName, string ColumnValue)>
+                            {
+                                ("Title", dto.Title),
+                                ("Description", dto.Description)
+                            };
 
-                return Success(dtos);
+                        if (dto.Id > 0 && IsTranslateionExixts)
+                        {
+                            await _genericService.UpdateTranslationsAsync(StringResourceEnums.Service, translations, dto.Id, dto.LangId);
+                        }
+                        else
+                        {
+                            await _genericService.AddTranslationsAsync(StringResourceEnums.Service, translations, dto.Id, dto.LangId);
+                        }
+
+
+                    }
+                    else
+                    {
+                        return Error<ServiceDTO>("Only default language can be managed first");
+                    }
+                }
+
+                return Success(dto);
             }
             catch (Exception ex)
             {
-                return Error<List<ServiceDTO>>(ex);
+                return Error<ServiceDTO>(ex);
+            }
+        }
+        // Mabnage SubItem
+        public async Task<ResponseResult<ServiceItemDTO>> ManageSubItem(ServiceItemDTO subDto)
+        {
+            try
+            {
+                var defaultLanguage = await _dbContext.Languages.FirstAsync(x => x.IsDefault);
+                bool IsTranslateionExixts = await _dbContext.StringResources.AnyAsync(x => x.ResourceId == subDto.Id && x.GroupKey == StringResourceEnums.ServiceItem && x.LanguageId == subDto.LangId);
+                var subService = _mapper.Map<ServiceItemDTO, ServiceItem>(subDto);
+                if (subDto.LangId == defaultLanguage.Id)
+                {
+                    if (subDto.Id > 0)
+                    {
+                        await _genericService.UpdateAsync(subService);
+                    }
+                    else
+                    {
+                        await _genericService.CreateAsync(subService);
+                    }
+                }
+                var subTranslations = new List<(string ColumnName, string ColumnValue)>
+                            {
+                                ("Title", subDto.Title),
+                                ("Description", subDto.Description)
+                             };
+                if (subDto.Id > 0 && IsTranslateionExixts)
+                {
+                    await _genericService.UpdateTranslationsAsync(StringResourceEnums.ServiceItem, subTranslations, subService.Id, subDto.LangId);
+                }
+                else
+                {
+                    await _genericService.AddTranslationsAsync(StringResourceEnums.ServiceItem, subTranslations, subService.Id, subDto.LangId);
+                }
+                return Success(subDto);
+            }
+            catch (Exception ex)
+            {
+                return Error<ServiceItemDTO>(ex);
+            }
+        }
+        public async Task<ResponseResult<ServiceDTO>> GetFirst()
+        {
+            try
+            {
+                var result = await _dbContext.Services.Include(x => x.ServiceItems).FirstOrDefaultAsync();
+                var serviceDto = _mapper.Map<ServiceDTO>(result);
+                return Success(serviceDto);
+            }
+            catch (Exception ex)
+            {
+                return Error<ServiceDTO>(ex);
             }
         }
 

@@ -1,0 +1,131 @@
+﻿@using Data.Dtos.OurCompanyDTOs
+
+@{
+    ViewData["Title"] = "Manage";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+@model OurCompanyDTO
+
+<div class="col-lg-12">
+    <div class="card">
+        <div style="margin: 20px">
+            <select name="langId" class=" form-control" id="languageSelect">
+                @foreach (var item in ViewBag.Languages)
+                {
+                    bool isSelected = ViewBag.SelectedLanguageId == item.Id;
+                    if (isSelected)
+                    {
+                        <option selected value="@item.Id">@item.Name</option>
+                    }
+                    else
+                    {
+                        <option value="@item.Id">@item.Name</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">Our Company</h4>
+            <div class="basic-form">
+                <div class="form-group row">
+                    <input id="Id" asp-for="Id" type="text" class="form-control input-default">
+                    <input id="LangId" asp-for="LangId" type="text" class="form-control input-default">
+                </div>
+                <div class="form-group row">
+                    <label class="col-md-2 col-form-label">Title</label>
+
+                    <div class="col-md-10">
+                        <input id="Title" asp-for="Title" type="text" class="form-control input-default">
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-md-2 col-form-label">Description</label>
+                    <div class="col-md-10">
+                        <input id="Description" asp-for="Description" type="text" class="form-control input-default">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-md-2 col-form-label">Image</label>
+                    <div class="col-md-10">
+                        <input id="File" asp-for="File" type="file" class="form-control input-default">
+                        <div style="display: flex;justify-content: center;max-height: 500px;padding:10px">
+                            @if (Model?.ImageUrl == null)
+                            {
+                                <img style="max-width: 100%;object-fit: contain;" id="ImagePreview" src="~/Images/main.png" alt="Alternate Text" />
+                            }
+                            else
+                            {
+                                <img style="max-width: 100%;object-fit: contain;" id="ImagePreview" src="~/Images/@Model.ImageUrl" alt="Alternate Text" />
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-10 offset-md-2">
+                        <button type="submit" id="submitBtn" class="btn btn-dark">Save</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        let LanguageId = $('#languageSelect').val();
+        $('#LangId').val(LanguageId);
+        $(document).on('change', '#languageSelect', function () {
+            let LanguageId = $('#languageSelect').val();
+            $('#LangId').val(LanguageId);
+            $.ajax({
+                type: "GET",
+                url: `/Admin/OurCompany/Get`,
+                data: { languageId: $('#languageSelect').val() },
+                success: function (response) {
+                    if (response && response.data) {
+                        $('#Id').val(response.data.id);
+                        $('#Title').val(response.data.title);
+                        $('#Description').val(response.data.description);
+                    } else {
+                        alert('Data not found or an error occurred.');
+                    }
+                },
+                error: function () {
+                    alert('An unexpected error occurred.');
+                }
+            });
+        });
+
+
+        $(document).on('click', '#submitBtn', function () {
+            var formData = new FormData();
+            formData.append('Id', $('#Id').val());
+            formData.append('LangId', $('#LangId').val());
+            formData.append('Title', $('#Title').val());
+            formData.append('Description', $('#Description').val());
+            formData.append('File', $('#File')[0].files[0]);
+
+            $.ajax({
+                type: "POST",
+                url: "/Admin/OurCompany/Save",
+                contentType: false,
+                processData: false,
+                data: formData,
+                success: function (response) {
+                    window.location.reload();
+                }
+            });
+        });
+
+        $(document).on('change', '#File', function () {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $('#ImagePreview').attr('src', e.target.result);
+            }
+            reader.readAsDataURL(this.files[0]);
+        });
+    });
+</script>
+

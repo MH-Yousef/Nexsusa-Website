@@ -16,7 +16,10 @@ namespace Data.Dtos.ServiceDTOs
         [Translatable]
         public string Description { get; set; }
         public string IconUrl { get; set; }
-        public List<ImageDTO> Images { get; set; }
+        public int ServiceId { get; set; }
+        public string Images1 { get; set; }
+        public string Images2 { get; set; }
+        public string Images3 { get; set; }
     }
 
 }

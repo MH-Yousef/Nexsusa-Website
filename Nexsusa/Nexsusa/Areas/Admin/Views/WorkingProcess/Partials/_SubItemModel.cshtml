@@ -1,0 +1,74 @@
+﻿@using Data.Dtos.WorkingProcessDTOs
+@model WorkingProcessItemDTO
+
+<div class="modal fade" id="SubModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <select name="langId" class=" form-control" id="SublanguageSelect">
+                    @foreach (var item in ViewBag.Languages)
+                    {
+                        bool isSelected = ViewBag.SelectedLanguageId == item.Id;
+                        if (isSelected)
+                        {
+                            <option selected value="@item.Id">@item.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@item.Id">@item.Name</option>
+                        }
+                    }
+                </select>
+                <div class="card-body">
+                    <h4 class="card-title">Sub Item</h4>
+                    <div class="basic-form">
+                        <div class="form-group row">
+                            <input id="SubId" type="text" class="form-control input-default">
+                            <input id="SubLangId" type="text" class="form-control input-default">
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-md-2 col-form-label">Title</label>
+
+                            <div class="col-md-10">
+                                <input id="SubItemTitle" type="text" class="form-control input-default" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-md-2 col-form-label">Description</label>
+                            <div class="col-md-10">
+                                <input id="SubDescription" type="text" class="form-control input-default" required>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-md-2 col-form-label">Image</label>
+                            <div class="col-md-10">
+                                <input id="File" asp-for="File" type="file" class="form-control input-default">
+                                <div style="display: flex;justify-content: center;max-height: 500px;padding:10px">
+                                    @if (Model?.ImageUrl == null)
+                                    {
+                                        <img style="max-width: 100%;object-fit: contain;" id="ImagePreview" src="~/Images/main.png" alt="Alternate Text" />
+                                    }
+                                    else
+                                    {
+                                        <img style="max-width: 100%;object-fit: contain;" id="ImagePreview" src="~/Images/@Model.ImageUrl" alt="Alternate Text" />
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="submitSubBtn" type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>

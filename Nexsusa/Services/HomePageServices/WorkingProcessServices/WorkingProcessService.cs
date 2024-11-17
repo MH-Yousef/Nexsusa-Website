@@ -5,21 +5,19 @@ using Data.Context;
 using Data.Dtos.WorkingProcessDTOs;
 using Microsoft.EntityFrameworkCore;
 using Services._Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
+using Services._GenericServices;
+using Services.ImageServices;
 
 namespace Services.HomePageServices.WorkingProcessServices
 {
     public class WorkingProcessService : BaseService, IWorkingProcessService
     {
-        private readonly Services._GenericServices.GenericService<WorkingProcess> _genericService;
-        public WorkingProcessService(AppDbContext dbContext, IMapper mapper, _GenericServices.GenericService<WorkingProcess> genericService) : base(dbContext, mapper)
+        private readonly GenericService<WorkingProcess> _genericService;
+        private readonly IImageService _imageService;
+        public WorkingProcessService(AppDbContext dbContext, IMapper mapper, _GenericServices.GenericService<WorkingProcess> genericService, IImageService imageService) : base(dbContext, mapper)
         {
             _genericService = genericService;
+            _imageService = imageService;
         }
         public async Task<ResponseResult<List<WorkingProcessDTO>>> GetList(int languageId)
         {
@@ -60,7 +58,7 @@ namespace Services.HomePageServices.WorkingProcessServices
         {
             try
             {
-                var workingProcess = await _genericService.GetByIdAsync(id, languageId, StringResourceEnums.WorkingProcess);
+                var workingProcess = await _genericService.GetByIdAsync(id, languageId, StringResourceEnums.WorkingProcess, x => x.WorkingProcessItems);
 
                 var workingProcessDto = _mapper.Map<WorkingProcess, WorkingProcessDTO>(workingProcess);
 
@@ -87,70 +85,129 @@ namespace Services.HomePageServices.WorkingProcessServices
                 return Error<WorkingProcessDTO>(ex);
             }
         }
-        public async Task<ResponseResult<List<WorkingProcessDTO>>> Manage(List<WorkingProcessDTO> dtos)
+        public async Task<ResponseResult<WorkingProcessDTO>> Manage(WorkingProcessDTO dto)
         {
             try
             {
                 var defaultLanguage = await _dbContext.Languages.FirstAsync(x => x.IsDefault);
-                var defaultModel = dtos.FirstOrDefault(x => x.LangId == defaultLanguage.Id);
-
-                var workingProcess = _mapper.Map<WorkingProcessDTO, WorkingProcess>(defaultModel);
-
-                if (defaultModel.Id > 0)
+                bool isDefualtExists = await _dbContext.WorkingProcesses.AnyAsync();
+                bool IsDefultModel = dto.LangId == defaultLanguage.Id;
+                bool IsTranslateionExixts = await _dbContext.StringResources.AnyAsync(x => x.ResourceId == dto.Id && x.GroupKey == StringResourceEnums.Service && x.LanguageId == dto.LangId);
+                var service = _mapper.Map<WorkingProcessDTO, WorkingProcess>(dto);
+                if (IsDefultModel)
                 {
-                    await _genericService.UpdateAsync(workingProcess);
-                }
-                else
-                {
-                    await _genericService.CreateAsync(workingProcess);
-                }
-
-                // Add or Update Translations for WorkingProcess
-                foreach (var item in dtos)
-                {
-                    var translations = new List<(string ColumnName, string ColumnValue)>
+                    if (dto.Id > 0)
                     {
-                        ("Title", item.Title),
-                        ("SubTitle", item.SubTitle)
-                    };
-
-                    if (item.Id > 0)
-                    {
-                        await _genericService.UpdateTranslationsAsync(StringResourceEnums.WorkingProcess, translations, workingProcess.Id, item.LangId);
+                        await _genericService.UpdateAsync(service);
                     }
                     else
                     {
-                        await _genericService.AddTranslationsAsync(StringResourceEnums.WorkingProcess, translations, workingProcess.Id, item.LangId);
+                        await _genericService.CreateAsync(service);
                     }
-
-                    // Handle translations for related WorkingProcessItems
-                    if (item.WorkingProcessItems != null && item.WorkingProcessItems.Any())
-                    {
-                        foreach (var subItem in item.WorkingProcessItems)
-                        {
-                            var subTranslations = new List<(string ColumnName, string ColumnValue)>
+                    var translations = new List<(string ColumnName, string ColumnValue)>
                             {
-                                ("Title", subItem.Title),
-                                ("Description", subItem.Description)
+                                ("Title", dto.Title),
+                                ("SubTitle", dto.SubTitle)
                             };
 
-                            if (subItem.Id > 0)
+                    if (dto.Id > 0)
+                    {
+                        await _genericService.UpdateTranslationsAsync(StringResourceEnums.WorkingProcess, translations, service.Id, dto.LangId);
+                    }
+                    else
+                    {
+                        await _genericService.AddTranslationsAsync(StringResourceEnums.WorkingProcess, translations, service.Id, dto.LangId);
+                    }
+                }
+                else
+                {
+                    if (isDefualtExists)
+                    {
+                        var translations = new List<(string ColumnName, string ColumnValue)>
                             {
-                                await _genericService.UpdateTranslationsAsync(StringResourceEnums.WorkingProcessItem, subTranslations, subItem.Id, subItem.LangId);
-                            }
-                            else
-                            {
-                                await _genericService.AddTranslationsAsync(StringResourceEnums.WorkingProcessItem, subTranslations, subItem.Id, subItem.LangId);
-                            }
+                                ("Title", dto.Title),
+                                ("SubTitle", dto.SubTitle)
+                            };
+
+                        if (dto.Id > 0 && IsTranslateionExixts)
+                        {
+                            await _genericService.UpdateTranslationsAsync(StringResourceEnums.WorkingProcess, translations, dto.Id, dto.LangId);
                         }
+                        else
+                        {
+                            await _genericService.AddTranslationsAsync(StringResourceEnums.WorkingProcess, translations, dto.Id, dto.LangId);
+                        }
+
+
+                    }
+                    else
+                    {
+                        return Error<WorkingProcessDTO>("Only default language can be managed first");
                     }
                 }
 
-                return Success(dtos);
+                return Success(dto);
             }
             catch (Exception ex)
             {
-                return Error<List<WorkingProcessDTO>>(ex);
+                return Error<WorkingProcessDTO>(ex);
+            }
+        }
+        // Mabnage SubItem
+        public async Task<ResponseResult<WorkingProcessItemDTO>> ManageSubItem(WorkingProcessItemDTO subDto)
+        {
+            try
+            {
+                var defaultLanguage = await _dbContext.Languages.FirstAsync(x => x.IsDefault);
+                bool IsTranslateionExixts = await _dbContext.StringResources.AnyAsync(x => x.ResourceId == subDto.Id && x.GroupKey == StringResourceEnums.WorkingProcessItem && x.LanguageId == subDto.LangId);
+                var subItem = _mapper.Map<WorkingProcessItemDTO, WorkingProcessItem>(subDto);
+                if (subDto.File != null)
+                {
+                    var imageResult = await _imageService.UploadImage(subDto.File);
+                    subItem.ImageUrl = imageResult;
+                }
+                if (subDto.LangId == defaultLanguage.Id)
+                {
+                    if (subDto.Id > 0)
+                    {
+                        await _genericService.UpdateAsync(subItem);
+                    }
+                    else
+                    {
+                        await _genericService.CreateAsync(subItem);
+                    }
+                }
+                var subTranslations = new List<(string ColumnName, string ColumnValue)>
+                            {
+                                ("Title", subDto.Title),
+                                ("Description", subDto.Description)
+                             };
+                if (subDto.Id > 0 && IsTranslateionExixts)
+                {
+                    await _genericService.UpdateTranslationsAsync(StringResourceEnums.WorkingProcessItem, subTranslations, subItem.Id, subDto.LangId);
+                }
+                else
+                {
+                    await _genericService.AddTranslationsAsync(StringResourceEnums.WorkingProcessItem, subTranslations, subItem.Id, subDto.LangId);
+                }
+                return Success(subDto);
+            }
+            catch (Exception ex)
+            {
+                return Error<WorkingProcessItemDTO>(ex);
+            }
+        }
+        public async Task<ResponseResult<WorkingProcessDTO>> GetFirst()
+        {
+            try
+            {
+                var result = await _dbContext.WorkingProcesses.Include(x => x.WorkingProcessItems).FirstOrDefaultAsync();
+                var serviceDto = _mapper.Map<WorkingProcessDTO>(result);
+                return Success(serviceDto);
+            }
+            catch (Exception ex)
+            {
+                return Error<WorkingProcessDTO>(ex);
             }
         }
     }

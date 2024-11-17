@@ -1,10 +1,6 @@
 ﻿using Core.Domains;
 using Data.Dtos.BaseDTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace Data.Dtos.OurCompanyDTOs
 {
@@ -15,6 +11,7 @@ namespace Data.Dtos.OurCompanyDTOs
         [Translatable]
         public string Description { get; set; }
         public string ImageUrl { get; set; }
+        public IFormFile File { get; set; }
     }
 
 }

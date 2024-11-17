@@ -1,5 +1,4 @@
 ﻿using Data.Dtos.ChooseUsDTOs;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services._Base;
 using Services.HomePageServices.ChooseUsServices;
@@ -22,11 +21,11 @@ namespace Nexsusa_Api.Controllers
             var result = await chooseUsService.GetById(id, languageId);
             return result;
         }
-        [HttpPost]
-        public async Task<ResponseResult<List<ChooseUsDTO>>> Manage(List<ChooseUsDTO> dto)
-        {
-            var result = await chooseUsService.Manage(dto);
-            return result;
-        }
+        //[HttpPost]
+        //public async Task<ResponseResult<List<ChooseUsDTO>>> Manage(List<ChooseUsDTO> dto)
+        //{
+        //    var result = await chooseUsService.Manage(dto);
+        //    return result;
+        //}
     }
 }

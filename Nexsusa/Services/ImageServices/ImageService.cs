@@ -5,12 +5,8 @@ using Services._Base;
 
 namespace Services.ImageServices
 {
-    public class ImageService : BaseService, IImageService
+    public class ImageService(AppDbContext dbContext, IMapper mapper) : BaseService(dbContext, mapper), IImageService
     {
-        public ImageService(AppDbContext dbContext, IMapper mapper) : base(dbContext, mapper)
-        {
-        }
-
         public async Task<string> UploadImage(IFormFile file)
         {
             try
@@ -34,7 +30,7 @@ namespace Services.ImageServices
                 }
                 return null;
             }
-            catch (Exception ex)
+            catch
             {
                 return null;
             }

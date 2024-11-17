@@ -20,16 +20,16 @@ namespace Data.Dtos.HomePageDTOs
         public HomePageInfoDTO HomePageInfo { get; set; }
         public List<NavBarItemDTO> NavBarItems { get; set; }
         public SliderDTO Slider { get; set; }
-        public ServiceDTO? Services { get; set; }
-        public OurCompanyDTO? OurCompany { get; set; }
-        public ChooseUsDTO? ChooseUs { get; set; }
-        public WorkingProcessDTO? WorkingProcess { get; set; }
-        public WorkShowCaseDTO? WorkShowCase { get; set; }
-        public WhoWeAreDTO? WhoWeAre { get; set; }
-        public OurEmployeesDTO? OurEmployees { get; set; }
-        public ClientSaysDTO? ClientSays { get; set; }
-        public RegularBlogsDTO? RegularBlogs { get; set; }
-        public FooterDTO? Footer { get; set; }
+        public ServiceDTO Services { get; set; }
+        public OurCompanyDTO OurCompany { get; set; }
+        public ChooseUsDTO ChooseUs { get; set; }
+        public WorkingProcessDTO WorkingProcess { get; set; }
+        public WorkShowCaseDTO WorkShowCase { get; set; }
+        public WhoWeAreDTO WhoWeAre { get; set; }
+        public OurEmployeesDTO OurEmployees { get; set; }
+        public ClientSaysDTO ClientSays { get; set; }
+        public RegularBlogsDTO RegularBlogs { get; set; }
+        public FooterDTO Footer { get; set; }
 
     }
 

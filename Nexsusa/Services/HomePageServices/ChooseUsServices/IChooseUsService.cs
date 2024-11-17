@@ -1,11 +1,6 @@
 ﻿using Data.Dtos.ChooseUsDTOs;
-using Data.Dtos.LanguageDTOs;
+using Data.Dtos.QuestionDTOs;
 using Services._Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Services.HomePageServices.ChooseUsServices
 {
@@ -15,9 +10,11 @@ namespace Services.HomePageServices.ChooseUsServices
         //====================================================================================================
         Task<ResponseResult<ChooseUsDTO>> GetById(int id, int LanguageId);
         //====================================================================================================
-        Task<ResponseResult<List<ChooseUsDTO>>> Manage(List<ChooseUsDTO> dto);
+        Task<ResponseResult<ChooseUsDTO>> Manage(ChooseUsDTO dto);
         //====================================================================================================
         Task<ResponseResult<ChooseUsDTO>> Delete(int id);
+        Task<ResponseResult<ChooseUsDTO>> GetFirst();
+        Task<ResponseResult<QuestionDTO>> ManageSubItem(QuestionDTO subDto);
         //====================================================================================================
     }
 }
