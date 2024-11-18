@@ -29,7 +29,7 @@ namespace Core.Domains.Enums
         WhoWeAre,
         WorkingProcessItem,
         WorkingProcess,
-        WorkShowCaseNavBarItem,
+        WorkShowCaseItem,
         WorkShowCaseNavBar,
         WorkShowCase,
         WorkShowCaseServiceServices,

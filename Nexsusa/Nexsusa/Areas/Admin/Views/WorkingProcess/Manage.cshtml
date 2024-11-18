@@ -81,8 +81,7 @@
                         {
                             foreach (var item in Model.WorkingProcessItems)
                             {
-                                if (item.Title != null)
-                                {
+ 
                                     <tr data-lang="@item.LangId">
                                         <td>@item.Id</td>
                                         <td>@item.Title</td>
@@ -103,7 +102,7 @@
                                             </span>
                                         </td>
                                     </tr>
-                                }
+                                
                             }
                         }
                         else

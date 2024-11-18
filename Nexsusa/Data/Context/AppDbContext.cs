@@ -64,8 +64,5 @@ namespace Data.Context
         public DbSet<WorkingProcess> WorkingProcesses { get; set; }
         public DbSet<WorkingProcessItem> WorkingProcessItems { get; set; }
         public DbSet<WorkShowCase> WorkShowCases { get; set; }
-        public DbSet<WorkShowCaseNavBar> WorkShowCaseNavBars { get; set; }
-        public DbSet<WorkShowCaseNavBarItem> WorkShowCaseNavBarItems { get; set; }
-        public DbSet<WorkShowCaseService> WorkShowCaseServices { get; set; }
     }
 }

@@ -1,9 +1,9 @@
 ﻿using Core.Domains;
-using Data.Dtos.BaseDTOs;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Data.Dtos.WorkShowCaseDTOs
+namespace Core.HomePage.HomePageItems
 {
-    public class WorkShowCaseServiceDTO : BaseDTO<int>
+    public class WorkShowCaseItem : _Base<int>
     {
         [Translatable]
         public string Title { get; set; }
@@ -18,7 +18,8 @@ namespace Data.Dtos.WorkShowCaseDTOs
         public string Image3 { get; set; }
 
 
+        [ForeignKey(nameof(WorkShowCaseId))]
+        public WorkShowCase WorkShowCase { get; set; }
         public int WorkShowCaseId { get; set; }
     }
-
 }

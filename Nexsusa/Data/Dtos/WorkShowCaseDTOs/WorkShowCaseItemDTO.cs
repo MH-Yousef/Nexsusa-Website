@@ -3,7 +3,7 @@ using Data.Dtos.BaseDTOs;
 
 namespace Data.Dtos.WorkShowCaseDTOs
 {
-    public class WorkShowCaseServiceDTO : BaseDTO<int>
+    public class WorkShowCaseItemDTO : BaseDTO<int>
     {
         [Translatable]
         public string Title { get; set; }
@@ -16,7 +16,6 @@ namespace Data.Dtos.WorkShowCaseDTOs
         public string Image1 { get; set; }
         public string Image2 { get; set; }
         public string Image3 { get; set; }
-
 
         public int WorkShowCaseId { get; set; }
     }

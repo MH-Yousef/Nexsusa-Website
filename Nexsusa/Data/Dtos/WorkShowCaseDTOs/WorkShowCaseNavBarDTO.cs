@@ -1,10 +1,5 @@
 ﻿using Core.Domains;
 using Data.Dtos.BaseDTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Data.Dtos.WorkShowCaseDTOs
 {
@@ -16,7 +11,8 @@ namespace Data.Dtos.WorkShowCaseDTOs
         public string Icon { get; set; }
         public bool HasSubItem { get; set; }
         public bool IsVisible { get; set; }
-        public List<WorkShowCaseNavBarItemDTO> WorkShowCaseNavBarItems { get; set; }
+        public List<WorkShowCaseItemDTO> WorkShowCaseNavBarItems { get; set; }
+        public int WorkShowCaseId { get; set; }
     }
 
 }

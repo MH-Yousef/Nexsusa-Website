@@ -14,7 +14,7 @@ namespace Data.Dtos.WhoWeAreDTOs
         public string Title { get; set; }
         [Translatable]
         public string Description { get; set; }
-        public List<WhoWeAreItemDTO> WhoWeAreItem { get; set; }
+        public List<WhoWeAreItemDTO> WhoWeAreItems { get; set; }
     }
 
 }

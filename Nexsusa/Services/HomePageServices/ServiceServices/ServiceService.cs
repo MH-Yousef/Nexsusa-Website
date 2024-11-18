@@ -48,7 +48,6 @@ namespace Services.HomePageServices.ServiceServices
             }
         }
 
-        // Get a service by Id
         public async Task<ResponseResult<ServiceDTO>> GetById(int id, int langId)
         {
             try
@@ -63,15 +62,6 @@ namespace Services.HomePageServices.ServiceServices
                         item.LangId = langId;
                         item.Title = _genericService.ApplyTranslations<ServiceItemDTO>(item, langId, item.Id, StringResourceEnums.ServiceItem).Title;
                         item.Description = _genericService.ApplyTranslations<ServiceItemDTO>(item, langId, item.Id, StringResourceEnums.ServiceItem).Description;
-
-                        //// Handle images if there are any
-                        //if (item.Images != null)
-                        //{
-                        //    foreach (var image in item.Images)
-                        //    {
-                        //        image.LangId = langId;
-                        //    }
-                        //}
                     }
                 }
 

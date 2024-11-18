@@ -66,16 +66,14 @@ namespace Data.Mapping
             //====================================================================================================
             CreateMap<Slider, SliderDTO>().ReverseMap();
             //====================================================================================================
-            CreateMap<WhoWeAre, WhoWeAreDTO>().ReverseMap();
+            CreateMap<WhoWeAre, WhoWeAreDTO>().ReverseMap().ForMember(x => x.WhoWeAreItems, opt => opt.MapFrom(src => src.WhoWeAreItems));
             CreateMap<WhoWeAreItem, WhoWeAreItemDTO>().ReverseMap();
             //====================================================================================================
             CreateMap<WorkingProcess, WorkingProcessDTO>().ReverseMap().ForMember(x => x.WorkingProcessItems, opt => opt.MapFrom(src => src.WorkingProcessItems));
             CreateMap<WorkingProcessItem, WorkingProcessItemDTO>().ReverseMap();
             //====================================================================================================
-            CreateMap<WorkShowCase, WorkShowCaseDTO>().ReverseMap();
-            CreateMap<WorkShowCaseNavBar, WorkShowCaseNavBarDTO>().ReverseMap();
-            CreateMap<WorkShowCaseNavBarItem, WorkShowCaseNavBarItemDTO>().ReverseMap();
-            CreateMap<WorkShowCaseService, WorkShowCaseServiceDTO>().ReverseMap();
+            CreateMap<WorkShowCase, WorkShowCaseDTO>().ReverseMap().ForMember(x => x.WorkShowCaseItems, opt => opt.MapFrom(src => src.WorkShowCaseItems));
+            CreateMap<WorkShowCaseItem, WorkShowCaseItemDTO>().ReverseMap();
             //====================================================================================================
         }
     }

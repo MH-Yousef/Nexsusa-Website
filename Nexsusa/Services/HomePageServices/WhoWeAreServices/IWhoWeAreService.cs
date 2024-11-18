@@ -12,7 +12,8 @@ namespace Services.HomePageServices.WhoWeAreServices
     {
         Task<ResponseResult<List<WhoWeAreDTO>>> GetList(int languageId);
         Task<ResponseResult<WhoWeAreDTO>> GetById(int id, int languageId);
-        Task<ResponseResult<List<WhoWeAreDTO>>> Manage(List<WhoWeAreDTO> dtos);
-
+        Task<ResponseResult<WhoWeAreDTO>> Manage(WhoWeAreDTO dto);
+        Task<ResponseResult<WhoWeAreItemDTO>> ManageSubItem(WhoWeAreItemDTO subDto);
+        Task<ResponseResult<WhoWeAreDTO>> GetFirst();
     }
 }

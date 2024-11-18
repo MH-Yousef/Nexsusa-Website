@@ -2,51 +2,44 @@
 using Core.Domains.Enums;
 using Core.HomePage.HomePageItems;
 using Data.Context;
+using Data.Dtos.ServiceDTOs;
 using Data.Dtos.WorkShowCaseDTOs;
 using Microsoft.EntityFrameworkCore;
 using Services._Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
+using Services._GenericServices;
 
 namespace Services.HomePageServices.WorkShowCaseServices
 {
     public class WorkShowCaseService : BaseService, IWorkShowCaseService
     {
-        private readonly Services._GenericServices.GenericService<WorkShowCase> _genericService;
-        public WorkShowCaseService(AppDbContext dbContext, IMapper mapper, _GenericServices.GenericService<WorkShowCase> genericService) : base(dbContext, mapper)
+        private readonly GenericService<WorkShowCase> _genericService;
+        public WorkShowCaseService(AppDbContext dbContext, IMapper mapper, GenericService<WorkShowCase> genericService) : base(dbContext, mapper)
         {
             _genericService = genericService;
         }
 
-        public async Task<ResponseResult<List<WorkShowCaseDTO>>> GetList(int languageId)
+        public async Task<ResponseResult<List<WorkShowCaseDTO>>> GetList(int langId)
         {
             try
             {
-                var workShowCases = await _genericService.GetListAsync(languageId, StringResourceEnums.WorkShowCase);
-                var dto = _mapper.Map<List<WorkShowCase>, List<WorkShowCaseDTO>>(workShowCases.Data);
+                var items = await _genericService.GetListAsync(langId, StringResourceEnums.WorkShowCase, x => x.WorkShowCaseItems);
+                var dto = _mapper.Map<List<WorkShowCase>, List<WorkShowCaseDTO>>(items.Data);
 
-                foreach (var item in dto)
+                // Iterate through the services and their items for translations
+                foreach (var service in dto)
                 {
-                    item.LangId = languageId;
-                    item.Title = _genericService.ApplyTranslations<WorkShowCaseDTO>(item, languageId, item.Id, StringResourceEnums.WorkShowCase).Title;
-                    item.Description = _genericService.ApplyTranslations<WorkShowCaseDTO>(item, languageId, item.Id, StringResourceEnums.WorkShowCase).Description;
+                    service.LangId = langId;
 
-                    // Apply translations for WorkShowCaseNavBar
-                    if (item.WorkShowCaseNavBar != null)
+                    if (service.WorkShowCaseItems != null)
                     {
-                        item.WorkShowCaseNavBar.Name = _genericService.ApplyTranslations<WorkShowCaseNavBarDTO>(item.WorkShowCaseNavBar, languageId, item.WorkShowCaseNavBar.Id, StringResourceEnums.WorkShowCaseNavBar).Name;
-                    }
-
-                    // Apply translations for WorkShowCaseNavBarItems
-                    if (item.WorkShowCaseNavBar?.WorkShowCaseNavBarItems != null)
-                    {
-                        foreach (var navBarItem in item.WorkShowCaseNavBar.WorkShowCaseNavBarItems)
+                        foreach (var item in service.WorkShowCaseItems)
                         {
-                            navBarItem.Name = _genericService.ApplyTranslations<WorkShowCaseNavBarItemDTO>(navBarItem, languageId, navBarItem.Id, StringResourceEnums.WorkShowCaseNavBarItem).Name;
+                            var Translate = _genericService.ApplyTranslations<WorkShowCaseItemDTO>(item, langId, item.Id, StringResourceEnums.WorkShowCaseItem);
+                            item.LangId = langId;
+                            item.Title = Translate.Title;
+                            item.SubTitle = Translate.SubTitle;
+                            item.Description = Translate.Description;
+                            item.SubDescription = Translate.SubDescription;
                         }
                     }
                 }
@@ -59,29 +52,23 @@ namespace Services.HomePageServices.WorkShowCaseServices
             }
         }
 
-        public async Task<ResponseResult<WorkShowCaseDTO>> GetById(int id, int languageId)
+        public async Task<ResponseResult<WorkShowCaseDTO>> GetById(int id, int langId)
         {
             try
             {
-                var workShowCase = await _genericService.GetByIdAsync(id, languageId, StringResourceEnums.WorkShowCase);
-                var dto = _mapper.Map<WorkShowCase, WorkShowCaseDTO>(workShowCase);
+                var service = await _genericService.GetByIdAsync(id, langId, StringResourceEnums.WorkShowCase, x => x.WorkShowCaseItems);
+                var dto = _mapper.Map<WorkShowCase, WorkShowCaseDTO>(service);
 
-                dto.LangId = languageId;
-                dto.Title = _genericService.ApplyTranslations<WorkShowCaseDTO>(dto, languageId, dto.Id, StringResourceEnums.WorkShowCase).Title;
-                dto.Description = _genericService.ApplyTranslations<WorkShowCaseDTO>(dto, languageId, dto.Id, StringResourceEnums.WorkShowCase).Description;
-
-                // Apply translations for WorkShowCaseNavBar
-                if (dto.WorkShowCaseNavBar != null)
+                if (dto.WorkShowCaseItems != null)
                 {
-                    dto.WorkShowCaseNavBar.Name = _genericService.ApplyTranslations<WorkShowCaseNavBarDTO>(dto.WorkShowCaseNavBar, languageId, dto.WorkShowCaseNavBar.Id, StringResourceEnums.WorkShowCaseNavBar).Name;
-                }
-
-                // Apply translations for WorkShowCaseNavBarItems
-                if (dto.WorkShowCaseNavBar?.WorkShowCaseNavBarItems != null)
-                {
-                    foreach (var navBarItem in dto.WorkShowCaseNavBar.WorkShowCaseNavBarItems)
+                    foreach (var item in dto.WorkShowCaseItems)
                     {
-                        navBarItem.Name = _genericService.ApplyTranslations<WorkShowCaseNavBarItemDTO>(navBarItem, languageId, navBarItem.Id, StringResourceEnums.WorkShowCaseNavBarItem).Name;
+                        var Translate = _genericService.ApplyTranslations<WorkShowCaseItemDTO>(item, langId, item.Id, StringResourceEnums.WorkShowCaseItem);
+                        item.LangId = langId;
+                        item.SubTitle = Translate.SubTitle;
+                        item.Title = Translate.Title;
+                        item.Description = Translate.Description;
+                        item.SubDescription = Translate.SubDescription;
                     }
                 }
 
@@ -93,87 +80,126 @@ namespace Services.HomePageServices.WorkShowCaseServices
             }
         }
 
-        public async Task<ResponseResult<List<WorkShowCaseDTO>>> Manage(List<WorkShowCaseDTO> dtos)
+        public async Task<ResponseResult<WorkShowCaseDTO>> Manage(WorkShowCaseDTO dto)
         {
             try
             {
                 var defaultLanguage = await _dbContext.Languages.FirstAsync(x => x.IsDefault);
-                var defaultModel = dtos.FirstOrDefault(x => x.LangId == defaultLanguage.Id);
-
-                var workShowCase = _mapper.Map<WorkShowCaseDTO, WorkShowCase>(defaultModel);
-
-                if (defaultModel.Id > 0)
+                bool isDefualtExists = await _dbContext.WorkShowCases.AnyAsync();
+                bool IsDefultModel = dto.LangId == defaultLanguage.Id;
+                bool IsTranslateionExixts = await _dbContext.StringResources.AnyAsync(x => x.ResourceId == dto.Id && x.GroupKey == StringResourceEnums.WorkShowCase && x.LanguageId == dto.LangId);
+                var service = _mapper.Map<WorkShowCaseDTO, WorkShowCase>(dto);
+                if (IsDefultModel)
                 {
-                    await _genericService.UpdateAsync(workShowCase);
-                }
-                else
-                {
-                    await _genericService.CreateAsync(workShowCase);
-                }
-
-                // Add or Update translations for WorkShowCase
-                foreach (var item in dtos)
-                {
-                    var translations = new List<(string ColumnName, string ColumnValue)>
+                    if (dto.Id > 0)
                     {
-                        ("Title", item.Title),
-                        ("Description", item.Description)
-                    };
-
-                    if (item.Id > 0)
-                    {
-                        await _genericService.UpdateTranslationsAsync(StringResourceEnums.WorkShowCase, translations, workShowCase.Id, item.LangId);
+                        await _genericService.UpdateAsync(service);
                     }
                     else
                     {
-                        await _genericService.AddTranslationsAsync(StringResourceEnums.WorkShowCase, translations, workShowCase.Id, item.LangId);
+                        await _genericService.CreateAsync(service);
                     }
+                    var translations = new List<(string ColumnName, string ColumnValue)>
+                            {
+                                ("Title", dto.Title),
+                                ("Description", dto.Description)
+                            };
 
-                    // Handle translations for WorkShowCaseNavBar
-                    if (item.WorkShowCaseNavBar != null)
+                    if (dto.Id > 0)
                     {
-                        var navBarTranslations = new List<(string ColumnName, string ColumnValue)>
-                        {
-                            ("Name", item.WorkShowCaseNavBar.Name)
-                        };
+                        await _genericService.UpdateTranslationsAsync(StringResourceEnums.WorkShowCase, translations, service.Id, dto.LangId);
+                    }
+                    else
+                    {
+                        await _genericService.AddTranslationsAsync(StringResourceEnums.WorkShowCase, translations, service.Id, dto.LangId);
+                    }
+                }
+                else
+                {
+                    if (isDefualtExists)
+                    {
+                        var translations = new List<(string ColumnName, string ColumnValue)>
+                            {
+                                ("Title", dto.Title),
+                                ("Description", dto.Description)
+                            };
 
-                        if (item.WorkShowCaseNavBar.Id > 0)
+                        if (dto.Id > 0 && IsTranslateionExixts)
                         {
-                            await _genericService.UpdateTranslationsAsync(StringResourceEnums.WorkShowCaseNavBar, navBarTranslations, item.WorkShowCaseNavBar.Id, item.LangId);
+                            await _genericService.UpdateTranslationsAsync(StringResourceEnums.WorkShowCase, translations, dto.Id, dto.LangId);
                         }
                         else
                         {
-                            await _genericService.AddTranslationsAsync(StringResourceEnums.WorkShowCaseNavBar, navBarTranslations, item.WorkShowCaseNavBar.Id, item.LangId);
+                            await _genericService.AddTranslationsAsync(StringResourceEnums.WorkShowCase, translations, dto.Id, dto.LangId);
                         }
 
-                        // Handle translations for WorkShowCaseNavBarItems
-                        if (item.WorkShowCaseNavBar.WorkShowCaseNavBarItems != null)
-                        {
-                            foreach (var navBarItem in item.WorkShowCaseNavBar.WorkShowCaseNavBarItems)
-                            {
-                                var navBarItemTranslations = new List<(string ColumnName, string ColumnValue)>
-                                {
-                                    ("Name", navBarItem.Name)
-                                };
 
-                                if (navBarItem.Id > 0)
-                                {
-                                    await _genericService.UpdateTranslationsAsync(StringResourceEnums.WorkShowCaseNavBarItem, navBarItemTranslations, navBarItem.Id, item.LangId);
-                                }
-                                else
-                                {
-                                    await _genericService.AddTranslationsAsync(StringResourceEnums.WorkShowCaseNavBarItem, navBarItemTranslations, navBarItem.Id, item.LangId);
-                                }
-                            }
-                        }
+                    }
+                    else
+                    {
+                        return Error<WorkShowCaseDTO>("Only default language can be managed first");
                     }
                 }
 
-                return Success(dtos);
+                return Success(dto);
             }
             catch (Exception ex)
             {
-                return Error<List<WorkShowCaseDTO>>(ex);
+                return Error<WorkShowCaseDTO>(ex);
+            }
+        }
+        // Mabnage SubItem
+        public async Task<ResponseResult<WorkShowCaseItemDTO>> ManageSubItem(WorkShowCaseItemDTO subDto)
+        {
+            try
+            {
+                var defaultLanguage = await _dbContext.Languages.FirstAsync(x => x.IsDefault);
+                bool IsTranslateionExixts = await _dbContext.StringResources.AnyAsync(x => x.ResourceId == subDto.Id && x.GroupKey == StringResourceEnums.WorkShowCaseItem && x.LanguageId == subDto.LangId);
+                var subItem = _mapper.Map<WorkShowCaseItemDTO, WorkShowCaseItem>(subDto);
+                if (subDto.LangId == defaultLanguage.Id)
+                {
+                    if (subDto.Id > 0)
+                    {
+                        await _genericService.UpdateAsync(subItem);
+                    }
+                    else
+                    {
+                        await _genericService.CreateAsync(subItem);
+                    }
+                }
+                var subTranslations = new List<(string ColumnName, string ColumnValue)>
+                            {
+                                ("Title", subDto.Title),
+                                ("Description", subDto.Description),
+                                ("SubTitle", subDto.SubTitle),
+                                ("SubDescription", subDto.SubDescription)
+                             };
+                if (subDto.Id > 0 && IsTranslateionExixts)
+                {
+                    await _genericService.UpdateTranslationsAsync(StringResourceEnums.WorkShowCaseItem, subTranslations, subItem.Id, subDto.LangId);
+                }
+                else
+                {
+                    await _genericService.AddTranslationsAsync(StringResourceEnums.WorkShowCaseItem, subTranslations, subItem.Id, subDto.LangId);
+                }
+                return Success(subDto);
+            }
+            catch (Exception ex)
+            {
+                return Error<WorkShowCaseItemDTO>(ex);
+            }
+        }
+        public async Task<ResponseResult<WorkShowCaseDTO>> GetFirst()
+        {
+            try
+            {
+                var result = await _dbContext.WorkShowCases.Include(x => x.WorkShowCaseItems).FirstOrDefaultAsync();
+                var serviceDto = _mapper.Map<WorkShowCaseDTO>(result);
+                return Success(serviceDto);
+            }
+            catch (Exception ex)
+            {
+                return Error<WorkShowCaseDTO>(ex);
             }
         }
     }

@@ -4,6 +4,7 @@ using Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241118181151_UpdateWorkShowCase")]
+    partial class UpdateWorkShowCase
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1025,7 +1028,82 @@ namespace Data.Migrations
                     b.ToTable("WorkShowCases");
                 });
 
-            modelBuilder.Entity("Core.HomePage.HomePageItems.WorkShowCaseItem", b =>
+            modelBuilder.Entity("Core.HomePage.HomePageItems.WorkShowCaseNavBar", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnOrder(0);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("HasSubItem")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Icon")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsVisible")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Url")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("WorkShowCaseId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WorkShowCaseId")
+                        .IsUnique();
+
+                    b.ToTable("WorkShowCaseNavBars");
+                });
+
+            modelBuilder.Entity("Core.HomePage.HomePageItems.WorkShowCaseNavBarItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnOrder(0);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("WorkShowCaseNavBarId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WorkShowCaseNavBarId");
+
+                    b.ToTable("WorkShowCaseNavBarItems");
+                });
+
+            modelBuilder.Entity("Core.HomePage.HomePageItems.WorkShowCaseService", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -1064,14 +1142,14 @@ namespace Data.Migrations
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("WorkShowCaseId")
+                    b.Property<int>("WorkShowCaseNavBarItemId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("WorkShowCaseId");
+                    b.HasIndex("WorkShowCaseNavBarItemId");
 
-                    b.ToTable("WorkShowCaseItem");
+                    b.ToTable("WorkShowCaseServices");
                 });
 
             modelBuilder.Entity("Core.HomePage.HomePageItems.WorkingProcess", b =>
@@ -1381,15 +1459,37 @@ namespace Data.Migrations
                     b.Navigation("WhoWeAre");
                 });
 
-            modelBuilder.Entity("Core.HomePage.HomePageItems.WorkShowCaseItem", b =>
+            modelBuilder.Entity("Core.HomePage.HomePageItems.WorkShowCaseNavBar", b =>
                 {
                     b.HasOne("Core.HomePage.HomePageItems.WorkShowCase", "WorkShowCase")
-                        .WithMany("WorkShowCaseItems")
-                        .HasForeignKey("WorkShowCaseId")
+                        .WithOne("WorkShowCaseNavBar")
+                        .HasForeignKey("Core.HomePage.HomePageItems.WorkShowCaseNavBar", "WorkShowCaseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("WorkShowCase");
+                });
+
+            modelBuilder.Entity("Core.HomePage.HomePageItems.WorkShowCaseNavBarItem", b =>
+                {
+                    b.HasOne("Core.HomePage.HomePageItems.WorkShowCaseNavBar", "WorkShowCaseNavBar")
+                        .WithMany("WorkShowCaseNavBarItems")
+                        .HasForeignKey("WorkShowCaseNavBarId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("WorkShowCaseNavBar");
+                });
+
+            modelBuilder.Entity("Core.HomePage.HomePageItems.WorkShowCaseService", b =>
+                {
+                    b.HasOne("Core.HomePage.HomePageItems.WorkShowCaseNavBarItem", "WorkShowCaseNavBarItem")
+                        .WithMany("WorkShowCaseServices")
+                        .HasForeignKey("WorkShowCaseNavBarItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("WorkShowCaseNavBarItem");
                 });
 
             modelBuilder.Entity("Core.HomePage.HomePageItems.WorkingProcessItem", b =>
@@ -1469,7 +1569,17 @@ namespace Data.Migrations
 
             modelBuilder.Entity("Core.HomePage.HomePageItems.WorkShowCase", b =>
                 {
-                    b.Navigation("WorkShowCaseItems");
+                    b.Navigation("WorkShowCaseNavBar");
+                });
+
+            modelBuilder.Entity("Core.HomePage.HomePageItems.WorkShowCaseNavBar", b =>
+                {
+                    b.Navigation("WorkShowCaseNavBarItems");
+                });
+
+            modelBuilder.Entity("Core.HomePage.HomePageItems.WorkShowCaseNavBarItem", b =>
+                {
+                    b.Navigation("WorkShowCaseServices");
                 });
 
             modelBuilder.Entity("Core.HomePage.HomePageItems.WorkingProcess", b =>
