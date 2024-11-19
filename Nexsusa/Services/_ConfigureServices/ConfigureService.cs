@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Services._GenericServices;
 using Services.AboutServices;
+using Services.ContactUsPageServices;
 using Services.HomePageServices;
 using Services.HomePageServices.ChooseUsServices;
 using Services.HomePageServices.ClientSaysServices;
@@ -45,6 +46,7 @@ namespace Services._ConfigureServices
             services.AddScoped<IWorkingProcessService, WorkingProcessService>();
             services.AddScoped<IWorkShowCaseService, WorkShowCaseService>();
             services.AddScoped<IImageService, ImageService>();
+            services.AddScoped<IContactUsPageService, ContactUsPageService>();
 
             #endregion
             services.AddScoped(typeof(GenericService<>));

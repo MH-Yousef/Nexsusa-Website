@@ -1,4 +1,5 @@
 ﻿using Core.AboutPage;
+using Core.ContactUsPage;
 using Core.Domains.Languages;
 using Core.HomePage;
 using Core.HomePage.HomePageItems;
@@ -64,5 +65,7 @@ namespace Data.Context
         public DbSet<WorkingProcess> WorkingProcesses { get; set; }
         public DbSet<WorkingProcessItem> WorkingProcessItems { get; set; }
         public DbSet<WorkShowCase> WorkShowCases { get; set; }
+        public DbSet<ContactUsPage> ContactUsPages { get; set; }
+        public DbSet<ContactUsItem> ContactUsItems { get; set; }
     }
 }

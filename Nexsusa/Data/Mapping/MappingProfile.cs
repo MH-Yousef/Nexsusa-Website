@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Core.AboutPage;
+using Core.ContactUsPage;
 using Core.Domains.Languages;
 using Core.HomePage;
 using Core.HomePage.HomePageItems;
@@ -8,6 +9,7 @@ using Data.Dtos.AboutDTOs;
 using Data.Dtos.ChooseUsDTOs;
 using Data.Dtos.ClientSaysDTOs;
 using Data.Dtos.ClientSaysItemDTOs;
+using Data.Dtos.ContactUsDTOs;
 using Data.Dtos.FooterDTOs;
 using Data.Dtos.FooterServiceDTOs;
 using Data.Dtos.HomePageDTOs;
@@ -75,6 +77,8 @@ namespace Data.Mapping
             CreateMap<WorkShowCase, WorkShowCaseDTO>().ReverseMap().ForMember(x => x.WorkShowCaseItems, opt => opt.MapFrom(src => src.WorkShowCaseItems));
             CreateMap<WorkShowCaseItem, WorkShowCaseItemDTO>().ReverseMap();
             //====================================================================================================
+            CreateMap<ContactUsPage, ContactUsPageDTO>().ReverseMap();
+            CreateMap<ContactUsItem, ContactUsItemDTO>().ReverseMap();
         }
     }
 }

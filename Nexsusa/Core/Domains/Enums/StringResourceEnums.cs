@@ -35,6 +35,8 @@ namespace Core.Domains.Enums
         WorkShowCaseServiceServices,
         FooterService,
         About,
-        ServicePage
+        ServicePage,
+        ContactUsPage,
+        ContactUsItem,
     }
 }

@@ -1,0 +1,278 @@
+﻿@using Data.Dtos.ContactUsDTOs
+
+@{
+    ViewData["Title"] = "Manage Contact Us Page";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    int deletedItemId = 0;
+}
+@model ContactUsPageDTO
+
+<div class="col-lg-12">
+    <div class="card">
+        <div style="margin: 20px">
+            <select name="langId" class=" form-control" id="languageSelect">
+                @foreach (var item in ViewBag.Languages)
+                {
+                    bool isSelected = ViewBag.SelectedLanguageId == item.Id;
+                    if (isSelected)
+                    {
+                        <option selected value="@item.Id">@item.Name</option>
+                    }
+                    else
+                    {
+                        <option value="@item.Id">@item.Name</option>
+                    }
+                }
+            </select>
+        </div>
+
+        <div class="card-body">
+            <h4 class="card-title">Contact Us Page Edit</h4>
+            <div class="basic-form">
+                <div class="form-group row">
+                    <input id="Id" asp-for="Id" type="text" class="form-control input-default">
+                    <input id="LangId" asp-for="LangId" type="text" class="form-control input-default">
+                </div>
+                <div class="form-group row">
+                    <label class="col-md-2 col-form-label">Title</label>
+
+                    <div class="col-md-10">
+                        <input id="Title" asp-for="Title" type="text" class="form-control input-default" value="@Model.Title" required>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-md-2 col-form-label">SubTitle</label>
+                    <div class="col-md-10">
+                        <input id="SubTitle" asp-for="SubTitle" type="text" class="form-control input-default" value="@Model.SubTitle" required>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-md-2 col-form-label">Description</label>
+                    <div class="col-md-10">
+                        <textarea id="Description" asp-for="Description" class="form-control input-default" rows="4">@Model.Description</textarea>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-md-10 offset-md-2">
+                        <button type="submit" id="submitBtn" class="btn btn-dark">Save</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-lg-12">
+    <div class="card">
+        <div class="card-body">
+            <a class="btn btn-primary" data-target="#SubModal" data-toggle="modal" data-placement="top" title="Add Contact Us Item" style="cursor : pointer; color:white">
+                <i class="fa fa-plus"></i> Add Contact Us Item
+            </a>
+            <br /><br />
+            <div class="table-responsive">
+                <table class="table table-bordered verticle-middle" id="navbarTable">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Title</th>
+                            <th scope="col">Contact Detail</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.ContactUsItems != null && Model.ContactUsItems.Any())
+                        {
+                            foreach (var item in Model.ContactUsItems)
+                            {
+                                <tr data-lang="@item.LangId">
+                                    <td>@item.Id</td>
+                                    <td>@item.Title</td>
+                                    <td>@item.ContactDetail</td>
+                                    <td>
+                                        <span>
+                                            <a onclick="getSubItem(@item.Id)" data-target="#SubModal" data-toggle="modal" data-placement="top" title="Edit">
+                                                <i class="fa fa-pencil color-muted m-r-5"></i>
+                                            </a>
+                                            <a data-target="#DeleteModal" data-toggle="tooltip" data-placement="top" title="Delete" style="cursor : pointer;">
+                                                <i class="fa fa-close color-danger"></i>
+                                            </a>
+                                            @{
+                                                deletedItemId = item.Id;
+                                            }
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center">No items found.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="DeleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Delete Contact Us Item</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this item?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <a href="/Admin/ContactUs/Delete/@deletedItemId" type="button" class="btn btn-danger">Delete</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sub Item Modal -->
+<div class="modal fade" id="SubModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Edit Contact Us Item</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <select name="langId" class=" form-control" id="SublanguageSelect">
+                    @foreach (var item in ViewBag.Languages)
+                    {
+                        bool isSelected = ViewBag.SelectedLanguageId == item.Id;
+                        if (isSelected)
+                        {
+                            <option selected value="@item.Id">@item.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@item.Id">@item.Name</option>
+                        }
+                    }
+                </select>
+
+                <div class="card-body">
+                    <div class="basic-form">
+                        <div class="form-group row">
+                            <input id="SubId" type="text" class="form-control input-default">
+                            <input id="SubLangId" type="text" class="form-control input-default">
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-md-2 col-form-label">Title</label>
+
+                            <div class="col-md-10">
+                                <input id="SubTitle" type="text" class="form-control input-default" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-md-2 col-form-label">Contact Detail</label>
+                            <div class="col-md-10">
+                                <input id="SubContactDetail" type="text" class="form-control input-default" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="submitSubBtn" type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        let LanguageId = $('#languageSelect').val();
+        $('#LangId').val(LanguageId);
+
+        $(document).on('change', '#languageSelect', function () {
+            let LanguageId = $('#languageSelect').val();
+            window.location.href = `/Admin/ContactUs/Manage?languageId=${LanguageId}`;
+        });
+
+        // SublanguageSelect
+        let SubLanguageId = $('#SublanguageSelect').val();
+        $('#SubLangId').val(SubLanguageId);
+        $(document).on('change', '#SublanguageSelect', function () {
+            let SubLanguageId = $('#SublanguageSelect').val();
+            $('#SubLangId').val(SubLanguageId);
+            let id = $('#SubId').val();
+            getSubItem(id);
+        });
+
+        $(document).on('click', '#submitBtn', function () {
+            var data = {
+                Id: $('#Id').val(),
+                LangId: $('#LangId').val(),
+                Title: $('#Title').val(),
+                SubTitle: $('#SubTitle').val(),
+                Description: $('#Description').val()
+            };
+            $.ajax({
+                type: "POST",
+                url: "/Admin/ContactUs/Save",
+                data: data,
+                success: function (response) {
+                    if (response == "success") {
+                        window.location.href = "/Admin/ContactUs/Manage";
+                    }
+                }
+            });
+        });
+
+        // submit Sub Item
+        $(document).on('click', '#submitSubBtn', function () {
+            var data = {
+                Id: $('#SubId').val(),
+                LangId: $('#SubLangId').val(),
+                Title: $('#SubTitle').val(),
+                ContactDetail: $('#SubContactDetail').val()
+            };
+            $.ajax({
+                type: "POST",
+                url: "/Admin/ContactUs/SaveSubItem",
+                data: data,
+                success: function (response) {
+                    if (response == "success") {
+                        window.location.href = "/Admin/ContactUs/Manage";
+                    }
+                }
+            });
+        });
+    });
+
+    function getSubItem(id) {
+        $.ajax({
+            type: "GET",
+            url: "/Admin/ContactUs/GetSubItem",
+            data: { id: id, languageId: $('#SubLangId').val() },
+            success: function (response) {
+                $('#SubId').val(response.id);
+                $('#SubTitle').val(response.title);
+                $('#SubContactDetail').val(response.contactDetail);
+            },
+            error: function () {
+                alert('An unexpected error occurred.');
+            }
+        });
+    }
+</script>

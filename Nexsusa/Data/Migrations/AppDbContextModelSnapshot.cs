@@ -31,9 +31,6 @@ namespace Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("ClientSaysId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
@@ -42,9 +39,6 @@ namespace Data.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
-
-                    b.Property<int?>("OurCompanyId")
-                        .HasColumnType("int");
 
                     b.Property<string>("SubTitle")
                         .HasColumnType("nvarchar(max)");
@@ -58,18 +52,83 @@ namespace Data.Migrations
                     b.Property<string>("VideoUrl")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("WhoWeAreId")
+                    b.HasKey("Id");
+
+                    b.ToTable("Abouts");
+                });
+
+            modelBuilder.Entity("Core.ContactUsPage.ContactUsItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnOrder(0);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ContactDetail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ContactUsPageId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Icon")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ClientSaysId");
+                    b.HasIndex("ContactUsPageId");
 
-                    b.HasIndex("OurCompanyId");
+                    b.ToTable("ContactUsItems");
+                });
 
-                    b.HasIndex("WhoWeAreId");
+            modelBuilder.Entity("Core.ContactUsPage.ContactUsPage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnOrder(0);
 
-                    b.ToTable("Abouts");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("ContactUsId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SubTitle")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ContactUsId");
+
+                    b.ToTable("ContactUsPages");
                 });
 
             modelBuilder.Entity("Core.Domains.Languages.Language", b =>
@@ -377,6 +436,50 @@ namespace Data.Migrations
                     b.HasIndex("ClientSaysId");
 
                     b.ToTable("ClientSaysItems");
+                });
+
+            modelBuilder.Entity("Core.HomePage.HomePageItems.ContactUs", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnOrder(0);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Subject")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ContactUs");
                 });
 
             modelBuilder.Entity("Core.HomePage.HomePageItems.Footer", b =>
@@ -1171,25 +1274,24 @@ namespace Data.Migrations
                     b.ToTable("ServicePages");
                 });
 
-            modelBuilder.Entity("Core.AboutPage.About", b =>
+            modelBuilder.Entity("Core.ContactUsPage.ContactUsItem", b =>
                 {
-                    b.HasOne("Core.HomePage.HomePageItems.ClientSays", "ClientSays")
+                    b.HasOne("Core.ContactUsPage.ContactUsPage", "ContactUsPage")
+                        .WithMany("ContactUsItems")
+                        .HasForeignKey("ContactUsPageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ContactUsPage");
+                });
+
+            modelBuilder.Entity("Core.ContactUsPage.ContactUsPage", b =>
+                {
+                    b.HasOne("Core.HomePage.HomePageItems.ContactUs", "ContactUs")
                         .WithMany()
-                        .HasForeignKey("ClientSaysId");
+                        .HasForeignKey("ContactUsId");
 
-                    b.HasOne("Core.HomePage.HomePageItems.OurCompany", "OurCompany")
-                        .WithMany()
-                        .HasForeignKey("OurCompanyId");
-
-                    b.HasOne("Core.HomePage.HomePageItems.WhoWeAre", "WhoWeAre")
-                        .WithMany()
-                        .HasForeignKey("WhoWeAreId");
-
-                    b.Navigation("ClientSays");
-
-                    b.Navigation("OurCompany");
-
-                    b.Navigation("WhoWeAre");
+                    b.Navigation("ContactUs");
                 });
 
             modelBuilder.Entity("Core.Domains.Languages.StringResource", b =>
@@ -1373,7 +1475,7 @@ namespace Data.Migrations
             modelBuilder.Entity("Core.HomePage.HomePageItems.WhoWeAreItem", b =>
                 {
                     b.HasOne("Core.HomePage.HomePageItems.WhoWeAre", "WhoWeAre")
-                        .WithMany("WhoWeAreItem")
+                        .WithMany("WhoWeAreItems")
                         .HasForeignKey("WhoWeAreId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1408,6 +1510,11 @@ namespace Data.Migrations
                         .HasForeignKey("ServiceId");
 
                     b.Navigation("Service");
+                });
+
+            modelBuilder.Entity("Core.ContactUsPage.ContactUsPage", b =>
+                {
+                    b.Navigation("ContactUsItems");
                 });
 
             modelBuilder.Entity("Core.Domains.Languages.Language", b =>
@@ -1464,7 +1571,7 @@ namespace Data.Migrations
 
             modelBuilder.Entity("Core.HomePage.HomePageItems.WhoWeAre", b =>
                 {
-                    b.Navigation("WhoWeAreItem");
+                    b.Navigation("WhoWeAreItems");
                 });
 
             modelBuilder.Entity("Core.HomePage.HomePageItems.WorkShowCase", b =>
