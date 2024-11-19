@@ -36,7 +36,6 @@ namespace Core.Domains.Enums
         FooterService,
         About,
         ServicePage,
-        ContactUsPage,
-        ContactUsItem,
+        ContactUs
     }
 }

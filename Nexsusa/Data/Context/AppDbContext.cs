@@ -65,7 +65,6 @@ namespace Data.Context
         public DbSet<WorkingProcess> WorkingProcesses { get; set; }
         public DbSet<WorkingProcessItem> WorkingProcessItems { get; set; }
         public DbSet<WorkShowCase> WorkShowCases { get; set; }
-        public DbSet<ContactUsPage> ContactUsPages { get; set; }
-        public DbSet<ContactUsItem> ContactUsItems { get; set; }
+        public DbSet<ContactUs> ContactUss { get; set; }
     }
 }

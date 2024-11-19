@@ -77,8 +77,7 @@ namespace Data.Mapping
             CreateMap<WorkShowCase, WorkShowCaseDTO>().ReverseMap().ForMember(x => x.WorkShowCaseItems, opt => opt.MapFrom(src => src.WorkShowCaseItems));
             CreateMap<WorkShowCaseItem, WorkShowCaseItemDTO>().ReverseMap();
             //====================================================================================================
-            CreateMap<ContactUsPage, ContactUsPageDTO>().ReverseMap();
-            CreateMap<ContactUsItem, ContactUsItemDTO>().ReverseMap();
+            CreateMap<ContactUs, ContactUsDTO>().ReverseMap();
         }
     }
 }

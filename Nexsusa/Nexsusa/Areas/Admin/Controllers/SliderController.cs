@@ -24,7 +24,6 @@ namespace Nexsusa_Api.Areas.Admin.Controllers
             var result = await _sliderService.Manage(dto);
             return Json(result);
         }
-        // get item
         [HttpGet]
         public async Task<IActionResult> Get(int languageId)
         {

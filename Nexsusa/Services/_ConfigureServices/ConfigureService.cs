@@ -46,7 +46,7 @@ namespace Services._ConfigureServices
             services.AddScoped<IWorkingProcessService, WorkingProcessService>();
             services.AddScoped<IWorkShowCaseService, WorkShowCaseService>();
             services.AddScoped<IImageService, ImageService>();
-            services.AddScoped<IContactUsPageService, ContactUsPageService>();
+            services.AddScoped<IContactUsService, ContactUsService>();
 
             #endregion
             services.AddScoped(typeof(GenericService<>));
