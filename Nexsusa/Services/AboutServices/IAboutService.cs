@@ -11,6 +11,7 @@ namespace Services.AboutServices
     public interface IAboutService
     {
         Task<ResponseResult<AboutDTO>> Get(int languageId);
-        Task<ResponseResult<List<AboutDTO>>> Manage(List<AboutDTO> dtos);
+        Task<ResponseResult<AboutDTO>> GetFirst();
+        Task<ResponseResult<AboutDTO>> Manage(AboutDTO dto);
     }
 }

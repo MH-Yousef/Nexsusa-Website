@@ -7,8 +7,9 @@ namespace Services.HomePageServices.OurEmployeeServices
     {
         Task<ResponseResult<List<OurEmployeesDTO>>> GetList(int LanguageId);
         Task<ResponseResult<OurEmployeesDTO>> GetById(int id, int LanguageId);
-        Task<ResponseResult<List<OurEmployeesDTO>>> Manage(List<OurEmployeesDTO> dtos);
-        Task<ResponseResult<OurEmployeesDTO>> Delete(int id);
+        Task<ResponseResult<OurEmployeesDTO>> Manage(OurEmployeesDTO dto);
+        Task<ResponseResult<OurEmployeesItemDTO>> ManageSubItem(OurEmployeesItemDTO subDto);
+        Task<ResponseResult<OurEmployeesDTO>> GetFirst();
     }
 
 }

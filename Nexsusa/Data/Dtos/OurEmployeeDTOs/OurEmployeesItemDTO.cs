@@ -1,9 +1,5 @@
 ﻿using Data.Dtos.BaseDTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace Data.Dtos.OurEmployeeDTOs
 {
@@ -13,6 +9,6 @@ namespace Data.Dtos.OurEmployeeDTOs
         public string Branch { get; set; }
         public string ImageUrl { get; set; }
         public int OurEmployeesId { get; set; }
+        public IFormFile File { get; set; }
     }
-
 }

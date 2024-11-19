@@ -25,6 +25,7 @@ namespace Services.ServicePageServices
         {
             try
             {
+                //var firstItam = await _serviceService.GetFirst();
                 var items = await genericService.GetListAsync(languageId, StringResourceEnums.ServicePage);
                 var dto = _mapper.Map<List<ServicePage>, List<ServicePageDTO>>(items.Data);
                 return Success(dto.FirstOrDefault());

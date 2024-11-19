@@ -6,15 +6,18 @@ using Data.Dtos.ServiceDTOs;
 using Microsoft.EntityFrameworkCore;
 using Services._Base;
 using Services._GenericServices;
+using Services.ImageServices;
 
 namespace Services.HomePageServices.ServiceServices
 {
     public class ServiceService : BaseService, IServiceService
     {
         private readonly GenericService<Service> _genericService;
-        public ServiceService(AppDbContext dbContext, IMapper mapper, GenericService<Service> genericService) : base(dbContext, mapper)
+        private readonly IImageService _imageService;
+        public ServiceService(AppDbContext dbContext, IMapper mapper, GenericService<Service> genericService, IImageService imageService) : base(dbContext, mapper)
         {
             _genericService = genericService;
+            _imageService = imageService;
         }
 
         public async Task<ResponseResult<List<ServiceDTO>>> GetList(int langId)
@@ -149,6 +152,11 @@ namespace Services.HomePageServices.ServiceServices
                 var defaultLanguage = await _dbContext.Languages.FirstAsync(x => x.IsDefault);
                 bool IsTranslateionExixts = await _dbContext.StringResources.AnyAsync(x => x.ResourceId == subDto.Id && x.GroupKey == StringResourceEnums.ServiceItem && x.LanguageId == subDto.LangId);
                 var subService = _mapper.Map<ServiceItemDTO, ServiceItem>(subDto);
+                if (subDto.File != null)
+                {
+                    var imageResult = await _imageService.UploadImage(subDto.File);
+                    subService.IconUrl = imageResult;
+                }
                 if (subDto.LangId == defaultLanguage.Id)
                 {
                     if (subDto.Id > 0)

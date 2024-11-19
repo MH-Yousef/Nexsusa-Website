@@ -12,8 +12,8 @@ namespace Core.AboutPage
         [Translatable]
         public string Description { get; set; }
         public string VideoUrl { get; set; }
-        public OurCompany OurCompany { get; set; }
-        public WhoWeAre WhoWeAre { get; set; }
-        public ClientSays ClientSays { get; set; }
+        //public OurCompany OurCompany { get; set; }
+        //public WhoWeAre WhoWeAre { get; set; }
+        //public ClientSays ClientSays { get; set; }
     }
 }

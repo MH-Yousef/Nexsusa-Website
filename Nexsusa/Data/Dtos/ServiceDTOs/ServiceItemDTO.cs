@@ -1,11 +1,6 @@
 ﻿using Core.Domains;
 using Data.Dtos.BaseDTOs;
-using Data.Dtos.ImageDTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace Data.Dtos.ServiceDTOs
 {
@@ -20,6 +15,10 @@ namespace Data.Dtos.ServiceDTOs
         public string Images1 { get; set; }
         public string Images2 { get; set; }
         public string Images3 { get; set; }
+        public IFormFile File { get; set; }
+        public IFormFile Image1File { get; set; }
+        public IFormFile Image2File { get; set; }
+        public IFormFile Image3File { get; set; }
     }
 
 }

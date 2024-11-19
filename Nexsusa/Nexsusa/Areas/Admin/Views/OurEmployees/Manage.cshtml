@@ -1,11 +1,10 @@
-﻿@using Data.Dtos.ServiceDTOs
-
+﻿@using Data.Dtos.OurEmployeeDTOs
 @{
     ViewData["Title"] = "Manage";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
     int deletedItemId = 0;
 }
-@model ServiceDTO
+@model OurEmployeesDTO
 <div class="col-lg-12">
     <div class="card">
         <div style="margin: 20px">
@@ -25,7 +24,7 @@
             </select>
         </div>
         <div class="card-body">
-            <h4 class="card-title">Services Edit</h4>
+            <h4 class="card-title">Who We Are Edit</h4>
             <div class="basic-form">
                 <div class="form-group row">
                     <input id="Id" asp-for="Id" type="text" class="form-control input-default">
@@ -61,33 +60,30 @@
     <div class="card">
         <div class="card-body">
             <a class="btn btn-primary" data-target="#SubModal" data-toggle="modal" data-placement="top" title="add sub service" style="cursor : pointer; color:white">
-                <i class="fa fa-plus "></i> Add Service Item
+                <i class="fa fa-plus "></i> Add Item
             </a>
             <br />
             <br />
-            <h4 class="card-title">Navbar Servisleri</h4>
             <div class="table-responsive">
                 <table class="table table-bordered verticle-middle" id="navbarTable">
                     <thead>
                         <tr>
                             <th scope="col">ID</th>
-                            <th scope="col">Title</th>
-                            <th scope="col">Description</th>
+                            <th scope="col">FullName</th>
+                            <th scope="col">Branch</th>
                             <th scope="col">Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @if (Model.ServiceItems != null && Model.ServiceItems.Any())
+                        @if (Model.OurEmployeesItems != null && Model.OurEmployeesItems.Any())
                         {
-                            foreach (var item in Model.ServiceItems)
+                            foreach (var item in Model.OurEmployeesItems)
                             {
 
                                 <tr data-lang="@item.LangId">
                                     <td>@item.Id</td>
-                                    <td>@item.Title</td>
-                                    <td>@item.Description</td>
-                                    <td>@item.CreatedDate</td>
-                                    <td>@item.UpdatedDate</td>
+                                    <td>@item.FullName</td>
+                                    <td>@item.Branch</td>
                                     <td>
                                         <span>
                                             <a onclick="getSubItem(@item.Id)" data-target="#SubModal" data-toggle="modal" data-placement="top" title="Düzenle">
@@ -133,7 +129,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <a href="/Admin/Navbar/Manage/@deletedItemId" type="button" class="btn btn-primary">Save changes</a>
+                <a href="/Admin/OurEmployees/Manage/@deletedItemId" type="button" class="btn btn-primary">Save changes</a>
             </div>
         </div>
     </div>
@@ -169,19 +165,18 @@
                         <div class="form-group row">
                             <input id="SubId" type="text" class="form-control input-default">
                             <input id="SubLangId" type="text" class="form-control input-default">
+                            <input id="ImageUrl" type="text" class="form-control input-default">
                         </div>
                         <div class="form-group row">
-                            <label class="col-md-2 col-form-label">Title</label>
-
+                            <label class="col-md-2 col-form-label">FullName</label>
                             <div class="col-md-10">
-                                <input id="SubTitle" type="text" class="form-control input-default" required>
+                                <input id="FullName" type="text" class="form-control input-default" required>
                             </div>
                         </div>
-
                         <div class="form-group row">
-                            <label class="col-md-2 col-form-label">Description</label>
+                            <label class="col-md-2 col-form-label">Branch</label>
                             <div class="col-md-10">
-                                <input id="SubDescription" type="text" class="form-control input-default" required>
+                                <input id="Branch" type="text" class="form-control input-default" required>
                             </div>
                         </div>
                         <div class="form-group row">
@@ -211,7 +206,7 @@
 
         $(document).on('change', '#languageSelect', function () {
             let LanguageId = $('#languageSelect').val();
-            window.location.href = `/Admin/Services/Manage?languageId=${LanguageId}`;
+            window.location.href = `/Admin/OurEmployees/Manage?languageId=${LanguageId}`;
         });
         // SublanguageSelect
         let SubLanguageId = $('#SublanguageSelect').val();
@@ -232,11 +227,14 @@
             }
             $.ajax({
                 type: "POST",
-                url: "/Admin/Services/Save",
+                url: "/Admin/OurEmployees/Save",
                 data: data,
                 success: function (response) {
-                    if (response == "success") {
-                        window.location.href = "/Admin/Slider/List";
+                    if (response.isSuccess) {
+                        window.location.reload();
+                    }
+                    else {
+                        alert(response.errors);
                     }
                 }
             });
@@ -246,16 +244,15 @@
         $(document).on('click', '#submitSubBtn', function () {
             var formData = new FormData();
             formData.append('Id', $('#SubId').val());
-            formData.append('ServiceId', $('#Id').val());
+            formData.append('OurEmployeesId', $('#Id').val());
             formData.append('LangId', $('#SubLangId').val());
-            formData.append('Title', $('#SubTitle').val());
-            formData.append('Description', $('#SubDescription').val());
-            formData.append('IconUrl', $('#ImageUrl').val());
+            formData.append('Branch', $('#Branch').val());
+            formData.append('FullName', $('#FullName').val());
+            formData.append('ImageUrl', $('#ImageUrl').val());
             formData.append('File', $('#File')[0].files[0]);
-
             $.ajax({
                 type: "POST",
-                url: "/Admin/Services/ManageSubItem",
+                url: "/Admin/OurEmployees/ManageSubItem",
                 data: formData,
                 contentType: false,
                 processData: false,
@@ -266,6 +263,7 @@
                     else {
                         alert(response.errors);
                     }
+
                 }
             });
         });
@@ -281,13 +279,13 @@
     function getSubItem(id) {
         $.ajax({
             type: "GET",
-            url: "/Admin/Services/GetSubItem",
-            data: { id: id, serviceID: $('#Id').val(), languageId: $('#SubLangId').val() },
+            url: "/Admin/OurEmployees/GetSubItem",
+            data: { id: id, OurEmployeesId: $('#Id').val(), languageId: $('#SubLangId').val() },
             success: function (response) {
                 $('#SubId').val(response.id);
-                $('#SubTitle').val(response.title);
-                $('#SubDescription').val(response.description);
-                $('#ImageUrl').val(response.iconUrl);
+                $('#Branch').val(response.branch);
+                $('#FullName').val(response.fullName);
+                $('#ImageUrl').val(response.imageUrl);
                 if (response.imageUrl != null) {
                     $('#ImagePreview').attr('src', '/Images/' + response.imageUrl);
                 }

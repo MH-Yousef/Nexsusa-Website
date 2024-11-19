@@ -15,11 +15,5 @@ namespace Nexsusa_Api.Controllers
             return Ok(result);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Manage(List<AboutDTO> dto)
-        {
-            var result = await _aboutService.Manage(dto);
-            return Ok(result);
-        }
     }
 }
