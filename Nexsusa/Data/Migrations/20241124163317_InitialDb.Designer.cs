@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241119215448_init")]
-    partial class init
+    [Migration("20241124163317_InitialDb")]
+    partial class InitialDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -928,40 +928,6 @@ namespace Data.Migrations
                     b.ToTable("Sliders");
                 });
 
-            modelBuilder.Entity("Core.HomePage.HomePageItems.SocialLink", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnOrder(0);
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("HomePageInfoId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Url")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("HomePageInfoId");
-
-                    b.ToTable("SocialLink");
-                });
-
             modelBuilder.Entity("Core.HomePage.HomePageItems.WhoWeAre", b =>
                 {
                     b.Property<int>("Id")
@@ -1368,13 +1334,6 @@ namespace Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Core.HomePage.HomePageItems.SocialLink", b =>
-                {
-                    b.HasOne("Core.HomePage.HomePageInfo", null)
-                        .WithMany("SocialLinks")
-                        .HasForeignKey("HomePageInfoId");
-                });
-
             modelBuilder.Entity("Core.HomePage.HomePageItems.WhoWeAreItem", b =>
                 {
                     b.HasOne("Core.HomePage.HomePageItems.WhoWeAre", "WhoWeAre")
@@ -1423,11 +1382,6 @@ namespace Data.Migrations
             modelBuilder.Entity("Core.HomePage.HomePage", b =>
                 {
                     b.Navigation("NavBarItems");
-                });
-
-            modelBuilder.Entity("Core.HomePage.HomePageInfo", b =>
-                {
-                    b.Navigation("SocialLinks");
                 });
 
             modelBuilder.Entity("Core.HomePage.HomePageItems.ChooseUs", b =>

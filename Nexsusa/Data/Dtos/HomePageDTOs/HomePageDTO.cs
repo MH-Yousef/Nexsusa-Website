@@ -42,6 +42,6 @@ namespace Data.Dtos.HomePageDTOs
         public string MetaPublisher { get; set; }
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
-        public List<SocialLink> SocialLinks { get; set; }
+       
     }
 }

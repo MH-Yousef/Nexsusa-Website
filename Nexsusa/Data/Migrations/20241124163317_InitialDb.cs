@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Data.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class InitialDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -398,29 +398,6 @@ namespace Data.Migrations
                         principalTable: "Footers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "SocialLink",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Url = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    HomePageInfoId = table.Column<int>(type: "int", nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SocialLink", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_SocialLink_HomePageInfos_HomePageInfoId",
-                        column: x => x.HomePageInfoId,
-                        principalTable: "HomePageInfos",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -867,11 +844,6 @@ namespace Data.Migrations
                 column: "ServiceId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SocialLink_HomePageInfoId",
-                table: "SocialLink",
-                column: "HomePageInfoId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_StringResources_LanguageId",
                 table: "StringResources",
                 column: "LanguageId");
@@ -930,9 +902,6 @@ namespace Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "ServicePages");
-
-            migrationBuilder.DropTable(
-                name: "SocialLink");
 
             migrationBuilder.DropTable(
                 name: "StringResources");
