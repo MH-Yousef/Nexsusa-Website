@@ -22,7 +22,7 @@ namespace Nexsusa_Api.Controllers
         {
             _languageService.SetLanguage(culture);
             return Ok();
-        }
+        }   
 
     }
 }

@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Data.Dtos.ServiceDTOs;
+using Data.Dtos.ServicePageDTOs;
+using Microsoft.AspNetCore.Mvc;
+using Services._Base;
 using Services.HomePageServices.ServiceServices;
 
 namespace Nexsusa_Api.Controllers
@@ -15,10 +18,15 @@ namespace Nexsusa_Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get(int languageId)
+        public async Task<ResponseResult<ServiceDTO>> Get(int languageId)
         {
-            var result = await _serviceService.GetList(languageId);
-            return Ok(result);
+            var result = (await _serviceService.GetList(languageId)).Data.FirstOrDefault();
+            var response = new ResponseResult<ServiceDTO>
+            {
+                Data = result,
+                IsSuccess = result != null
+            };
+            return response;
         }
     }
 }
