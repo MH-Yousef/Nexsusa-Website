@@ -148,7 +148,7 @@ namespace Services._GenericServices
                         .FirstOrDefault()?.Value;
 
                     // Apply the translation if available, otherwise keep the original value
-                    property.SetValue(entity, translatedValue);
+                    property.SetValue(entity, translatedValue ?? originalValue);
                 }
             }
 
@@ -178,10 +178,10 @@ namespace Services._GenericServices
                     {
                         hasTranslation = false;
                     }
-                    else
-                    {
-                        property.SetValue(entity, translatedValue);
-                    }
+                    //else
+                    //{
+                    //    property.SetValue(entity, translatedValue);
+                    //}
                 }
             }
 

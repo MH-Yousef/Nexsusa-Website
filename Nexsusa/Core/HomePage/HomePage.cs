@@ -21,12 +21,19 @@ namespace Core.HomePage
     }
     public class HomePageInfo : _Base<int>
     {
+        [Translatable]
         public string Title { get; set; }
+        [Translatable]
         public string MetaDescription { get; set; }
+        [Translatable]
         public string MetaKeywords { get; set; }
+        [Translatable]
         public string MetaAuthor { get; set; }
+        [Translatable]
         public string MetaPublisher { get; set; }
+        [Translatable]
         public string PhoneNumber { get; set; }
+        [Translatable]
         public string Email { get; set; }
         
     }

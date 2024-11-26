@@ -7,6 +7,7 @@ using Services._Base;
 using Services.HomePageServices.ChooseUsServices;
 using Services.HomePageServices.ClientSaysServices;
 using Services.HomePageServices.FooterServices;
+using Services.HomePageServices.HomePageInfoServices;
 using Services.HomePageServices.NavBarItemServices;
 using Services.HomePageServices.OurCompanyServices;
 using Services.HomePageServices.OurEmployeeServices;
@@ -33,7 +34,8 @@ namespace Services.HomePageServices
         private readonly IClientSaysService _clientSaysService;
         private readonly IRegularBlogsService _regularBlogsService;
         private readonly IFooterService _footerService;
-        public HomePageService(AppDbContext dbContext, IMapper mapper, INavBarItemService navBarItemService, ISliderService sliderService, IOurCompanyService ourCompanyService, IWorkingProcessService workingProcessService, IWorkShowCaseService workShowCaseService, IWhoWeAreService whoWeAreService, IOurEmployeesService ourEmployeesService, IClientSaysService clientSaysService, IRegularBlogsService regularBlogsService, IFooterService footerService, IServiceService serviceService, IChooseUsService chooseUsService) : base(dbContext, mapper)
+        private readonly IHomePageInfoService _homePageInfoService;
+        public HomePageService(AppDbContext dbContext, IMapper mapper, INavBarItemService navBarItemService, ISliderService sliderService, IOurCompanyService ourCompanyService, IWorkingProcessService workingProcessService, IWorkShowCaseService workShowCaseService, IWhoWeAreService whoWeAreService, IOurEmployeesService ourEmployeesService, IClientSaysService clientSaysService, IRegularBlogsService regularBlogsService, IFooterService footerService, IServiceService serviceService, IChooseUsService chooseUsService, IHomePageInfoService homePageInfoService = null) : base(dbContext, mapper)
         {
             _navBarItemService = navBarItemService;
             _sliderService = sliderService;
@@ -47,6 +49,7 @@ namespace Services.HomePageServices
             _footerService = footerService;
             _serviceService = serviceService;
             _chooseUsService = chooseUsService;
+            _homePageInfoService = homePageInfoService;
         }
 
         public async Task<ResponseResult<HomePageDTO>> GetHomePage(int languageId)
@@ -55,7 +58,7 @@ namespace Services.HomePageServices
             {
                 var model = new HomePageDTO
                 {
-                    HomePageInfo = (await GetHomePageInfo()).Data,
+                    HomePageInfo = (await _homePageInfoService.GetHomePageInfoAsync(languageId)).Data,
                     NavBarItems = (await _navBarItemService.GetList(languageId)).Data,
                     Slider = (await _sliderService.GetList(languageId)).Data.FirstOrDefault(),
                     Services = (await _serviceService.GetList(languageId)).Data.FirstOrDefault(),
@@ -76,7 +79,7 @@ namespace Services.HomePageServices
                 return Error<HomePageDTO>(ex);
             }
         }
-        // get Homne page info
+       // get Homne page info
         public async Task<ResponseResult<HomePageInfoDTO>> GetHomePageInfo()
         {
             try

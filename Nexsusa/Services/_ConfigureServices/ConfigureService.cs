@@ -6,6 +6,7 @@ using Services.HomePageServices;
 using Services.HomePageServices.ChooseUsServices;
 using Services.HomePageServices.ClientSaysServices;
 using Services.HomePageServices.FooterServices;
+using Services.HomePageServices.HomePageInfoServices;
 using Services.HomePageServices.NavBarItemServices;
 using Services.HomePageServices.OurCompanyServices;
 using Services.HomePageServices.OurEmployeeServices;
@@ -47,7 +48,7 @@ namespace Services._ConfigureServices
             services.AddScoped<IWorkShowCaseService, WorkShowCaseService>();
             services.AddScoped<IImageService, ImageService>();
             services.AddScoped<IContactUsService, ContactUsService>();
-
+            services.AddScoped<IHomePageInfoService,HomePageInfoService>();
             #endregion
             services.AddScoped(typeof(GenericService<>));
         }

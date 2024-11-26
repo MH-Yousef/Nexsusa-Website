@@ -9,7 +9,16 @@
 <div class="col-lg-12">
     <div class="card">
         <div style="margin: 20px">
-          
+            <select name="langId" class=" form-control" id="languageSelect">
+                @foreach (var item in ViewBag.Languages)
+                {
+                    
+                   
+                   
+                        <option value="@item.Id">@item.Name</option>
+                    
+                }
+            </select>
         </div>
         <div class="card-body">
             <h4 class="card-title">Services Edit</h4>
@@ -77,7 +86,39 @@
 
 
 <script>
+    
+    $(document).on('change', '#languageSelect', function () {
+        var selectedLangId = $('#languageSelect').val();
+        $.ajax({
+            type: "GET",
+            url: '/Admin/HomePageInfo/GetHomePageInfo?langId=' + selectedLangId,
+
+            success: function (response) {
+                if (response.success == true) {
+                    $('#Id').val(response.data.id);
+                    $('#Title').val(response.data.title);
+                    $('#MetaDescription').val(response.data.metaDescription);
+                    $('#MetaKeywords').val(response.data.metaKeywords);
+                    $('#MetaAuthor').val(response.data.metaAuthor);
+                    $('#MetaPublisher').val(response.data.metaPublisher);
+                    $('#PhoneNumber').val(response.data.phoneNumber);
+                    $('#Email').val(response.data.email);
+    
+                    }
+                    else{
+                    console.log(response.message);
+                    }
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        });
+    });
+
+
+
     $(document).on('click','#submitBtn',function(){
+       
         var formData = {
             Id: $('#Id').val(),
             Title: $('#Title').val(),
@@ -87,7 +128,7 @@
             MetaPublisher: $('#MetaPublisher').val(),
             PhoneNumber: $('#PhoneNumber').val(),
             Email: $('#Email').val(),
-
+            LangId: $('#languageSelect').val()
 
         };
         $.ajax({
@@ -95,10 +136,11 @@
             url: '/Admin/HomePageInfo/Save',
             data: formData,
             success: function (response) {
-                if (response.success == true) {
+                if (response.success == false) {
 
-                    window.location.href = "/Admin/HomePageInfo/Manage"; 
+                     console.log(response.message);
                 }
+                
             },
             error: function (err) {
                 console.log(err);
