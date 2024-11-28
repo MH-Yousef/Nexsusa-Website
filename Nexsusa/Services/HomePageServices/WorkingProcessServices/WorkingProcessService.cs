@@ -10,6 +10,7 @@ using Services.ImageServices;
 
 namespace Services.HomePageServices.WorkingProcessServices
 {
+
     public class WorkingProcessService : BaseService, IWorkingProcessService
     {
         private readonly GenericService<WorkingProcess> _genericService;
@@ -24,16 +25,15 @@ namespace Services.HomePageServices.WorkingProcessServices
             try
             {
                 // Retrieve WorkingProcess data with translations
-                var workingProcesses = await _genericService.GetListAsync(languageId, StringResourceEnums.WorkingProcess);
+                var workingProcesses = await _genericService.GetListAsync(languageId, StringResourceEnums.WorkingProcess, x => x.WorkingProcessItems);
 
                 var workingProcessDtos = _mapper.Map<List<WorkingProcess>, List<WorkingProcessDTO>>(workingProcesses.Data);
-
                 // Apply translations for each WorkingProcess item
                 foreach (var item in workingProcessDtos)
                 {
                     item.LangId = languageId;
-                    //item.Title = _genericService.ApplyTranslations<WorkingProcessDTO>(item, languageId, item.Id, StringResourceEnums.WorkingProcess).Title;
-                    //item.SubTitle = _genericService.ApplyTranslations<WorkingProcessDTO>(item, languageId, item.Id, StringResourceEnums.WorkingProcess).SubTitle;
+                    item.Title = _genericService.ApplyTranslations<WorkingProcessDTO>(item, languageId, item.Id, StringResourceEnums.WorkingProcess).Title;
+                    item.SubTitle = _genericService.ApplyTranslations<WorkingProcessDTO>(item, languageId, item.Id, StringResourceEnums.WorkingProcess).SubTitle;
 
                     // Apply translations for each WorkingProcessItem related to the WorkingProcess
                     if (item.WorkingProcessItems != null)
