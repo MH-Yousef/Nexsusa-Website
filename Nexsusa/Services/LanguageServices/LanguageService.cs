@@ -24,19 +24,19 @@ namespace Services.LanguageServices
                 var languages = new List<Language>();
                 if (!IsActiveDisable)
                 {
-                     languages = await _dbContext.Languages.AsNoTracking()
-                    .Where(x => !x.IsDeleted && x.IsActive).ToListAsync();
+                    languages = await _dbContext.Languages.AsNoTracking()
+                   .Where(x => !x.IsDeleted && x.IsActive).ToListAsync();
                 }
                 else
                 {
-                     languages = await _dbContext.Languages.AsNoTracking()
-                    .Where(x => !x.IsDeleted).ToListAsync();
+                    languages = await _dbContext.Languages.AsNoTracking()
+                   .Where(x => !x.IsDeleted).ToListAsync();
                 }
-                if(languages == null || !languages.Any())
+                if (languages == null || !languages.Any())
                 {
                     return Error<List<Language>>("Languages not found");
                 }
-            return Success(languages);
+                return Success(languages);
             }
             catch (Exception ex)
             {
@@ -132,7 +132,74 @@ namespace Services.LanguageServices
             }
         }
 
+        public async Task<ResponseResult<List<Translate>>> GetAllStringResources()
+        {
+            try
+            {
+                var translates = await _dbContext.Translates.AsNoTracking()
+                    .ToListAsync();
+                if (translates == null || !translates.Any())
+                {
+                    return Error<List<Translate>>("String Resources not found");
+                }
+                return Success(translates);
+            }
+            catch (Exception ex)
+            {
+                return Error<List<Translate>>(ex);
+            }
+        }
 
+        public async Task<ResponseResult<Translate>> GetStringResourceById(int id)
+        {
+            try
+            {
+                var translate = await _dbContext.Translates.AsNoTracking()
+                    .FirstOrDefaultAsync(x => x.Id == id);
+                if (translate == null)
+                {
+                    return Error<Translate>("String Resource not found", System.Net.HttpStatusCode.NotFound);
+                }
+                return Success(translate);
+            }
+            catch (Exception ex)
+            {
+                return Error<Translate>(ex);
+            }
+        }
+
+        public async Task<ResponseResult<Translate>> CreateStringResource(Translate translate)
+        {
+            try
+            {
+                await _dbContext.Translates.AddAsync(translate);
+                await _dbContext.SaveChangesAsync();
+                return Success(translate);
+            }
+            catch (Exception ex)
+            {
+                return Error<Translate>(ex);
+            }
+        }
+        public async Task<ResponseResult<Translate>> UpdateStringResource(Translate translate)
+        {
+            try
+            {
+                var translateDb = await _dbContext.Translates.FirstOrDefaultAsync(x => x.Id == translate.Id);
+                if (translateDb == null)
+                {
+                    return Error<Translate>("String Resource is not found...");
+                }
+                return Success(translate);
+
+            }
+            catch (Exception ex)
+            {
+
+                return Error<Translate>(ex);
+
+            }
+        }
         public async void SetLanguage(string culture)
         {
 

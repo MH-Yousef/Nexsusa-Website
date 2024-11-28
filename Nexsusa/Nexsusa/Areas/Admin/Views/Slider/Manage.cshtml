@@ -28,8 +28,8 @@
             <h4 class="card-title">Slider Edit</h4>
             <div class="basic-form">
                 <div class="form-group row">
-                    <input id="Id" asp-for="Id" type="text" class="form-control input-default">
-                    <input id="LangId" asp-for="LangId" type="text" class="form-control input-default">
+                    <input id="Id" asp-for="Id" type="text" class="form-control input-default" hidden>
+                    <input id="LangId" asp-for="LangId" type="text" class="form-control input-default" hidden>
                 </div>
                 <div class="form-group row">
                     <label class="col-md-2 col-form-label">Title Enter</label>
@@ -42,7 +42,7 @@
                 <div class="form-group row">
                     <label class="col-md-2 col-form-label">Description Enter</label>
                     <div class="col-md-10">
-                        <input id="Description" asp-for="Description" type="text" class="form-control input-default">
+                        <textarea id="Description" asp-for="Description" type="text" style="min-height: 200px;" class="form-control input-default"> </textarea>
                     </div>
                 </div>
 
@@ -63,24 +63,7 @@
         $('#LangId').val(LanguageId);
         $(document).on('change', '#languageSelect', function () {
             let LanguageId = $('#languageSelect').val();
-            $('#LangId').val(LanguageId);
-            $.ajax({
-                type: "GET",
-                url: `/Admin/Slider/Get`,
-                data: { languageId: $('#languageSelect').val() },
-                success: function (response) {
-                    if (response && response.data) {
-                        $('#Id').val(response.data.id);
-                        $('#Title').val(response.data.title);
-                        $('#Description').val(response.data.description);
-                    } else {
-                        alert('Data not found or an error occurred.');
-                    }
-                },
-                error: function () {
-                    alert('An unexpected error occurred.');
-                }
-            });
+            window.location.href = `/Admin/Slider/Manage?languageId=${LanguageId}`;
         });
 
 
@@ -96,8 +79,8 @@
                 url: "/Admin/Slider/Save",
                 data: data,
                 success: function (response) {
-                    if (response == "success") {
-                        window.location.href = "/Admin/Slider/List";
+                    if (response.isSuccess) {
+                        window.location.reload();
                     }
                 }
             });

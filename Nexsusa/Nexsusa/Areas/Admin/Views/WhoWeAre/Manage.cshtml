@@ -30,21 +30,21 @@
             <h4 class="card-title">Who We Are Edit</h4>
             <div class="basic-form">
                 <div class="form-group row">
-                    <input id="Id" asp-for="Id" type="text" class="form-control input-default">
-                    <input id="LangId" asp-for="LangId" type="text" class="form-control input-default">
+                    <input id="Id" asp-for="Id" type="text" class="form-control input-default" hidden>
+                    <input id="LangId" asp-for="LangId" type="text" class="form-control input-default" hidden>
                 </div>
                 <div class="form-group row">
                     <label class="col-md-2 col-form-label">Title Enter</label>
 
                     <div class="col-md-10">
-                        <input id="Title" asp-for="Title" type="text" class="form-control input-default" value="@Model.Title" required>
+                        <input id="Title" asp-for="Title" type="text" class="form-control input-default" required>
                     </div>
                 </div>
 
                 <div class="form-group row">
                     <label class="col-md-2 col-form-label">Description Enter</label>
                     <div class="col-md-10">
-                        <input id="Description" asp-for="Description" type="text" class="form-control input-default" value="@Model.Description" required>
+                        <textarea id="Description" asp-for="Description" type="text" style="min-height: 200px;" class="form-control input-default"> </textarea>
                     </div>
                 </div>
 
@@ -137,7 +137,7 @@
 </div>
 <!-- Sub Modal -->
 <div class="modal fade" id="SubModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
@@ -164,8 +164,8 @@
                     <h4 class="card-title">Sub Item</h4>
                     <div class="basic-form">
                         <div class="form-group row">
-                            <input id="SubId" type="text" class="form-control input-default">
-                            <input id="SubLangId" type="text" class="form-control input-default">
+                            <input id="SubId" type="text" class="form-control input-default"hidden>
+                            <input id="SubLangId" type="text" class="form-control input-default" hidden>
                         </div>
                         <div class="form-group row">
                             <label class="col-md-2 col-form-label">Description</label>

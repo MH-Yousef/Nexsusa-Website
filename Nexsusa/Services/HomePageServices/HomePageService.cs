@@ -60,7 +60,7 @@ namespace Services.HomePageServices
                 {
                     HomePageInfo = (await _homePageInfoService.GetHomePageInfoAsync(languageId)).Data,
                     NavBarItems = (await _navBarItemService.GetList(languageId)).Data,
-                    Slider = (await _sliderService.GetList(languageId)).Data.FirstOrDefault(),
+                    Slider = (await _sliderService.GetList(languageId)).Data,
                     Services = (await _serviceService.GetList(languageId)).Data.FirstOrDefault(),
                     OurCompany = (await _ourCompanyService.GetList(languageId)).Data.FirstOrDefault(),
                     ChooseUs = (await _chooseUsService.GetList(languageId)).Data.FirstOrDefault(),

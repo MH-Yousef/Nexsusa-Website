@@ -1,0 +1,172 @@
+﻿@using Core.Domains.Languages
+
+@{
+    ViewData["Title"] = "List";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+@model List<Translate>
+
+<div class="col-lg-12">
+    <div class="card">
+        <div class="card-body">
+            <a class="btn btn-primary" data-target="#SubModal" data-toggle="modal" data-placement="top" title="add sub service" style="cursor : pointer; color:white">
+                <i class="fa fa-plus "></i> Add Item
+            </a>
+            <br />
+            <br />
+            <div class="table-responsive">
+                <table class="table table-bordered verticle-middle" id="navbarTable">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">FullName</th>
+                            <th scope="col">Branch</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null)
+                        {
+                            foreach (var item in Model)
+                            {
+
+                                <tr data-lang="@item.LanguageId">
+                                    <td>@item.Id</td>
+                                    <td>@item.Key</td>
+                                    <td>@item.Value</td>
+                                    <td>
+                                        <span>
+                                            <a onclick="getSubItem(@item.Id)" data-target="#SubModal" data-toggle="modal" data-placement="top" title="Düzenle">
+                                                <i class="fa fa-pencil color-muted m-r-5"></i>
+                                            </a>
+                                        </span>
+                                    </td>
+                                </tr>
+
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center">No items found.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Edit Modal -->
+<div class="modal fade" id="SubModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <select name="langId" class=" form-control" id="SublanguageSelect">
+                    @foreach (var item in ViewBag.Languages)
+                    {
+                        bool isSelected = ViewBag.SelectedLanguageId == item.Id;
+                        if (isSelected)
+                        {
+                            <option selected value="@item.Id">@item.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@item.Id">@item.Name</option>
+                        }
+                    }
+                </select>
+                <div class="card-body">
+                    <h4 class="card-title">Item</h4>
+                    <div class="basic-form">
+                        <div class="form-group row">
+                            <input id="Id" type="text" class="form-control input-default">
+                            <input id="LangId" type="text" class="form-control input-default">
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-md-2 col-form-label">Key</label>
+                            <div class="col-md-10">
+                                <input id="Key" type="text" class="form-control input-default" required>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-md-2 col-form-label">Value</label>
+                            <div class="col-md-10">
+                                <input id="Value" type="text" class="form-control input-default" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="submitSubBtn" type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        // SublanguageSelect
+        let SubLanguageId = $('#SublanguageSelect').val();
+        $('#LangId').val(SubLanguageId);
+        $(document).on('change', '#SublanguageSelect', function () {
+            let SubLanguageId = $('#SublanguageSelect').val();
+            $('#LangId').val(SubLanguageId);
+            let id = $('#Id').val();
+            getSubItem(id);
+        });
+
+        // submit Item
+        $(document).on('click', '#submitSubBtn', function () {
+            var formData = new FormData();
+            formData.append('Id', $('#Id').val());
+            formData.append('LangId', $('#LangId').val());
+            formData.append('Value', $('#Value').val());
+            formData.append('Key', $('#Key').val());
+            $.ajax({
+                type: "POST",
+                url: "/Admin/Language/Save",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    if (response.isSuccess) {
+                        window.location.reload();
+                    }
+                    else {
+                        alert(response.errors);
+                    }
+
+                }
+            });
+        });
+    });
+
+    function getSubItem(id) {
+        $.ajax({
+            type: "GET",
+            url: "/Admin/Language/Get",
+            data: { id: id},
+            success: function (response) {
+                $('#Id').val(response.id);
+                $('#Key').val(response.branch);
+                $('#Value').val(response.fullName);
+
+            },
+            error: function () {
+                alert('An unexpected error occurred.');
+            }
+        });
+    }
+</script>

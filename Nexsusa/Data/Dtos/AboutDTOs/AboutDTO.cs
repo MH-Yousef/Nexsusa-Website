@@ -11,8 +11,6 @@ namespace Data.Dtos.AboutDTOs
         [Translatable]
         public string Title { get; set; }
         [Translatable]
-        public string SubTitle { get; set; }
-        [Translatable]
         public string Description { get; set; }
         public string VideoUrl { get; set; }
         public OurCompanyDTO OurCompany { get; set; }

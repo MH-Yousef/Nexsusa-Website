@@ -23,7 +23,7 @@ namespace Services.HomePageServices.SliderServices
             _genericService = genericService;
         }
 
-        public async Task<ResponseResult<List<SliderDTO>>> GetList(int languageId)
+        public async Task<ResponseResult<SliderDTO>> GetList(int languageId)
         {
             try
             {
@@ -40,11 +40,11 @@ namespace Services.HomePageServices.SliderServices
                     slider.Description = _genericService.ApplyTranslations<SliderDTO>(slider, languageId, slider.Id, StringResourceEnums.Slider).Description;
                 }
 
-                return Success(sliderDtos);
+                return Success(sliderDtos.FirstOrDefault());
             }
             catch (Exception ex)
             {
-                return Error<List<SliderDTO>>(ex);
+                return Error<SliderDTO>(ex);
             }
         }
 

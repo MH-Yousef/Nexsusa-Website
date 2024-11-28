@@ -148,7 +148,7 @@ namespace Services._GenericServices
                         .FirstOrDefault()?.Value;
 
                     // Apply the translation if available, otherwise keep the original value
-                    property.SetValue(entity, translatedValue ?? originalValue);
+                    property.SetValue(entity, translatedValue);
                 }
             }
 

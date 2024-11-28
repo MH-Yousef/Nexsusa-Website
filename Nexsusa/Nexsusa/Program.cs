@@ -2,6 +2,7 @@ using Core.Domains.Languages;
 using Data;
 using Data.Mapping;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.OpenApi.Models;
 using Services._ConfigureServices;
 using Services.LanguageServices;
 using System.Globalization;
@@ -15,7 +16,6 @@ builder.Services.AddRazorPages();
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 builder.Services.Configure<ConnectionStrings>(builder.Configuration.GetSection("ConnectionStrings"));
 builder.Services.Dependencies(builder.Configuration);
 builder.Services.AddAutoMapper(typeof(MappingProfile));
@@ -26,8 +26,6 @@ builder.Services.AddHttpContextAccessor();
 // Add Interfaces and Services
 builder.Services.ConfigureApplicationServices();
 
-// Add AutoMapper
-//builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // AllowAllOrigins
 builder.Services.AddCors(options =>
@@ -40,6 +38,8 @@ builder.Services.AddCors(options =>
                 .AllowAnyHeader();
         });
 });
+
+builder.Services.AddSwaggerGen(x => x.SwaggerDoc("v1", new OpenApiInfo { Title = "Nexsusa_Api", Version = "v1" }));
 
 var serviceProvider = builder.Services.BuildServiceProvider();
 
@@ -76,55 +76,32 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
 
 #endregion
 
-//Test
-//var NavbarService = serviceProvider.GetRequiredService<INavBarItemService>();
-//var model = new List<NavBarItemDTO>
-//{
-//    new()
-//    {
-//    CreatedDate = DateTime.Now,
-//    IsDeleted = false,
-//    UpdatedDate = DateTime.Now,
-//    Name = "Home",
-//    Url = "/",
-//    Icon = "fas fa-home",
-//    LangId = 1,
-//    IsVisible = true,
-//    NavBarItemSubItems = null
-//    },
-//    new()
-//    {
-//    CreatedDate = DateTime.Now,
-//    IsDeleted = false,
-//    UpdatedDate = DateTime.Now,
-//    Name = "Ana Sayfa",
-//    Url = "/",
-//    Icon = "fas fa-home",
-//    LangId = 1,
-//    IsVisible = true,
-//    NavBarItemSubItems = null
-//    }
-//};
-//await NavbarService.Create(model);
-
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
+    app.UseDeveloperExceptionPage();
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(x => x.SwaggerEndpoint("/swagger/v1/swagger.json", "Nexsusa_Api"));
 }
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
 app.UseStaticFiles();
 app.MapRazorPages();
 app.UseRouting();
+
+// Cors
+app.UseCors();
+
 app.MapControllerRoute(
     name: "Areas",
     pattern: "{area:exists}/{controller=Dashboard}/{action=Dashboard}/{id?}");
 
 app.MapControllers();
-// Cors
-app.UseCors();
+
+app.UseDeveloperExceptionPage();
+app.UseSwagger();
+app.UseSwaggerUI(x => x.SwaggerEndpoint("/swagger/v1/swagger.json", "Nexsusa_Api"));
+
 app.Run();

@@ -23,15 +23,13 @@ namespace Data.Context
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<Language>().ToTable("Languages");
-            modelBuilder.Entity<HomePage>().ToTable("HomePages");
-            modelBuilder.Entity<NavBarItem>().ToTable("NavBarItems");
-            modelBuilder.Entity<NavBarItemSubItem>().ToTable("NavBarItemSubItems");
         }
 
         // Tables
         public DbSet<Language> Languages { get; set; }
         public DbSet<StringResource> StringResources { get; set; }
+        public DbSet<Translate> Translates { get; set; }
+
 
 
         public DbSet<HomePage> HomePages { get; set; }

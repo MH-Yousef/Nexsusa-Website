@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialDb : Migration
+    public partial class Inial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -249,6 +249,24 @@ namespace Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Sliders", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Translates",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Key = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LanguageId = table.Column<int>(type: "int", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Translates", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -905,6 +923,9 @@ namespace Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "StringResources");
+
+            migrationBuilder.DropTable(
+                name: "Translates");
 
             migrationBuilder.DropTable(
                 name: "WhoWeAreItems");

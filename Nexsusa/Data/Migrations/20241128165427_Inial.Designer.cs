@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241124163317_InitialDb")]
-    partial class InitialDb
+    [Migration("20241128165427_Inial")]
+    partial class Inial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -136,7 +136,7 @@ namespace Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Languages", (string)null);
+                    b.ToTable("Languages");
                 });
 
             modelBuilder.Entity("Core.Domains.Languages.StringResource", b =>
@@ -180,6 +180,38 @@ namespace Data.Migrations
                     b.HasIndex("LanguageId");
 
                     b.ToTable("StringResources");
+                });
+
+            modelBuilder.Entity("Core.Domains.Languages.Translate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnOrder(0);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Key")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("LanguageId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Translates");
                 });
 
             modelBuilder.Entity("Core.HomePage.HomePage", b =>
@@ -257,7 +289,7 @@ namespace Data.Migrations
 
                     b.HasIndex("WorkingProcessId");
 
-                    b.ToTable("HomePages", (string)null);
+                    b.ToTable("HomePages");
                 });
 
             modelBuilder.Entity("Core.HomePage.HomePageInfo", b =>
@@ -546,7 +578,7 @@ namespace Data.Migrations
 
                     b.HasIndex("HomePageId");
 
-                    b.ToTable("NavBarItems", (string)null);
+                    b.ToTable("NavBarItems");
                 });
 
             modelBuilder.Entity("Core.HomePage.HomePageItems.NavBarItemSubItem", b =>
@@ -586,7 +618,7 @@ namespace Data.Migrations
 
                     b.HasIndex("NavBarItemId");
 
-                    b.ToTable("NavBarItemSubItems", (string)null);
+                    b.ToTable("NavBarItemSubItems");
                 });
 
             modelBuilder.Entity("Core.HomePage.HomePageItems.OurCompany", b =>

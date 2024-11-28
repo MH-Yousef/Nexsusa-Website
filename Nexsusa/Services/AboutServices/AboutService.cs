@@ -96,7 +96,6 @@ namespace Services.AboutServices
                         var translations = new List<(string ColumnName, string ColumnValue)>
                             {
                                 ("Title", dto.Title),
-                                ("SubTitle", dto.SubTitle),
                                 ("Description", dto.Description)
                             };
 

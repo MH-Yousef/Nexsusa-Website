@@ -8,11 +8,22 @@ namespace Nexsusa_Api.Areas.Admin.Controllers
     [Area("Admin")]
     public class SliderController(ILanguageService _languageService, ISliderService _sliderService) : Controller
     {
-        public async Task<IActionResult> Manage()
+        public async Task<IActionResult> Manage(int? languageId = null)
         {
             ViewBag.Languages = (await _languageService.Get(true)).Data;
-            var model = await _sliderService.GetFirst();
-            return View(model.Data);
+            if (languageId == null)
+            {
+                var defaultLanguageId = (await _languageService.Get()).Data.FirstOrDefault(x => x.IsDefault).Id;
+                ViewBag.SelectedLanguageId = defaultLanguageId;
+                var model = await _sliderService.GetFirst();
+                return View(model.Data);
+            }
+            else
+            {
+                ViewBag.SelectedLanguageId = languageId;
+                var result = await _sliderService.GetList(languageId.Value);
+                return View(result.Data);
+            }
         }
 
         public async Task<IActionResult> Save(SliderDTO dto)

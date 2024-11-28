@@ -17,6 +17,10 @@ namespace Services.LanguageServices
         Task<ResponseResult<LanguageDTO>> Delete(int id);
         //====================================================================================================
         void SetLanguage(string culture);
+        Task<ResponseResult<List<Translate>>> GetAllStringResources();
+        Task<ResponseResult<Translate>> GetStringResourceById(int id);
+        Task<ResponseResult<Translate>> CreateStringResource(Translate translate);
+        Task<ResponseResult<Translate>> UpdateStringResource(Translate translate);
         //====================================================================================================
     }
 }

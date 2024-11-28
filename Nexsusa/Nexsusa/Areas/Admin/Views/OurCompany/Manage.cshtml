@@ -28,8 +28,8 @@
             <h4 class="card-title">Our Company</h4>
             <div class="basic-form">
                 <div class="form-group row">
-                    <input id="Id" asp-for="Id" type="text" class="form-control input-default">
-                    <input id="LangId" asp-for="LangId" type="text" class="form-control input-default">
+                    <input id="Id" asp-for="Id" type="text" class="form-control input-default" hidden>
+                    <input id="LangId" asp-for="LangId" type="text" class="form-control input-default" hidden>
                 </div>
                 <div class="form-group row">
                     <label class="col-md-2 col-form-label">Title</label>
@@ -42,7 +42,7 @@
                 <div class="form-group row">
                     <label class="col-md-2 col-form-label">Description</label>
                     <div class="col-md-10">
-                        <input id="Description" asp-for="Description" type="text" class="form-control input-default">
+                        <textarea id="Description" asp-for="Description" type="text" style="min-height: 200px;" class="form-control input-default"> </textarea>
                     </div>
                 </div>
                 <div class="form-group row">

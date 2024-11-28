@@ -22,7 +22,13 @@ namespace Nexsusa_Api.Controllers
         {
             _languageService.SetLanguage(culture);
             return Ok();
-        }   
+        }
 
+        [HttpGet]
+        public async Task<ResponseResult<List<Translate>>> GetAllStringResources()
+        {
+            var result = await _languageService.GetAllStringResources();
+            return result;
+        }
     }
 }
