@@ -288,8 +288,8 @@
                 $('#SubTitle').val(response.title);
                 $('#SubDescription').val(response.description);
                 $('#ImageUrl').val(response.iconUrl);
-                if (response.imageUrl != null) {
-                    $('#ImagePreview').attr('src', '/Images/' + response.imageUrl);
+                if (response.iconUrl != null) {
+                    $('#ImagePreview').attr('src', '/Images/' + response.iconUrl);
                 }
 
             },
