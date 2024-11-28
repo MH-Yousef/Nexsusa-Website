@@ -93,5 +93,6 @@ namespace Nexsusa_Api.Areas.Admin.Controllers
             var result = (await _serviceService.GetById(serviceId, languageId)).Data.ServiceItems.FirstOrDefault(x => x.Id == id);
             return Json(result);
         }
+
     }
 }

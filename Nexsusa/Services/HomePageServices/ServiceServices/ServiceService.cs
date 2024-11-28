@@ -168,19 +168,27 @@ namespace Services.HomePageServices.ServiceServices
                         await _genericService.CreateAsync(subService);
                     }
                 }
-                var subTranslations = new List<(string ColumnName, string ColumnValue)>
+              
+                    var subTranslations = new List<(string ColumnName, string ColumnValue)>
                             {
                                 ("Title", subDto.Title),
                                 ("Description", subDto.Description)
                              };
-                if (subDto.Id > 0 && IsTranslateionExixts)
-                {
-                    await _genericService.UpdateTranslationsAsync(StringResourceEnums.ServiceItem, subTranslations, subService.Id, subDto.LangId);
-                }
-                else
-                {
-                    await _genericService.AddTranslationsAsync(StringResourceEnums.ServiceItem, subTranslations, subService.Id, subDto.LangId);
-                }
+                    if (IsTranslateionExixts)
+                    {
+                        
+                        await _genericService.UpdateTranslationsAsync(StringResourceEnums.ServiceItem,subTranslations,subService.Id,subDto.LangId);
+                    }
+                    else
+                    {
+                        await _genericService.AddTranslationsAsync(StringResourceEnums.ServiceItem,subTranslations,subService.Id,subDto.LangId);
+
+                    }
+
+                
+
+                
+               
                 return Success(subDto);
             }
             catch (Exception ex)
