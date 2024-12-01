@@ -70,7 +70,7 @@ namespace Services.HomePageServices
                     OurEmployees = (await _ourEmployeesService.GetList(languageId)).Data.FirstOrDefault(),
                     ClientSays = (await _clientSaysService.GetList(languageId)).Data.FirstOrDefault(),
                     RegularBlogs = (await _regularBlogsService.GetList(languageId)).Data.FirstOrDefault(),
-                    Footer = (await _footerService.GetList(languageId)).Data.FirstOrDefault()
+                    Footer = (await _footerService.Get(languageId)).Data
                 };
                 return Success(model);
             }

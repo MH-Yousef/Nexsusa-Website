@@ -1,172 +1,125 @@
 ﻿using AutoMapper;
 using Core.Domains.Enums;
+using Core.HomePage;
 using Core.HomePage.HomePageItems;
 using Data.Context;
 using Data.Dtos.FooterDTOs;
 using Data.Dtos.FooterServiceDTOs;
+using Data.Dtos.HomePageDTOs;
 using Data.Dtos.QuickLinkDTOs;
+using Data.Dtos.SliderDTOs;
 using Microsoft.EntityFrameworkCore;
 using Services._Base;
 using Services._GenericServices;
+using Services.HomePageServices.ServiceServices;
+using Services.ImageServices;
 using System.Net;
 
 namespace Services.HomePageServices.FooterServices
 {
-    public class FooterService : BaseService, IFooterService
+    public class FooterService(AppDbContext dbContext, IMapper mapper, GenericService<Footer> genericService, IImageService _imageService, IServiceService _serviceService) : BaseService(dbContext, mapper), IFooterService
     {
-        private readonly GenericService<Footer> genericService;
-        public FooterService(AppDbContext dbContext, IMapper mapper, GenericService<Footer> genericService) : base(dbContext, mapper)
-        {
-            this.genericService = genericService;
-        }
-        public async Task<ResponseResult<List<FooterDTO>>> GetList(int LanguageId)
+        private readonly GenericService<Footer> _genericService = genericService;
+        //private readonly IImageService _imageService;
+        //private readonly IServiceService _serviceService;
+        public async Task<ResponseResult<FooterDTO>> Get(int LanguageId)
         {
             try
             {
-                var items = await genericService.GetListAsync(LanguageId, StringResourceEnums.Footer, x => x.QuickLinks, x => x.Services);
-                var dto = _mapper.Map<List<Footer>, List<FooterDTO>>(items.Data);
-                foreach (var item in dto)
+                var entity = await _dbContext.Footers.AsNoTracking().FirstOrDefaultAsync();
+                var defaultLanguage = await _dbContext.Languages.AsNoTracking().FirstOrDefaultAsync(x => x.IsDefault);
+
+                if (entity == null)
                 {
-                    item.LangId = LanguageId;
-                    if (item.QuickLinks != null)
-                    {
-                        foreach (var sub in item.QuickLinks)
+                    return Error<FooterDTO>("Footer Not Found...");
+
+                }
+                if (LanguageId != defaultLanguage.Id)
+                {
+
+                    entity = _genericService.ApplyTranslations(entity, LanguageId, entity.Id, StringResourceEnums.Footer);
+                }
+
+                var dto = _mapper.Map<FooterDTO>(entity);
+                dto.LangId = LanguageId;
+                dto.Services = (await _serviceService.GetList(LanguageId)).Data;
+                return Success(dto);
+            }
+            catch (Exception ex)
+            {
+
+                return Error<FooterDTO>(ex);
+            }
+
+        }
+        public async Task<ResponseResult<FooterDTO>> Manage(FooterDTO dto)
+        {
+            try
+            {
+                var defaultLanguage = await _dbContext.Languages.AsNoTracking().FirstOrDefaultAsync(x => x.IsDefault);
+                bool isDefault = defaultLanguage.Id == dto.LangId;
+                var entity = _mapper.Map<Footer>(dto);
+                if (dto.File != null)
+                {
+                    var imageResult = await _imageService.UploadImage(dto.File);
+                    entity.ImageUrl = imageResult;
+                    dto.ImageUrl = imageResult;
+                }
+                if (isDefault)
+                {
+                    if (dto.Id == 0)
+                        await _genericService.CreateAsync(entity);
+                    else
+                        await _genericService.UpdateAsync(entity);
+                }
+                else
+                {
+                    bool hasTranslation = _genericService.HasTranslations(entity, dto.LangId, dto.Id, StringResourceEnums.Footer);
+                    List<(string ColumnName, string ColumnValue)> transalteValues =
+                [
+                         new()
                         {
-                            sub.LangId = LanguageId;
-                            sub.Title = genericService.ApplyTranslations<QuickLinkDTO>(sub, LanguageId, sub.Id, StringResourceEnums.QuickLink).Title;
+                            ColumnName="Description",
+                            ColumnValue=entity.Description
+                        },
+                          new()
+                        {
+                            ColumnName="Address",
+                            ColumnValue=entity.Address
                         }
+                ];
+                    if (hasTranslation)
+                    {
+                        await _genericService.UpdateTranslationsAsync(StringResourceEnums.Footer, transalteValues, dto.Id, dto.LangId);
                     }
-                    if (item.Services != null)
+                    else
                     {
-                        foreach (var sub in item.Services)
-                        {
-                            sub.LangId = LanguageId;
-                            sub.Title = genericService.ApplyTranslations<FooterServiceDTO>(sub, LanguageId, sub.Id, StringResourceEnums.FooterService).Title;
-                        }
+                        await _genericService.AddTranslationsAsync(StringResourceEnums.Footer, transalteValues, dto.Id, dto.LangId);
+
                     }
                 }
                 return Success(dto);
             }
             catch (Exception ex)
             {
-                return Error<List<FooterDTO>>(ex);
+
+                return Error<FooterDTO>(ex);
             }
         }
 
-        public async Task<ResponseResult<FooterDTO>> GetById(int id, int LanguageId)
+        public async Task<ResponseResult<FooterDTO>> GetFirst()
         {
             try
             {
-                var model = await genericService.GetByIdAsync(id, LanguageId, StringResourceEnums.Footer, x => x.QuickLinks, x => x.Services);
-                var dto = _mapper.Map<Footer, FooterDTO>(model);
+                var result = await _dbContext.Footers.FirstOrDefaultAsync();
+                var Dto = _mapper.Map<Footer, FooterDTO>(result);
+                return Success(Dto);
 
-                if (dto.QuickLinks != null)
-                {
-                    foreach (var item in dto.QuickLinks)
-                    {
-                        item.LangId = LanguageId;
-                        item.Title = genericService.ApplyTranslations<QuickLinkDTO>(item, LanguageId, item.Id, StringResourceEnums.QuickLink).Title;
-                    }
-                }
-                if (dto.Services != null)
-                {
-                    foreach (var item in dto.Services)
-                    {
-                        item.LangId = LanguageId;
-                        item.Title = genericService.ApplyTranslations<FooterServiceDTO>(item, LanguageId, item.Id, StringResourceEnums.FooterService).Title;
-                    }
-                }
-
-                return Success(dto);
             }
             catch (Exception ex)
             {
                 return Error<FooterDTO>(ex);
             }
-        }
-        public async Task<ResponseResult<List<FooterDTO>>> Manage(List<FooterDTO> dtos)
-        {
-            try
-            {
-                var defultLanguage = await _dbContext.Languages.FirstAsync(x => x.IsDefault);
-                var defultModel = dtos.Where(x => x.LangId == defultLanguage.Id).FirstOrDefault();
-                var mainItem = _mapper.Map<FooterDTO, Footer>(defultModel);
-                if (defultModel.Id > 0)
-                {
-                    var result = await genericService.UpdateAsync(mainItem);
-                }
-                else
-                {
-                    var result = await genericService.CreateAsync(mainItem);
-                }
-
-                // Add Translations
-                foreach (var item in dtos)
-                {
-                    var translations = new List<(string ColumnName, string ColumnValue)>
-                            {
-                                ("Description", item.Description),
-                            };
-                    if (item.Id > 0)
-                    {
-                        await genericService.UpdateTranslationsAsync(StringResourceEnums.Footer, translations, mainItem.Id, item.LangId);
-                    }
-                    else
-                    {
-                        await genericService.AddTranslationsAsync(StringResourceEnums.Footer, translations, mainItem.Id, item.LangId);
-                    }
-                    if (item.QuickLinks.Any())
-                    {
-
-                        foreach (var subItem in item.QuickLinks)
-                        {
-                            var subItemModel = await _dbContext.QuickLinks.FirstOrDefaultAsync(x => x.FooterId == mainItem.Id);
-                            var Subtranslations = new List<(string ColumnName, string ColumnValue)>
-                            {
-                                ("Title", subItem.Title),
-                            };
-                            if (subItem.Id > 0)
-                            {
-                                await genericService.UpdateTranslationsAsync(StringResourceEnums.QuickLink, Subtranslations, subItemModel.Id, subItem.LangId);
-                            }
-                            else
-                            {
-                                await genericService.AddTranslationsAsync(StringResourceEnums.QuickLink, Subtranslations, subItemModel.Id, subItem.LangId);
-                            }
-                        }
-                    }
-                    if (item.Services.Any())
-                    {
-
-                        foreach (var subItem in item.Services)
-                        {
-                            var subItemModel = await _dbContext.FooterServices.FirstOrDefaultAsync(x => x.FooterId == mainItem.Id);
-                            var Subtranslations = new List<(string ColumnName, string ColumnValue)>
-                            {
-                                ("Title", subItem.Title),
-                            };
-                            if (subItem.Id > 0)
-                            {
-                                await genericService.UpdateTranslationsAsync(StringResourceEnums.FooterService, Subtranslations, subItemModel.Id, subItem.LangId);
-                            }
-                            else
-                            {
-                                await genericService.AddTranslationsAsync(StringResourceEnums.FooterService, Subtranslations, subItemModel.Id, subItem.LangId);
-                            }
-                        }
-                    }
-                }
-
-                return Success(dtos);
-            }
-            catch (Exception ex)
-            {
-                return Error<List<FooterDTO>>(ex);
-            }
-        }
-        public Task<ResponseResult<FooterDTO>> Delete(int id)
-        {
-            throw new NotImplementedException();
         }
     }
 }

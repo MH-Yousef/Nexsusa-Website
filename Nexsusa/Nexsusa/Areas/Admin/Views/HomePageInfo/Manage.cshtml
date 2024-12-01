@@ -1,79 +1,72 @@
 ﻿@model Data.Dtos.HomePageDTOs.HomePageInfoDTO
-
 @{
     ViewData["Title"] = "Manage";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
-    int deletedItemId = 0;
 }
-
 <div class="col-lg-12">
     <div class="card">
         <div style="margin: 20px">
             <select name="langId" class=" form-control" id="languageSelect">
                 @foreach (var item in ViewBag.Languages)
                 {
-                    
-                   
-                   
-                        <option value="@item.Id">@item.Name</option>
-                    
+                    <option value="@item.Id">@item.Name</option>
                 }
             </select>
         </div>
         <div class="card-body">
-            <h4 class="card-title">Services Edit</h4>
+            <h4 class="card-title">Home Page Info</h4>
             <div class="basic-form">
                 <div class="form-group row">
                     <input id="Id" asp-for="Id" type="hidden" class="form-control input-default">
-                  
+
                 </div>
                 <div class="form-group row">
                     <label class="col-md-2 col-form-label">Title</label>
                     <div class="col-md-10">
-                        <input id="Title" asp-for="Title"  class="form-control input-default" required>
+                        <input id="Title" asp-for="Title" class="form-control input-default" required>
                     </div>
                 </div>
                 <div class="form-group row">
                     <label class="col-md-2 col-form-label">MetaDescription</label>
 
                     <div class="col-md-10">
-                        <input id="MetaDescription" asp-for="MetaDescription"  class="form-control input-default"  required>
+                        <input id="MetaDescription" asp-for="MetaDescription" class="form-control input-default" required>
                     </div>
                 </div>
 
                 <div class="form-group row">
                     <label class="col-md-2 col-form-label">MetaKeywords</label>
                     <div class="col-md-10">
-                        <input id="MetaKeywords" asp-for="MetaKeywords" class="form-control input-default"  required>
+                        <input id="MetaKeywords" asp-for="MetaKeywords" class="form-control input-default" required>
                     </div>
                 </div>
                 <div class="form-group row">
                     <label class="col-md-2 col-form-label">MetaAuthor</label>
                     <div class="col-md-10">
-                        <input id="MetaAuthor" asp-for="MetaAuthor"  class="form-control input-default"  required>
+                        <input id="MetaAuthor" asp-for="MetaAuthor" class="form-control input-default" required>
                     </div>
                 </div>
                 <div class="form-group row">
                     <label class="col-md-2 col-form-label">MetaPublisher</label>
                     <div class="col-md-10">
-                        <input id="MetaPublisher" asp-for="MetaPublisher"  class="form-control input-default" required>
+                        <input id="MetaPublisher" asp-for="MetaPublisher" class="form-control input-default" required>
                     </div>
-                </div>  
+                </div>
                 <div class="form-group row">
                     <label class="col-md-2 col-form-label">PhoneNumber</label>
                     <div class="col-md-10">
-                        <input id="PhoneNumber" asp-for="PhoneNumber"  class="form-control input-default"  required>
+                        <input id="PhoneNumber" asp-for="PhoneNumber" class="form-control input-default" required>
                     </div>
                 </div>
                 <div class="form-group row">
                     <label class="col-md-2 col-form-label">Email</label>
                     <div class="col-md-10">
-                        <input id="Email" asp-for="Email"  class="form-control input-default" required>
+                        <input id="Email" asp-for="Email" class="form-control input-default" required>
                     </div>
                 </div>
                 <div class="form-group row">
                     <div class="col-md-10 offset-md-2">
-                        <button type="submit" id="submitBtn"  class="btn btn-dark">Save</button>
+                        <button type="submit" id="submitBtn" class="btn btn-dark">Save</button>
                     </div>
                 </div>
 
@@ -81,18 +74,13 @@
         </div>
     </div>
 </div>
-
-
-
-
 <script>
-    
+
     $(document).on('change', '#languageSelect', function () {
         var selectedLangId = $('#languageSelect').val();
         $.ajax({
             type: "GET",
             url: '/Admin/HomePageInfo/GetHomePageInfo?langId=' + selectedLangId,
-
             success: function (response) {
                 if (response.success == true) {
                     $('#Id').val(response.data.id);
@@ -103,22 +91,17 @@
                     $('#MetaPublisher').val(response.data.metaPublisher);
                     $('#PhoneNumber').val(response.data.phoneNumber);
                     $('#Email').val(response.data.email);
-    
-                    }
-                    else{
+                }
+                else {
                     console.log(response.message);
-                    }
+                }
             },
             error: function (err) {
                 console.log(err);
             }
         });
     });
-
-
-
-    $(document).on('click','#submitBtn',function(){
-       
+    $(document).on('click', '#submitBtn', function () {
         var formData = {
             Id: $('#Id').val(),
             Title: $('#Title').val(),
@@ -129,7 +112,6 @@
             PhoneNumber: $('#PhoneNumber').val(),
             Email: $('#Email').val(),
             LangId: $('#languageSelect').val()
-
         };
         $.ajax({
             type: "POST",
@@ -138,113 +120,12 @@
             success: function (response) {
                 if (response.success == false) {
 
-                     console.log(response.message);
+                    console.log(response.message);
                 }
-                
             },
             error: function (err) {
                 console.log(err);
             }
-
-
         });
-    
-       
     });
-   
 </script>
-@* <script>
-    $(document).ready(function () {
-        let LanguageId = $('#languageSelect').val();
-        $('#LangId').val(LanguageId);
-
-        $(document).on('change', '#languageSelect', function () {
-            let LanguageId = $('#languageSelect').val();
-            window.location.href = `/Admin/Services/Manage?languageId=${LanguageId}`;
-        });
-        // SublanguageSelect
-        let SubLanguageId = $('#SublanguageSelect').val();
-        $('#SubLangId').val(SubLanguageId);
-        $(document).on('change', '#SublanguageSelect', function () {
-            let SubLanguageId = $('#SublanguageSelect').val();
-            $('#SubLangId').val(SubLanguageId);
-            let id = $('#SubId').val();
-            getSubItem(id);
-        });
-
-        $(document).on('click', '#submitBtn', function () {
-            var data = {
-                Id: $('#Id').val(),
-                LangId: $('#LangId').val(),
-                Title: $('#Title').val(),
-                Description: $('#Description').val()
-            }
-            $.ajax({
-                type: "POST",
-                url: "/Admin/Services/Save",
-                data: data,
-                success: function (response) {
-                    if (response == "success") {
-                        window.location.href = "/Admin/Slider/List";
-                    }
-                }
-            });
-        });
-
-        // submit Sub Item
-        $(document).on('click', '#submitSubBtn', function () {
-            var formData = new FormData();
-            formData.append('Id', $('#SubId').val());
-            formData.append('ServiceId', $('#Id').val());
-            formData.append('LangId', $('#SubLangId').val());
-            formData.append('Title', $('#SubTitle').val());
-            formData.append('Description', $('#SubDescription').val());
-            formData.append('IconUrl', $('#ImageUrl').val());
-            formData.append('File', $('#File')[0].files[0]);
-
-            $.ajax({
-                type: "POST",
-                url: "/Admin/Services/ManageSubItem",
-                data: formData,
-                contentType: false,
-                processData: false,
-                success: function (response) {
-                    if (response.isSuccess) {
-                        window.location.reload();
-                    }
-                    else {
-                        alert(response.errors);
-                    }
-                }
-            });
-        });
-        $(document).on('change', '#File', function () {
-            var reader = new FileReader();
-            reader.onload = function (e) {
-                $('#ImagePreview').attr('src', e.target.result);
-            }
-            reader.readAsDataURL(this.files[0]);
-        });
-    });
-
-    function getSubItem(id) {
-        $.ajax({
-            type: "GET",
-            url: "/Admin/Services/GetSubItem",
-            data: { id: id, serviceID: $('#Id').val(), languageId: $('#SubLangId').val() },
-            success: function (response) {
-                $('#SubId').val(response.id);
-                $('#SubTitle').val(response.title);
-                $('#SubDescription').val(response.description);
-                $('#ImageUrl').val(response.iconUrl);
-                if (response.imageUrl != null) {
-                    $('#ImagePreview').attr('src', '/Images/' + response.imageUrl);
-                }
-
-            },
-            error: function () {
-                alert('An unexpected error occurred.');
-            }
-        });
-    }
-</script> *@

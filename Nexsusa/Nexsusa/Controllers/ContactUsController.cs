@@ -5,7 +5,7 @@ using Services.ContactUsPageServices;
 
 namespace Nexsusa_Api.Controllers
 {
-    [Route("api/[controller]/[action]")]
+    [Route("[controller]/[action]")]
     [ApiController]
     public class ContactUsController(IContactUsService _contactUsPageService) : ControllerBase
     {

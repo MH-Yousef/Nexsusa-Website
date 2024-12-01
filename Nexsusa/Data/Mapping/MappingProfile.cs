@@ -52,7 +52,6 @@ namespace Data.Mapping
             CreateMap<ClientSaysItem, ClientSaysItemDTO>().ReverseMap();
             //====================================================================================================
             CreateMap<Footer, FooterDTO>().ReverseMap();
-            CreateMap<FooterService, FooterServiceDTO>().ReverseMap();
             CreateMap<QuickLink, QuickLinkDTO>().ReverseMap();
             //====================================================================================================
             CreateMap<OurCompany, OurCompanyDTO>().ReverseMap();

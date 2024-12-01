@@ -140,12 +140,12 @@
                 data: formData,
                 contentType: false,
                 processData: false,
-                success: function (response) {
-                    if (response.isSuccess) {
+                success: function (response ) {
+                    if (response.success) {
                         window.location.reload();
                     }
                     else {
-                        alert(response.errors);
+                        alert(response);
                     }
 
                 }
@@ -160,8 +160,8 @@
             data: { id: id},
             success: function (response) {
                 $('#Id').val(response.id);
-                $('#Key').val(response.branch);
-                $('#Value').val(response.fullName);
+                $('#Key').val(response.key);
+                $('#Value').val(response.value);
 
             },
             error: function () {

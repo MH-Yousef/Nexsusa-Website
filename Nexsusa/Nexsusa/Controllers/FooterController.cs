@@ -14,13 +14,8 @@ namespace Nexsusa_Api.Controllers
         [HttpGet]
         public async Task<ResponseResult<FooterDTO>> GetFooter(int languageId)
         {
-            var result = (await _footerService.GetList(languageId)).Data.FirstOrDefault();
-            var response = new ResponseResult<FooterDTO>
-            {
-                Data = result,
-                IsSuccess = true,
-            };
-            return response;
+            var result = await _footerService.Get(languageId);
+            return result;
         }
     }
 }

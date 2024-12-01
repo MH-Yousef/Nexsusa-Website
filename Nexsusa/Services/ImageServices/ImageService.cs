@@ -12,27 +12,32 @@ namespace Services.ImageServices
             try
             {
                 var directory = Directory.GetCurrentDirectory();
-                var path = Path.Combine(directory,"wwwroot", "Images");
+                var path = Path.Combine(directory, "wwwroot", "Images");
+
                 if (!Directory.Exists(path))
                 {
                     Directory.CreateDirectory(path);
                 }
 
-                if (file != null)
+                if (file != null && file.Length > 0)
                 {
                     var extension = Path.GetExtension(file.FileName);
                     var fileName = Guid.NewGuid() + extension;
                     var saveLocation = Path.Combine(path, fileName);
-                    var stream = new FileStream(saveLocation, FileMode.Create);
-                    await file.CopyToAsync(stream);
+
+                    using (var stream = new FileStream(saveLocation, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
 
                     return fileName;
                 }
-                return null;
+
+                return "No file uploaded.";
             }
-            catch
+            catch (Exception ex)
             {
-                return null;
+                return $"Error: {ex.Message}";
             }
         }
 

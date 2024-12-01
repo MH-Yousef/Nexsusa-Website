@@ -57,7 +57,6 @@ namespace Data.Context
         public DbSet<Image> Images { get; set; }
         public DbSet<Footer> Footers { get; set; }
         public DbSet<QuickLink> QuickLinks { get; set; }
-        public DbSet<FooterService> FooterServices { get; set; }
         public DbSet<WhoWeAre> WhoWeAres { get; set; }
         public DbSet<WhoWeAreItem> WhoWeAreItems { get; set; }
         public DbSet<WorkingProcess> WorkingProcesses { get; set; }

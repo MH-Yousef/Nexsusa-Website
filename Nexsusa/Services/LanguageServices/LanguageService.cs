@@ -186,6 +186,9 @@ namespace Services.LanguageServices
             try
             {
                 var translateDb = await _dbContext.Translates.FirstOrDefaultAsync(x => x.Id == translate.Id);
+                translateDb.Value = translate.Value;
+                _dbContext.Update(translateDb);
+                await _dbContext.SaveChangesAsync();
                 if (translateDb == null)
                 {
                     return Error<Translate>("String Resource is not found...");
