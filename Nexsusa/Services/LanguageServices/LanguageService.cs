@@ -132,13 +132,23 @@ namespace Services.LanguageServices
             }
         }
 
-        public async Task<ResponseResult<List<Translate>>> GetAllStringResources()
+        public async Task<ResponseResult<List<Translate>>> GetAllStringResources(int? languageId = null)
         {
             try
             {
-                var translates = await _dbContext.Translates.AsNoTracking()
-                    .ToListAsync();
-                if (translates == null || !translates.Any())
+                var translates = new List<Translate>();
+                if (languageId == null)
+                {
+                    translates = await _dbContext.Translates.AsNoTracking()
+                   .ToListAsync();
+                }
+                else
+                {
+                    translates = await _dbContext.Translates.AsNoTracking()
+                   .Where(x => x.LanguageId == languageId)
+                   .ToListAsync();
+                }
+                if (translates == null || translates.Count == 0)
                 {
                     return Error<List<Translate>>("String Resources not found");
                 }

@@ -11,7 +11,7 @@ namespace Nexsusa_Api.Areas.Admin.Controllers
         public async Task<IActionResult> List()
         {
             ViewBag.Languages = (await _languageService.Get(true)).Data;
-            var result = await _languageService.GetAllStringResources();
+            var result = await _languageService.GetAllStringResources(null);
             return View(result.Data);
         }
 

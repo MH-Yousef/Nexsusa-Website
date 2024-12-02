@@ -25,9 +25,9 @@ namespace Nexsusa_Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ResponseResult<List<Translate>>> GetAllStringResources()
+        public async Task<ResponseResult<List<Translate>>> GetAllStringResources(int languageId)
         {
-            var result = await _languageService.GetAllStringResources();
+            var result = await _languageService.GetAllStringResources(languageId);
             return result;
         }
     }
