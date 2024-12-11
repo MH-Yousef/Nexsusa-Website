@@ -35,13 +35,6 @@ namespace Core.HomePage
         public string PhoneNumber { get; set; }
         [Translatable]
         public string Email { get; set; }
+    }
 
-        public List<SocialLink> SocialLinks { get; set; }
-    }
-    public class SocialLink : _Base<int>
-    {
-        public string Name { get; set; }
-        public string Url { get; set; }
-        public string IconClass { get; set; }
-    }
 }

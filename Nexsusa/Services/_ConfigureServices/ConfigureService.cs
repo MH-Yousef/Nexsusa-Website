@@ -19,6 +19,7 @@ using Services.HomePageServices.WorkShowCaseServices;
 using Services.ImageServices;
 using Services.LanguageServices;
 using Services.ServicePageServices;
+using Services.SocialLinkServices;
 
 namespace Services._ConfigureServices
 {
@@ -32,6 +33,8 @@ namespace Services._ConfigureServices
             services.AddScoped<IHomePageServices, HomePageService>();
             services.AddScoped<IAboutService, AboutService>();
             services.AddScoped<IServicePageService, ServicePageService>();
+
+            services.AddScoped<ISocialLinkService, SocialLinkService>();
             
 
             services.AddScoped<INavBarItemService, NavBarItemService>();

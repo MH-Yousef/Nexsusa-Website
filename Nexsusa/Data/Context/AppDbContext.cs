@@ -4,6 +4,7 @@ using Core.Domains.Languages;
 using Core.HomePage;
 using Core.HomePage.HomePageItems;
 using Core.ServicesPage;
+using Core.SocialLinks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -34,6 +35,7 @@ namespace Data.Context
 
         public DbSet<HomePage> HomePages { get; set; }
         public DbSet<HomePageInfo> HomePageInfos { get; set; }
+        public DbSet<SocialLink> SocialLinks { get; set; }
 
         public DbSet<About> Abouts { get; set; }
         public DbSet<ServicePage> ServicePages { get; set; }

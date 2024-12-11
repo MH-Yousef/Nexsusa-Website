@@ -1129,43 +1129,6 @@ namespace Data.Migrations
                     b.ToTable("WorkingProcessItems");
                 });
 
-            modelBuilder.Entity("Core.HomePage.SocialLink", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnOrder(0);
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("HomePageInfoId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("IconClass")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Url")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("HomePageInfoId");
-
-                    b.ToTable("SocialLink");
-                });
-
             modelBuilder.Entity("Core.ServicesPage.ServicePage", b =>
                 {
                     b.Property<int>("Id")
@@ -1195,6 +1158,38 @@ namespace Data.Migrations
                     b.HasIndex("ServiceId");
 
                     b.ToTable("ServicePages");
+                });
+
+            modelBuilder.Entity("Core.SocialLinks.SocialLink", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnOrder(0);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("IconClass")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Url")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SocialLinks");
                 });
 
             modelBuilder.Entity("Core.Domains.Languages.StringResource", b =>
@@ -1395,13 +1390,6 @@ namespace Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Core.HomePage.SocialLink", b =>
-                {
-                    b.HasOne("Core.HomePage.HomePageInfo", null)
-                        .WithMany("SocialLinks")
-                        .HasForeignKey("HomePageInfoId");
-                });
-
             modelBuilder.Entity("Core.ServicesPage.ServicePage", b =>
                 {
                     b.HasOne("Core.HomePage.HomePageItems.Service", "Service")
@@ -1419,11 +1407,6 @@ namespace Data.Migrations
             modelBuilder.Entity("Core.HomePage.HomePage", b =>
                 {
                     b.Navigation("NavBarItems");
-                });
-
-            modelBuilder.Entity("Core.HomePage.HomePageInfo", b =>
-                {
-                    b.Navigation("SocialLinks");
                 });
 
             modelBuilder.Entity("Core.HomePage.HomePageItems.ChooseUs", b =>

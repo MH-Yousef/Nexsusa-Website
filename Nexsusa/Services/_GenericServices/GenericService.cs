@@ -178,10 +178,10 @@ namespace Services._GenericServices
                     {
                         hasTranslation = false;
                     }
-                    //else
-                    //{
-                    //    property.SetValue(entity, translatedValue);
-                    //}
+                    else
+                    {
+                        property.SetValue(entity, translatedValue);
+                    }
                 }
             }
 

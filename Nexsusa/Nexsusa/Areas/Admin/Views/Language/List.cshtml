@@ -160,6 +160,8 @@
             data: { id: id},
             success: function (response) {
                 $('#Id').val(response.id);
+                $('#LangId').val(response.languageId);
+                $('#SublanguageSelect').val(response.languageId);
                 $('#Key').val(response.key);
                 $('#Value').val(response.value);
 

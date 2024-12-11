@@ -196,6 +196,8 @@ namespace Services.LanguageServices
             try
             {
                 var translateDb = await _dbContext.Translates.FirstOrDefaultAsync(x => x.Id == translate.Id);
+                translateDb.Key = translate.Key;
+                translateDb.LanguageId = translate.LanguageId;
                 translateDb.Value = translate.Value;
                 _dbContext.Update(translateDb);
                 await _dbContext.SaveChangesAsync();

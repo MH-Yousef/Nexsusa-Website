@@ -93,6 +93,7 @@ namespace Services.AboutServices
                 {
                     if (isDefualtExists)
                     {
+                        var defultModel = await _dbContext.Abouts.FirstAsync();
                         var translations = new List<(string ColumnName, string ColumnValue)>
                             {
                                 ("Title", dto.Title),
@@ -105,7 +106,7 @@ namespace Services.AboutServices
                         }
                         else
                         {
-                            await _genericService.AddTranslationsAsync(StringResourceEnums.About, translations, dto.Id, dto.LangId);
+                            await _genericService.AddTranslationsAsync(StringResourceEnums.About, translations, defultModel.Id, dto.LangId);
                         }
 
 
